@@ -1,0 +1,306 @@
+.note-card {
+    position: relative;
+    z-index: var(--z-note-cards, 45);
+    background: rgba(30, 41, 59, 0.5);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    /* transition: all 0.2s ease; */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    min-width: 0;
+}
+
+
+.note-card.selected {
+    border-color: #00d4aa;
+    background: rgba(0, 212, 170, 0.02);
+}
+
+.note-checkbox-wrapper {
+    position: absolute;
+    top: 10px;   
+    left: 5px;  
+    z-index: 50;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.note-checkbox-wrapper-selected,
+.note-card:hover .note-checkbox-wrapper,
+.note-card.selected .note-checkbox-wrapper {
+    position: absolute;
+    top: 10px;   
+    left: 5px;  
+    z-index: 50;
+    cursor: pointer;
+    opacity: 1;
+    /* transform: scale(0.8); */
+    transform: scale(1);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.custom-checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05); 
+    border: 2px solid rgba(255, 255, 255, 0.3); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent; 
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.custom-checkbox.checked {
+    background: #00d4aa;
+    border-color: #00d4aa;
+    color: #111827;
+}
+
+.note-card-glow {
+    border-top-left-radius: inherit;
+}
+
+
+.note-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(0, 212, 170, 0.08);
+}
+
+.note-card.done {
+    opacity: 0.7;
+}
+
+.note-card.done .note-title {
+    text-decoration: line-through;
+    color: #64748b;
+}
+
+.note-card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    opacity: 0.8;
+}
+
+.note-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 15px 0px;
+}
+
+.note-tag {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.note-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.note-card-body {
+    margin-bottom: 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-left: -8px;
+    margin-right: -8px;
+    padding: 4px 8px;
+    transition: background 0.2s ease;
+    min-width: 0;
+    overflow: hidden;
+}
+    
+.note-card-body:hover {
+    /* background: rgba(255, 255, 255, 0.03); */
+    opacity: 0.8;
+}
+
+.note-card-body:focus-visible {
+    outline: 2px solid rgba(0, 212, 170, 0.5);
+    outline-offset: 2px;
+}
+
+.note-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+    transition: all 0.3s ease;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.note-content {
+    font-size: 14px;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    overflow: hidden;
+    max-height: calc(1.6em * 3);
+}
+
+.note-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.status-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.status-btn.completed {
+    background: rgba(0, 212, 170, 0.1);
+    border-color: rgba(0, 212, 170, 0.2);
+    color: #00d4aa;
+}
+
+.status-btn.completed:hover {
+    background: rgba(0, 212, 170, 0.15);
+}
+
+.note-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+}
+
+.note-card:hover .note-actions {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+}
+
+.action-btn.edit:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+}
+
+.action-btn.archive:hover {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+}
+
+.action-btn.unarchive:hover {
+    background: rgba(0, 212, 170, 0.15);
+    border-color: rgba(0, 212, 170, 0.3);
+    color: #00d4aa;
+}
+
+.action-btn.delete:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.action-btn.restore:hover {
+    background: rgba(0, 212, 170, 0.15);
+    border-color: rgba(0, 212, 170, 0.3);
+    color: #00d4aa;
+}
+
+.action-btn.delete-permanent:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+/* Above close overlay (40), below header (50); grid gaps stay click-through */
+.notes-app.sidebar-open .note-card {
+    z-index: var(--z-note-cards, 45);
+    pointer-events: auto;
+}
+
+/* Keep action buttons visible and clickable when smart overlay is active */
+.notes-app.sidebar-open .note-card:hover .note-actions,
+.notes-app.sidebar-open .note-actions {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@media (max-width: 768px) {
+    .note-card {
+        padding: 18px;
+    }
+
+    .note-title {
+        font-size: 16px;
+    }
+
+    .note-actions {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
