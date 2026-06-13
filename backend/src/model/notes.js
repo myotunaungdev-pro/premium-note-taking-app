@@ -12,6 +12,11 @@ export const ALLOWED_TAGS = [
 
 // Define the Schema for Notes
 const noteSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     title: {
         type: String,
         required: true,

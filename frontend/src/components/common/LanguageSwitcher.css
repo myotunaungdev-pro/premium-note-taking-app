@@ -1,0 +1,93 @@
+.lang-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.lang-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.lang-dropdown-toggle:hover,
+.lang-dropdown-toggle:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+}
+
+.lang-dropdown-toggle::after {
+    content: "";
+    display: inline-block;
+    margin-left: 4px;
+    vertical-align: 0.255em;
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
+}
+
+.lang-dropdown-menu {
+    display: none;
+    background: rgba(17, 24, 39, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    min-width: 150px;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 1000;
+    list-style: none;
+    margin: 0;
+}
+
+.lang-dropdown-menu.show {
+    display: block;
+}
+
+.lang-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    clear: both;
+    font-weight: 500;
+    color: #94a3b8;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.lang-dropdown-item:hover,
+.lang-dropdown-item:focus {
+    color: #e2e8f0;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.lang-dropdown-item.active {
+    color: #fff;
+    background-color: rgba(0, 212, 170, 0.2);
+}
+
+@media (max-width: 768px) {
+    .lang-dropdown-toggle {
+        padding: 6px 12px;
+        font-size: 13px;
+        gap: 6px;
+    }
+}

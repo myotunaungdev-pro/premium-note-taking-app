@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import router from './route/route.js';
+import authRoutes from './route/authRoutes.js';
 import { connectDB } from './utils/database.js';
 
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api', router);
 
 // Global Error Handler

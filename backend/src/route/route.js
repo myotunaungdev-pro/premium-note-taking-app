@@ -5,13 +5,16 @@ import {
     getNoteById,
     updateNote,
     deleteNote,
-    // ✨ bulk
     bulkArchiveNotes,
     bulkTrashNotes,
     bulkRestoreNotes
 } from '../controller/notesController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// Apply auth middleware to all note routes
+router.use('/notes', protect);
 
 // Fetch all notes
 router.get('/notes', getNotes);

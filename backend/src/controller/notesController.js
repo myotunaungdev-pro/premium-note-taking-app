@@ -3,7 +3,7 @@ import Note from '../model/notes.js';
 // Get all notes (Excluding soft-deleted ones if needed)
 export const getNotes = async (req, res) => {
     try {
-        const notes = await Note.find().sort({ createdAt: -1 }); // Sort by latest
+        const notes = await Note.find({ userId: req.user.id }).sort({ createdAt: -1 }); // Sort by latest
         res.status(200).json(notes);
     } catch (err) {
         res.status(500).json({ message: "Error fetching notes", error: err.message });
@@ -13,7 +13,7 @@ export const getNotes = async (req, res) => {
 // Get a single note by ID
 export const getNoteById = async (req, res) => {
     try {
-        const note = await Note.findById(req.params.id);
+        const note = await Note.findOne({ _id: req.params.id, userId: req.user.id });
         if (!note) {
             return res.status(404).json({ message: "Note not found" });
         }
@@ -27,7 +27,10 @@ export const getNoteById = async (req, res) => {
 export const createNote = async (req, res) => {
     try {
         // Mongoose automatically filters fields based on schema and sets default values
-        const newNote = new Note(req.body);
+        const newNote = new Note({
+            ...req.body,
+            userId: req.user.id // Enforce ownership
+        });
         const savedNote = await newNote.save();
 
         // Return response format matching your frontend slice (_id instead of insertedId)
@@ -40,14 +43,14 @@ export const createNote = async (req, res) => {
 // Update an existing note
 export const updateNote = async (req, res) => {
     try {
-        const updatedNote = await Note.findByIdAndUpdate(
-            req.params.id,
+        const updatedNote = await Note.findOneAndUpdate(
+            { _id: req.params.id, userId: req.user.id },
             { $set: req.body },
-            { returnDocument: 'after', runValidators: true } // Changed 'new: true' to 'returnDocument: 'after''
+            { returnDocument: 'after', runValidators: true }
         );
 
         if (!updatedNote) {
-            return res.status(404).json({ message: "Note not found" });
+            return res.status(404).json({ message: "Note not found or unauthorized" });
         }
 
         res.status(200).json({ message: "Update successful", updatedNote });
@@ -59,9 +62,9 @@ export const updateNote = async (req, res) => {
 // Delete a note permanently
 export const deleteNote = async (req, res) => {
     try {
-        const deletedNote = await Note.findByIdAndDelete(req.params.id);
+        const deletedNote = await Note.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
         if (!deletedNote) {
-            return res.status(404).json({ message: "Note not found" });
+            return res.status(404).json({ message: "Note not found or unauthorized" });
         }
         res.status(200).json({ message: "Deleted successful" });
     } catch (err) {
@@ -75,7 +78,7 @@ export const bulkArchiveNotes = async (req, res) => {
         const { ids } = req.body; // Array from frontend (example - ["id1", "id2"])
         
         await Note.updateMany(
-            { _id: { $in: ids } }, 
+            { _id: { $in: ids }, userId: req.user.id }, 
             { $set: { isArchived: true, isDeleted: false } }
         );
         
@@ -91,7 +94,7 @@ export const bulkTrashNotes = async (req, res) => {
         const { ids } = req.body;
         
         await Note.updateMany(
-            { _id: { $in: ids } }, 
+            { _id: { $in: ids }, userId: req.user.id }, 
             { $set: { isDeleted: true, isArchived: false } }
         );
         
@@ -107,7 +110,7 @@ export const bulkRestoreNotes = async (req, res) => {
         const { ids } = req.body;
         
         await Note.updateMany(
-            { _id: { $in: ids } }, 
+            { _id: { $in: ids }, userId: req.user.id }, 
             { $set: { isArchived: false, isDeleted: false } }
         );
         

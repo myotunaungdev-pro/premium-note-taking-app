@@ -13,10 +13,14 @@ import {
 import { bulkArchiveOnServer, bulkTrashOnServer, bulkRestoreOnServer } from '../store/notesThunks';
 import './Header.css';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import LanguageSwitcher from '../../components/common/LanguageSwitcher';
+import { logout } from '../store/authSlice';
 
 const Header = ({ onSelectAll }) => {
     const { t, i18n } = useTranslation();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { searchQuery, sortBy, activeView } = useSelector((state) => state.notes);
 
@@ -25,11 +29,9 @@ const Header = ({ onSelectAll }) => {
     const isSelectionMode = selectedNoteIds.length > 0;
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [isLangOpen, setIsLangOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
 
     const filterDropdownRef = useRef(null);
-    const langDropdownRef = useRef(null);
 
     useEffect(() => {
         const handleScroll = (event) => {
@@ -52,17 +54,14 @@ const Header = ({ onSelectAll }) => {
             if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
                 setIsFilterOpen(false);
             }
-            if (langDropdownRef.current && !langDropdownRef.current.contains(event.target)) {
-                setIsLangOpen(false);
-            }
         };
 
-        if (isFilterOpen || isLangOpen) {
+        if (isFilterOpen) {
             document.addEventListener('mousedown', handleClickOutside);
         }
 
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [isFilterOpen, isLangOpen]);
+    }, [isFilterOpen]);
 
     const handleSortSelect = (value) => {
         dispatch(setSortBy(value));
@@ -83,6 +82,11 @@ const Header = ({ onSelectAll }) => {
             default:
                 return t('All Notes');
         }
+    };
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/');
     };
 
     if (isSelectionMode) {
@@ -158,51 +162,7 @@ const Header = ({ onSelectAll }) => {
             </div>
 
             <div className="header-right">
-                <div
-                    className={`dropdown ${isLangOpen ? 'show' : ''}`}
-                    ref={langDropdownRef}
-                    style={{ marginRight: '8px' }}
-                >
-                    <button
-                        className={`sort-dropdown dropdown-toggle ${isLangOpen ? 'show' : ''}`}
-                        type="button"
-                        aria-expanded={isLangOpen}
-                        onClick={() => setIsLangOpen((open) => !open)}
-                        title={t("Toggle Language")}
-                    >
-                        <i className="bi bi-globe"></i>
-                        <span>{i18n.language?.toUpperCase()}</span>
-                    </button>
-                    <ul className={`dropdown-menu dropdown-menu-dark ${isLangOpen ? 'show' : ''}`}>
-                        <li>
-                            <button
-                                type="button"
-                                className={`dropdown-item ${i18n.language === 'en' ? 'active' : ''}`}
-                                onClick={() => { i18n.changeLanguage('en'); setIsLangOpen(false); }}
-                            >
-                                English
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                type="button"
-                                className={`dropdown-item ${i18n.language === 'my' ? 'active' : ''}`}
-                                onClick={() => { i18n.changeLanguage('my'); setIsLangOpen(false); }}
-                            >
-                                မြန်မာ
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                type="button"
-                                className={`dropdown-item ${i18n.language === 'th' ? 'active' : ''}`}
-                                onClick={() => { i18n.changeLanguage('th'); setIsLangOpen(false); }}
-                            >
-                                ไทย
-                            </button>
-                        </li>
-                    </ul>
-                </div>
+                <LanguageSwitcher />
                 <button 
                     className="action-btn" 
                     onClick={onSelectAll}
@@ -278,6 +238,15 @@ const Header = ({ onSelectAll }) => {
                         <span>{t('New Note')}</span>
                     </button>
                 )}
+
+                <button 
+                    className="action-btn logout-btn" 
+                    onClick={handleLogout}
+                    title={t("Logout")}
+                    style={{ marginLeft: '12px', color: '#ef4444' }}
+                >
+                    <i className="bi bi-box-arrow-right"></i>
+                </button>
             </div>
         </header>
     );
