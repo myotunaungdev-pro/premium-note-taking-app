@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { v2 as cloudinary } from 'cloudinary';
 import User from '../model/user.js';
 
 export const signup = async (req, res) => {
@@ -100,7 +101,34 @@ export const updateProfile = async (req, res) => {
         // Update fields
         if (name) user.name = name;
         if (birthdate) user.birthdate = birthdate;
-        if (avatarUrl) user.avatarUrl = avatarUrl;
+        
+        if (avatarUrl !== undefined && avatarUrl !== user.avatarUrl) {
+            // If the user already had an avatar, delete it from Cloudinary to prevent storage bloat
+            if (user.avatarUrl) {
+                try {
+                    cloudinary.config({
+                        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+                        api_key: process.env.CLOUDINARY_API_KEY,
+                        api_secret: process.env.CLOUDINARY_API_SECRET
+                    });
+
+                    const parts = user.avatarUrl.split('/upload/');
+                    if (parts.length > 1) {
+                        const pathWithVersion = parts[1];
+                        const pathWithoutVersion = pathWithVersion.replace(/^v\d+\//, '');
+                        const lastDotIndex = pathWithoutVersion.lastIndexOf('.');
+                        const publicId = lastDotIndex !== -1 ? pathWithoutVersion.substring(0, lastDotIndex) : pathWithoutVersion;
+                        
+                        if (publicId && process.env.CLOUDINARY_API_KEY) {
+                            await cloudinary.uploader.destroy(publicId);
+                        }
+                    }
+                } catch (err) {
+                    console.error("Cloudinary cleanup failed:", err);
+                }
+            }
+            user.avatarUrl = avatarUrl;
+        }
 
         const updatedUser = await user.save();
 

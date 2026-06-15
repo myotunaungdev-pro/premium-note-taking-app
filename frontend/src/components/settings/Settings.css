@@ -103,6 +103,15 @@
     color: white;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 2px solid transparent;
+}
+
+.account-avatar:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 212, 170, 0.15);
+    border-color: rgba(0, 212, 170, 0.3);
 }
 
 .initials-avatar-large {
@@ -118,31 +127,12 @@
     border-radius: inherit;
 }
 
-.avatar-upload-container {
+.avatar-lightbox-trigger {
     cursor: pointer;
 }
 
 .avatar-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.avatar-overlay i {
-    font-size: 24px;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.avatar-upload-container:hover .avatar-overlay {
-    opacity: 1;
+    display: none;
 }
 
 .account-info h3 {
@@ -156,6 +146,23 @@
     margin: 0;
     font-size: 14px;
     color: #94a3b8;
+}
+
+.btn-text-edit-avatar {
+    background: transparent;
+    border: none;
+    color: #00d4aa;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.btn-text-edit-avatar:hover {
+    color: #00fff0;
+    text-decoration: underline;
 }
 
 .profile-form .form-group {
@@ -271,9 +278,17 @@
     box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
 }
 
-.btn-save:hover {
+.btn-save:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
+}
+
+.btn-save:disabled {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+    box-shadow: none;
+    background-image: none;
 }
 
 .btn-cancel {
@@ -466,6 +481,7 @@
 }
 
 .logout-modal {
+    position: relative;
     background: #0b0f19;
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
@@ -475,6 +491,26 @@
     width: 90%;
     text-align: center;
     animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-close-icon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close-icon:hover {
+    color: #f8fafc;
 }
 
 @keyframes modalSlideIn {
@@ -548,6 +584,163 @@
     background: #dc2626;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Avatar Modal Styles */
+.modal-avatar-preview {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    color: white;
+    margin: 0 auto 32px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.avatar-modal-icon {
+    background: rgba(0, 212, 170, 0.1);
+    color: #00d4aa;
+}
+
+.avatar-modal-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-avatar-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-avatar-upload {
+    background: linear-gradient(135deg, #00d4aa 0%, #3b82f6 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.2);
+}
+
+.btn-avatar-upload:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
+}
+
+.btn-avatar-remove {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.btn-avatar-remove:hover {
+    background: #ef4444;
+    color: #fff;
+    border-color: #ef4444;
+}
+
+.btn-avatar-cancel {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    margin-top: 8px;
+}
+
+.btn-avatar-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
+/* Lightbox Styles */
+.lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    color: #fff;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 1001;
+}
+
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.lightbox-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-image {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lightbox-initials {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00d4aa 0%, #3b82f6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 @media (max-width: 768px) {

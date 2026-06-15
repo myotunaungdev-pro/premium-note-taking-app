@@ -21,7 +21,8 @@ const Settings = () => {
 
     const [isEditMode, setIsEditMode] = React.useState(false);
     const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
-    const [isUploading, setIsUploading] = React.useState(false);
+    const [isAvatarModalOpen, setIsAvatarModalOpen] = React.useState(false);
+    const [isLightboxOpen, setIsLightboxOpen] = React.useState(false);
     const fileInputRef = React.useRef(null);
 
     const [formData, setFormData] = React.useState({
@@ -38,6 +39,11 @@ const Settings = () => {
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+
+    const isFormChanged = 
+        formData.name !== (user?.name || '') ||
+        formData.email !== (user?.email || '') ||
+        formData.birthdate !== (user?.birthdate ? new Date(user.birthdate).toISOString().split('T')[0] : '');
 
     const handleSaveProfile = async (e) => {
         e.preventDefault();
@@ -62,7 +68,6 @@ const Settings = () => {
     const handleFileChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            setIsUploading(true);
             const uploadData = new FormData();
             uploadData.append('file', file);
             uploadData.append('upload_preset', 'profile_uploads');
@@ -76,9 +81,18 @@ const Settings = () => {
             } catch (error) {
                 toast.error(t('Failed to upload image'));
             } finally {
-                setIsUploading(false);
                 if (fileInputRef.current) fileInputRef.current.value = null;
             }
+        }
+    };
+
+    const handleRemoveAvatar = async () => {
+        setIsAvatarModalOpen(false);
+        try {
+            await dispatch(updateUserProfile({ avatarUrl: '' })).unwrap();
+            toast.success(t('Profile picture removed!'));
+        } catch (error) {
+            toast.error(t('Failed to remove image'));
         }
     };
 
@@ -108,26 +122,22 @@ const Settings = () => {
                     <div className="settings-card">
                         <div className="account-card-header">
                             <div 
-                                className={`account-avatar ${user?.avatarUrl ? '' : 'initials-avatar-large'} avatar-upload-container`}
-                                onClick={() => !isUploading && fileInputRef.current?.click()}
+                                className={`account-avatar ${user?.avatarUrl ? '' : 'initials-avatar-large'} avatar-lightbox-trigger`}
+                                onClick={() => setIsLightboxOpen(true)}
                             >
                                 {user?.avatarUrl ? (
                                     <img src={user.avatarUrl} alt="Avatar" className="avatar-image" />
                                 ) : (
                                     user?.name ? user.name.charAt(0).toUpperCase() : 'U'
                                 )}
-                                <div className="avatar-overlay">
-                                    {isUploading ? (
-                                        <i className="bi bi-hourglass-split"></i>
-                                    ) : (
-                                        <i className="bi bi-camera"></i>
-                                    )}
-                                </div>
                             </div>
                             <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
                             <div className="account-info">
                                 <h3>{user?.name || 'User'}</h3>
                                 <p>{user?.email || 'email@example.com'}</p>
+                                <button className="btn-text-edit-avatar" onClick={() => setIsAvatarModalOpen(true)}>
+                                    {t('Change Picture')}
+                                </button>
                             </div>
                         </div>
 
@@ -166,7 +176,7 @@ const Settings = () => {
                                     <input type="date" name="birthdate" className="form-input" value={formData.birthdate} onChange={handleInputChange} />
                                 </div>
                                 <div className="form-actions mt-3">
-                                    <button type="submit" className="btn-save">
+                                    <button type="submit" className="btn-save" disabled={!isFormChanged}>
                                         <i className="bi bi-check2"></i> {t('Save Changes')}
                                     </button>
                                     <button type="button" className="btn-cancel" onClick={handleCancelEdit}>
@@ -249,6 +259,66 @@ const Settings = () => {
                                 {t('Confirm Logout')}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {isAvatarModalOpen && (
+                <div className="logout-modal-overlay" onClick={() => setIsAvatarModalOpen(false)}>
+                    <div className="logout-modal avatar-options-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close-icon" onClick={() => setIsAvatarModalOpen(false)}>
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+
+                        <div className={`modal-avatar-preview ${user?.avatarUrl ? '' : 'initials-avatar-large'}`}>
+                            {user?.avatarUrl ? (
+                                <img src={user.avatarUrl} alt="Avatar Preview" className="avatar-image" />
+                            ) : (
+                                user?.name ? user.name.charAt(0).toUpperCase() : 'U'
+                            )}
+                        </div>
+
+                        <h3>{t('Profile Picture')}</h3>
+                        <p>{t('A picture helps people recognize you and lets you know when you\'re signed in to your account.')}</p>
+                        
+                        <div className="avatar-modal-options">
+                            <button 
+                                className="btn-avatar-option btn-avatar-upload" 
+                                onClick={() => {
+                                    setIsAvatarModalOpen(false);
+                                    fileInputRef.current?.click();
+                                }}
+                            >
+                                <i className="bi bi-upload"></i>
+                                {t('Upload from Device')}
+                            </button>
+                            {user?.avatarUrl && (
+                                <button className="btn-avatar-option btn-avatar-remove" onClick={handleRemoveAvatar}>
+                                    <i className="bi bi-trash3"></i>
+                                    {t('Remove Picture')}
+                                </button>
+                            )}
+                            <button className="btn-avatar-option btn-avatar-cancel" onClick={() => setIsAvatarModalOpen(false)}>
+                                {t('Cancel')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isLightboxOpen && (
+                <div className="lightbox-overlay" onClick={() => setIsLightboxOpen(false)}>
+                    <button className="lightbox-close" onClick={() => setIsLightboxOpen(false)}>
+                        <i className="bi bi-x-lg"></i>
+                    </button>
+                    <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+                        {user?.avatarUrl ? (
+                            <img src={user.avatarUrl} alt="Full Profile" className="lightbox-image" />
+                        ) : (
+                            <div className="lightbox-initials">
+                                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
