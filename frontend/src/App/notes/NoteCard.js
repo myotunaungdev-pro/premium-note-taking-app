@@ -29,6 +29,11 @@ const NoteCard = ({ note }) => {
         });
     };
 
+    const stripHtml = (html) => {
+        const doc = new DOMParser().parseFromString(html || '', 'text/html');
+        return doc.body.textContent || "";
+    };
+
     const handleReadNote = () => {
         dispatch(setReadingNote(note));
         dispatch(setReaderOpen(true));
@@ -126,7 +131,7 @@ const NoteCard = ({ note }) => {
                 aria-label={`Read note: ${note.title}`}
             >
                 <h3 className="note-title">{note.title}</h3>
-                <p className="note-content">{note.content}</p>
+                <p className="note-content">{stripHtml(note.content)}</p>
             </div>
 
             <div className="note-card-footer" onClick={(e) => e.stopPropagation()}>

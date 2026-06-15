@@ -1,0 +1,162 @@
+/* theme.css - Light Theme Overrides */
+
+body.light-theme {
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+/* App Backgrounds */
+.light-theme .settings-page,
+.light-theme .notes-container,
+.light-theme .auth-container,
+.light-theme .landing-page {
+    background-color: #f8fafc !important;
+}
+
+/* Sidebar */
+.light-theme .sidebar {
+    background-color: #ffffff !important;
+    border-right-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-theme .sidebar .nav-item {
+    color: #64748b !important;
+}
+
+.light-theme .sidebar .nav-item:hover,
+.light-theme .sidebar .nav-item.active {
+    background: rgba(0, 212, 170, 0.1) !important;
+    color: #00d4aa !important;
+}
+
+.light-theme .user-profile {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-theme .user-name {
+    color: #0f172a !important;
+}
+
+.light-theme .logo-icon {
+    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.2) !important;
+}
+
+/* Header */
+.light-theme .app-header {
+    background-color: rgba(248, 250, 252, 0.8) !important;
+    border-bottom-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-theme .page-title,
+.light-theme .note-title,
+.light-theme .note-content {
+    color: #0f172a !important;
+}
+
+.light-theme .search-input {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: #0f172a !important;
+}
+
+.light-theme .action-btn,
+.light-theme .new-note-btn,
+.light-theme .mobile-menu-btn,
+.light-theme .lang-dropdown-toggle,
+.light-theme .sort-dropdown {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: #64748b !important;
+}
+
+/* Note Cards */
+.light-theme .note-card {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme .note-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Settings Page */
+.light-theme .settings-card,
+.light-theme .auth-card {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme .account-info h3,
+.light-theme .preference-info,
+.light-theme .danger-card p {
+    color: #0f172a !important;
+}
+
+.light-theme .toggle-switch {
+    background: rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-theme .toggle-switch.active {
+    background: #00d4aa !important;
+}
+
+.light-theme .back-btn {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: #64748b !important;
+}
+
+/* Dropdowns & Modals */
+.light-theme .lang-dropdown-menu,
+.light-theme .dropdown-menu-dark,
+.light-theme .note-modal,
+.light-theme .reader-modal {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-theme .dropdown-item,
+.light-theme .lang-dropdown-item {
+    color: #64748b !important;
+}
+
+.light-theme .dropdown-item:hover,
+.light-theme .lang-dropdown-item:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #0f172a !important;
+}
+
+.light-theme .form-input,
+.light-theme .form-textarea,
+.light-theme .auth-input {
+    background: #f1f5f9 !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: #0f172a !important;
+}
+
+.light-theme .modal-title,
+.light-theme .auth-title {
+    color: #0f172a !important;
+}
+
+.light-theme .modal-header,
+.light-theme .modal-footer,
+.light-theme .reader-header,
+.light-theme .reader-footer {
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-theme .modal-close {
+    background: #f1f5f9 !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-theme .btn-cancel {
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: #64748b !important;
+}

@@ -13,14 +13,10 @@ import {
 import { bulkArchiveOnServer, bulkTrashOnServer, bulkRestoreOnServer } from '../store/notesThunks';
 import './Header.css';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import LanguageSwitcher from '../../components/common/LanguageSwitcher';
-import { logout } from '../store/authSlice';
 
 const Header = ({ onSelectAll }) => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const { searchQuery, sortBy, activeView } = useSelector((state) => state.notes);
 
@@ -82,11 +78,6 @@ const Header = ({ onSelectAll }) => {
             default:
                 return t('All Notes');
         }
-    };
-
-    const handleLogout = () => {
-        dispatch(logout());
-        navigate('/');
     };
 
     if (isSelectionMode) {
@@ -162,7 +153,6 @@ const Header = ({ onSelectAll }) => {
             </div>
 
             <div className="header-right">
-                <LanguageSwitcher />
                 <button 
                     className="action-btn" 
                     onClick={onSelectAll}
@@ -238,15 +228,6 @@ const Header = ({ onSelectAll }) => {
                         <span>{t('New Note')}</span>
                     </button>
                 )}
-
-                <button 
-                    className="action-btn logout-btn" 
-                    onClick={handleLogout}
-                    title={t("Logout")}
-                    style={{ marginLeft: '12px', color: '#ef4444' }}
-                >
-                    <i className="bi bi-box-arrow-right"></i>
-                </button>
             </div>
         </header>
     );

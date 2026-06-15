@@ -16,6 +16,12 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    birthdate: {
+        type: Date
+    },
+    avatarUrl: {
+        type: String
     }
 }, {
     timestamps: true

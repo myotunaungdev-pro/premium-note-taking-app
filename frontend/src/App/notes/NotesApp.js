@@ -141,7 +141,6 @@ const NotesApp = () => {
 
             <main 
                 className={`main-content ${sidebarCollapsed ? 'expanded' : ''}`}
-                onClick={isSidebarOpen ? closeSidebar : undefined}
             >
                 <Header onSelectAll={() => dispatch(selectAllNotes(filteredAndSortedNotes.map(n => n._id)))} />
 

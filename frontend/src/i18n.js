@@ -73,7 +73,27 @@ const resources = {
       "Create your account to start capturing ideas.": "Create your account to start capturing ideas.",
       "Create a password": "Create a password",
       "Toggle Language": "Toggle Language",
-      "Logout": "Logout"
+      "Logout": "Logout",
+      "Settings": "Settings",
+      "Account Details": "Account Details",
+      "Preferences": "Preferences",
+      "Theme": "Theme",
+      "Language": "Language",
+      "Subscription": "Subscription",
+      "Danger Zone": "Danger Zone",
+      "Back to Notes": "Back to Notes",
+      "Dark Mode": "Dark Mode",
+      "Light Mode": "Light Mode",
+      "Current Plan": "Current Plan",
+      "You are currently on the Pro Plan.": "You are currently on the Pro Plan.",
+      "Edit Profile": "Edit Profile",
+      "Free Plan": "Free Plan",
+      "Upgrade to Pro": "Upgrade to Pro",
+      "Save Changes": "Save Changes",
+      "Leaving so soon?": "Leaving so soon?",
+      "We will keep your notes safe and sound until you return. Are you sure you want to sign out?": "We will keep your notes safe and sound until you return. Are you sure you want to sign out?",
+      "Confirm Logout": "Confirm Logout",
+      "Birthdate": "Birthdate"
     }
   },
   my: {
@@ -148,7 +168,27 @@ const resources = {
       "Enter your full name": "သင့်အမည်အပြည့်အစုံထည့်ပါ",
       "Create a password": "စကားဝှက်တစ်ခုဖန်တီးပါ",
       "Toggle Language": "ဘာသာစကားပြောင်းရန်",
-      "Logout": "ထွက်မည်"
+      "Logout": "ထွက်မည်",
+      "Settings": "ဆက်တင်များ",
+      "Account Details": "အကောင့်အသေးစိတ်",
+      "Preferences": "စိတ်ကြိုက်ပြင်ဆင်ချက်များ",
+      "Theme": "အပြင်အဆင်",
+      "Language": "ဘာသာစကား",
+      "Subscription": "စာရင်းသွင်းမှု",
+      "Danger Zone": "အန္တရာယ်ဇုန်",
+      "Back to Notes": "မှတ်စုများသို့ပြန်သွားရန်",
+      "Dark Mode": "အမှောင်စနစ်",
+      "Light Mode": "အလင်းစနစ်",
+      "Current Plan": "လက်ရှိအစီအစဉ်",
+      "You are currently on the Pro Plan.": "သင်သည်လက်ရှိ Pro Plan တွင်ရှိနေပါသည်။",
+      "Edit Profile": "ပရိုဖိုင်ကိုတည်းဖြတ်ရန်",
+      "Free Plan": "အခမဲ့အစီအစဉ်",
+      "Upgrade to Pro": "Pro သို့အဆင့်မြှင့်ရန်",
+      "Save Changes": "ပြောင်းလဲမှုများကိုသိမ်းမည်",
+      "Leaving so soon?": "ခဏတာ ခွဲခွာတော့မလို့လား?",
+      "We will keep your notes safe and sound until you return. Are you sure you want to sign out?": "မိတ်ဆွေရဲ့ မှတ်စုတွေကို လုံလုံခြုံခြုံ သိမ်းဆည်းပေးထားပါတယ်။ အကောင့်ထဲကနေ ထွက်ဖို့ သေချာပြီလား?",
+      "Confirm Logout": "ထွက်မည်ကိုအတည်ပြုပါ",
+      "Birthdate": "မွေးသက္ကရာဇ်"
     }
   },
   th: {
@@ -223,7 +263,27 @@ const resources = {
       "Enter your full name": "ป้อนชื่อ-นามสกุลของคุณ",
       "Create a password": "สร้างรหัสผ่าน",
       "Toggle Language": "สลับภาษา",
-      "Logout": "ออกจากระบบ"
+      "Logout": "ออกจากระบบ",
+      "Settings": "การตั้งค่า",
+      "Account Details": "รายละเอียดบัญชี",
+      "Preferences": "การตั้งค่าความพึงพอใจ",
+      "Theme": "ธีม",
+      "Language": "ภาษา",
+      "Subscription": "การสมัครสมาชิก",
+      "Danger Zone": "พื้นที่อันตราย",
+      "Back to Notes": "กลับไปที่โน้ต",
+      "Dark Mode": "โหมดกลางคืน",
+      "Light Mode": "โหมดสว่าง",
+      "Current Plan": "แผนปัจจุบัน",
+      "You are currently on the Pro Plan.": "คุณกำลังอยู่ในโปรแพลน",
+      "Edit Profile": "แก้ไขโปรไฟล์",
+      "Free Plan": "แพลนฟรี",
+      "Upgrade to Pro": "อัปเกรดเป็น Pro",
+      "Save Changes": "บันทึกการเปลี่ยนแปลง",
+      "Leaving so soon?": "จะไปแล้วเหรอ?",
+      "We will keep your notes safe and sound until you return. Are you sure you want to sign out?": "เราจะเก็บรักษาโน้ตของคุณอย่างปลอดภัยจนกว่าคุณจะกลับมา คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
+      "Confirm Logout": "ยืนยันการออกจากระบบ",
+      "Birthdate": "วันเกิด"
     }
   }
 };
@@ -232,7 +292,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "en", 
+    lng: localStorage.getItem('appLanguage') || "en", 
     fallbackLng: "en",
     interpolation: {
       escapeValue: false

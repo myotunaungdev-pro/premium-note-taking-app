@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { setActiveView, toggleSidebar, setSidebarCollapsed } from '../store/notesSlice';
 import { useTranslation } from 'react-i18next';
 import './Sidebar.css';
@@ -11,7 +12,9 @@ const MOBILE_BREAKPOINT = 768;
 const Sidebar = () => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { activeView, sidebarCollapsed, notes } = useSelector((state) => state.notes);
+    const { user } = useSelector((state) => state.auth);
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -79,15 +82,18 @@ const Sidebar = () => {
                 </nav>
 
                 <div className="sidebar-footer">
-                    <div className="user-profile">
-                        <div className="avatar">
-                            {/* <i className="bi bi-person-fill"></i> */}
-                            <i className="bi bi-person-circle"></i>
+                    <div className="user-profile clickable" onClick={() => navigate('/settings')}>
+                        <div className={`avatar ${user?.avatarUrl ? '' : 'initials-avatar'}`}>
+                            {user?.avatarUrl ? (
+                                <img src={user.avatarUrl} alt="Avatar" className="avatar-image" />
+                            ) : (
+                                user?.name ? user.name.charAt(0).toUpperCase() : 'U'
+                            )}
                         </div>
                         {!sidebarCollapsed && (
                             <div className="user-info">
-                                <span className="user-name">Joseph Min</span>
-                                <span className="user-plan">{t('Pro Plan')}</span>
+                                <span className="user-name">{user?.name || 'User'}</span>
+                                <span className="user-plan">{t('Free Plan')}</span>
                             </div>
                         )}
                     </div>

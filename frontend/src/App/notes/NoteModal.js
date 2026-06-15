@@ -9,6 +9,8 @@ import {
     setReaderOpen,
 } from '../store/notesSlice';
 import { addNoteToServer, updateNoteOnServer } from '../store/notesThunks';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import './NoteModal.css';
 import { useTranslation } from 'react-i18next';
 
@@ -47,7 +49,10 @@ const NoteReadView = ({ note, onClose }) => {
                 <div className="reader-body">
                     <article className="reader-page">
                         <h1 className="reader-page-title">{note.title}</h1>
-                        <div className="reader-page-content">{note.content}</div>
+                        <div 
+                            className="reader-page-content ql-editor"
+                            dangerouslySetInnerHTML={{ __html: note.content }}
+                        ></div>
                     </article>
 
                     <div className="reader-tags-section">
@@ -89,11 +94,25 @@ const NoteReadView = ({ note, onClose }) => {
 const NoteEditModal = () => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
-    const { isModalOpen, editingNote } = useSelector((state) => state.notes);
+    const { editingNote } = useSelector((state) => state.notes);
 
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
-    const [selectedTag, setSelectedTag] = useState(tagOptions[0]);
+    const [isComposing, setIsComposing] = useState(false);
+
+    const [title, setTitle] = useState(editingNote?.title || '');
+    const [content, setContent] = useState(editingNote?.content || '');
+    const [selectedTag, setSelectedTag] = useState(
+        editingNote ? (tagOptions.find((t) => t.label === editingNote.tag) || tagOptions[0]) : tagOptions[0]
+    );
+
+    const quillModules = {
+        toolbar: [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['link', 'image'],
+            ['clean']
+        ],
+    };
 
     const isUnchanged =
         title.trim() === (editingNote?.title || '').trim() &&
@@ -106,8 +125,8 @@ const NoteEditModal = () => {
 
     useEffect(() => {
         if (editingNote) {
-            setTitle(editingNote.title);
-            setContent(editingNote.content);
+            setTitle(editingNote.title || '');
+            setContent(editingNote.content || '');
             const tag = tagOptions.find((t) => t.label === editingNote.tag) || tagOptions[0];
             setSelectedTag(tag);
         } else {
@@ -115,7 +134,7 @@ const NoteEditModal = () => {
             setContent('');
             setSelectedTag(tagOptions[0]);
         }
-    }, [editingNote, isModalOpen]);
+    }, [editingNote]);
 
     const handleClose = () => {
         dispatch(setModalOpen(false));
@@ -156,8 +175,6 @@ const NoteEditModal = () => {
         handleClose();
     };
 
-    if (!isModalOpen) return null;
-
     return (
         <div className="modal-overlay" onClick={handleClose}>
             <div className="note-modal" onClick={(e) => e.stopPropagation()}>
@@ -185,14 +202,18 @@ const NoteEditModal = () => {
                             />
                         </div>
 
-                        <div className="form-group">
+                        <div 
+                            className={`form-group quill-group ${isComposing ? 'is-composing' : ''}`}
+                            onCompositionStart={() => setIsComposing(true)}
+                            onCompositionEnd={() => setIsComposing(false)}
+                        >
                             <label className="form-label">{t('Content')}</label>
-                            <textarea
-                                className="form-textarea"
+                            <ReactQuill 
+                                theme="snow" 
+                                value={content} 
+                                onChange={setContent} 
+                                modules={quillModules}
                                 placeholder={t("Write your note here...")}
-                                rows="5"
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
                             />
                         </div>
 
@@ -237,7 +258,7 @@ const NoteEditModal = () => {
 
 const NoteModal = () => {
     const dispatch = useDispatch();
-    const { isReaderOpen, readingNote } = useSelector((state) => state.notes);
+    const { isReaderOpen, readingNote, isModalOpen } = useSelector((state) => state.notes);
 
     const handleCloseReader = () => {
         dispatch(setReaderOpen(false));
@@ -249,7 +270,7 @@ const NoteModal = () => {
             {isReaderOpen && readingNote && (
                 <NoteReadView note={readingNote} onClose={handleCloseReader} />
             )}
-            <NoteEditModal />
+            {isModalOpen && <NoteEditModal />}
         </>
     );
 };

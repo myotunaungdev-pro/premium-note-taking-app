@@ -21,6 +21,12 @@ const LanguageSwitcher = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isOpen]);
 
+    const changeLang = (lang) => {
+        i18n.changeLanguage(lang);
+        localStorage.setItem('appLanguage', lang);
+        setIsOpen(false);
+    };
+
     return (
         <div className={`lang-dropdown-wrapper ${isOpen ? 'show' : ''}`} ref={dropdownRef}>
             <button
@@ -38,7 +44,7 @@ const LanguageSwitcher = () => {
                     <button
                         type="button"
                         className={`lang-dropdown-item ${i18n.language === 'en' ? 'active' : ''}`}
-                        onClick={() => { i18n.changeLanguage('en'); setIsOpen(false); }}
+                        onClick={() => changeLang('en')}
                     >
                         English
                     </button>
@@ -47,7 +53,7 @@ const LanguageSwitcher = () => {
                     <button
                         type="button"
                         className={`lang-dropdown-item ${i18n.language === 'my' ? 'active' : ''}`}
-                        onClick={() => { i18n.changeLanguage('my'); setIsOpen(false); }}
+                        onClick={() => changeLang('my')}
                     >
                         မြန်မာ
                     </button>
@@ -56,7 +62,7 @@ const LanguageSwitcher = () => {
                     <button
                         type="button"
                         className={`lang-dropdown-item ${i18n.language === 'th' ? 'active' : ''}`}
-                        onClick={() => { i18n.changeLanguage('th'); setIsOpen(false); }}
+                        onClick={() => changeLang('th')}
                     >
                         ไทย
                     </button>

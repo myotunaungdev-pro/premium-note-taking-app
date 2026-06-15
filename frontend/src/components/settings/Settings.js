@@ -1,0 +1,259 @@
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import { logout, updateUserProfile } from '../../App/store/authSlice';
+import LanguageSwitcher from '../common/LanguageSwitcher';
+import './Settings.css';
+
+const Settings = () => {
+    const { t } = useTranslation();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { user } = useSelector((state) => state.auth);
+
+    const [isDarkMode, setIsDarkMode] = React.useState(() => {
+        const savedTheme = localStorage.getItem('theme');
+        return savedTheme ? savedTheme === 'dark' : true;
+    });
+
+    const [isEditMode, setIsEditMode] = React.useState(false);
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
+    const [isUploading, setIsUploading] = React.useState(false);
+    const fileInputRef = React.useRef(null);
+
+    const [formData, setFormData] = React.useState({
+        name: user?.name || '',
+        email: user?.email || '',
+        birthdate: user?.birthdate ? new Date(user.birthdate).toISOString().split('T')[0] : ''
+    });
+
+    React.useEffect(() => {
+        document.body.classList.toggle('light-theme', !isDarkMode);
+        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    }, [isDarkMode]);
+
+    const handleInputChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSaveProfile = async (e) => {
+        e.preventDefault();
+        try {
+            await dispatch(updateUserProfile(formData)).unwrap();
+            toast.success("Profile updated successfully!");
+            setIsEditMode(false);
+        } catch (error) {
+            toast.error(error || "Failed to update profile");
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setFormData({
+            name: user?.name || '',
+            email: user?.email || '',
+            birthdate: user?.birthdate ? new Date(user.birthdate).toISOString().split('T')[0] : ''
+        });
+        setIsEditMode(false);
+    };
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setIsUploading(true);
+            const uploadData = new FormData();
+            uploadData.append('file', file);
+            uploadData.append('upload_preset', 'profile_uploads');
+            
+            try {
+                const response = await axios.post('https://api.cloudinary.com/v1_1/daiusa7bt/image/upload', uploadData);
+                const secure_url = response.data.secure_url;
+                
+                await dispatch(updateUserProfile({ avatarUrl: secure_url })).unwrap();
+                toast.success(t('Profile updated successfully!'));
+            } catch (error) {
+                toast.error(t('Failed to upload image'));
+            } finally {
+                setIsUploading(false);
+                if (fileInputRef.current) fileInputRef.current.value = null;
+            }
+        }
+    };
+
+    const handleLogoutClick = () => {
+        setIsLogoutModalOpen(true);
+    };
+
+    const confirmLogout = () => {
+        dispatch(logout());
+        navigate('/');
+    };
+
+    return (
+        <div className="settings-page">
+            <div className="settings-header">
+                <button className="back-btn" onClick={() => navigate('/notes')}>
+                    <i className="bi bi-arrow-left"></i>
+                    <span>{t('Back to Notes')}</span>
+                </button>
+                <h1 className="page-title">{t('Settings')}</h1>
+            </div>
+
+            <div className="settings-content">
+                {/* Account Details */}
+                <section className="settings-section">
+                    <h2 className="section-title">{t('Account Details')}</h2>
+                    <div className="settings-card">
+                        <div className="account-card-header">
+                            <div 
+                                className={`account-avatar ${user?.avatarUrl ? '' : 'initials-avatar-large'} avatar-upload-container`}
+                                onClick={() => !isUploading && fileInputRef.current?.click()}
+                            >
+                                {user?.avatarUrl ? (
+                                    <img src={user.avatarUrl} alt="Avatar" className="avatar-image" />
+                                ) : (
+                                    user?.name ? user.name.charAt(0).toUpperCase() : 'U'
+                                )}
+                                <div className="avatar-overlay">
+                                    {isUploading ? (
+                                        <i className="bi bi-hourglass-split"></i>
+                                    ) : (
+                                        <i className="bi bi-camera"></i>
+                                    )}
+                                </div>
+                            </div>
+                            <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
+                            <div className="account-info">
+                                <h3>{user?.name || 'User'}</h3>
+                                <p>{user?.email || 'email@example.com'}</p>
+                            </div>
+                        </div>
+
+                        {!isEditMode ? (
+                            <div className="profile-readonly">
+                                <div className="profile-data-row">
+                                    <span className="profile-data-label">{t('Full Name')}</span>
+                                    <span className="profile-data-value">{user?.name || '—'}</span>
+                                </div>
+                                <div className="profile-data-row">
+                                    <span className="profile-data-label">{t('Email')}</span>
+                                    <span className="profile-data-value">{user?.email || '—'}</span>
+                                </div>
+                                <div className="profile-data-row">
+                                    <span className="profile-data-label">{t('Birthdate')}</span>
+                                    <span className="profile-data-value">
+                                        {user?.birthdate ? new Date(user.birthdate).toLocaleDateString() : '—'}
+                                    </span>
+                                </div>
+                                <button className="btn-edit-profile mt-3" onClick={() => setIsEditMode(true)}>
+                                    <i className="bi bi-pencil"></i> {t('Edit Profile')}
+                                </button>
+                            </div>
+                        ) : (
+                            <form className="profile-form" onSubmit={handleSaveProfile}>
+                                <div className="form-group">
+                                    <label className="form-label">{t('Full Name')}</label>
+                                    <input type="text" name="name" className="form-input" value={formData.name} onChange={handleInputChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">{t('Email')}</label>
+                                    <input type="email" name="email" className="form-input" value={formData.email} onChange={handleInputChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">{t('Birthdate')}</label>
+                                    <input type="date" name="birthdate" className="form-input" value={formData.birthdate} onChange={handleInputChange} />
+                                </div>
+                                <div className="form-actions mt-3">
+                                    <button type="submit" className="btn-save">
+                                        <i className="bi bi-check2"></i> {t('Save Changes')}
+                                    </button>
+                                    <button type="button" className="btn-cancel" onClick={handleCancelEdit}>
+                                        {t('Cancel')}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                </section>
+
+                {/* Preferences */}
+                <section className="settings-section preferences-section">
+                    <h2 className="section-title">{t('Preferences')}</h2>
+                    <div className="settings-card">
+                        <div className="preference-item">
+                            <div className="preference-info">
+                                <i className="bi bi-palette"></i>
+                                <span>{t('Theme')} ({isDarkMode ? t('Dark Mode') : t('Light Mode')})</span>
+                            </div>
+                            <div 
+                                className={`toggle-switch ${isDarkMode ? 'active' : ''}`}
+                                onClick={() => setIsDarkMode(!isDarkMode)}
+                            >
+                                <div className="toggle-knob"></div>
+                            </div>
+                        </div>
+                        <div className="preference-divider"></div>
+                        <div className="preference-item">
+                            <div className="preference-info">
+                                <i className="bi bi-translate"></i>
+                                <span>{t('Language')}</span>
+                            </div>
+                            <LanguageSwitcher />
+                        </div>
+                    </div>
+                </section>
+
+                {/* Subscription */}
+                <section className="settings-section">
+                    <h2 className="section-title">{t('Subscription')}</h2>
+                    <div className="settings-card subscription-card">
+                        <div className="subscription-header">
+                            <i className="bi bi-star text-muted"></i>
+                            <h3>{t('Current Plan')}</h3>
+                        </div>
+                        <div className="subscription-body">
+                            <p>{t('Free Plan')}</p>
+                            <button className="btn-upgrade">{t('Upgrade to Pro')}</button>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Danger Zone */}
+                <section className="settings-section danger-zone">
+                    <h2 className="section-title text-danger">{t('Danger Zone')}</h2>
+                    <div className="settings-card danger-card">
+                        <p>{t('Logout')}</p>
+                        <button className="btn-logout" onClick={handleLogoutClick}>
+                            <i className="bi bi-box-arrow-right"></i>
+                            {t('Logout')}
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            {isLogoutModalOpen && (
+                <div className="logout-modal-overlay">
+                    <div className="logout-modal">
+                        <div className="logout-modal-icon">
+                            <i className="bi bi-box-arrow-right"></i>
+                        </div>
+                        <h3>{t('Leaving so soon?')}</h3>
+                        <p>{t('We will keep your notes safe and sound until you return. Are you sure you want to sign out?')}</p>
+                        <div className="logout-modal-actions">
+                            <button className="btn-modal-cancel" onClick={() => setIsLogoutModalOpen(false)}>
+                                {t('Cancel')}
+                            </button>
+                            <button className="btn-modal-confirm" onClick={confirmLogout}>
+                                {t('Confirm Logout')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default Settings;
