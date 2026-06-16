@@ -8,6 +8,7 @@ import store from "./App/store/store";
 import App from "./App";
 import './i18n';
 import './theme.css';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 const root = ReactDom.createRoot(document.getElementById("root"));
 root.render(
@@ -17,3 +18,8 @@ root.render(
         </Provider>
     </React.StrictMode>
 );
+
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://cra.link/PWA
+serviceWorkerRegistration.register();
