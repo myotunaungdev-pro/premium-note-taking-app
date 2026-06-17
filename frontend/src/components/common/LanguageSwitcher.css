@@ -84,7 +84,7 @@
     background-color: rgba(0, 212, 170, 0.2);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 904px) {
     .lang-dropdown-toggle {
         padding: 6px 12px;
         font-size: 13px;

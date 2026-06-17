@@ -489,6 +489,18 @@
         0 0 80px rgba(0, 212, 170, 0.08);
     animation: slideUp 0.3s ease;
     overflow: hidden;
+    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.4s ease;
+}
+
+.reader-modal-wide {
+    max-width: 904px;
+}
+
+.reader-modal-fullscreen {
+    max-width: 96vw;
+    max-height: 96vh;
+    height: 96vh;
+    border-radius: 12px;
 }
 
 .reader-header {
@@ -498,6 +510,47 @@
     padding: 22px 28px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     flex-shrink: 0;
+}
+
+.reader-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.view-size-controls {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.size-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+}
+
+.size-btn:hover {
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.size-btn.active {
+    background: rgba(0, 212, 170, 0.1);
+    color: #00d4aa;
 }
 
 .reader-title {
@@ -636,7 +689,7 @@
     color: #e2e8f0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 904px) {
     .reader-page {
         padding: 24px 20px;
     }

@@ -211,7 +211,7 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 904px) {
     .landing-nav {
         padding: 16px 20px;
         flex-wrap: wrap;

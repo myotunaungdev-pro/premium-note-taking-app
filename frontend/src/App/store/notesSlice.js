@@ -17,17 +17,32 @@ const notesSlice = createSlice({
         activeView: 'all',
         searchQuery: '',
         sortBy: 'latest',
-        sidebarCollapsed: false,
+        sidebarCollapsed: typeof window !== 'undefined' ? window.innerWidth <= 904 : false,
         editingNote: null,
         isModalOpen: false,
         readingNote: null,
-        isReaderOpen: false,
-        selectedNoteIds: []
+        selectedNoteIds: [],
+        categoryFilter: []
     },
     reducers: {
         setActiveView: (state, action) => { state.activeView = action.payload; },
         setSearchQuery: (state, action) => { state.searchQuery = action.payload; },
         setSortBy: (state, action) => { state.sortBy = action.payload; },
+        toggleCategoryFilter: (state, action) => {
+            const category = action.payload;
+            if (!Array.isArray(state.categoryFilter)) {
+                state.categoryFilter = [];
+            }
+            if (category === 'All') {
+                state.categoryFilter = [];
+            } else {
+                if (state.categoryFilter.includes(category)) {
+                    state.categoryFilter = state.categoryFilter.filter(c => c !== category);
+                } else {
+                    state.categoryFilter.push(category);
+                }
+            }
+        },
         toggleSidebar: (state) => { state.sidebarCollapsed = !state.sidebarCollapsed; },
         setEditingNote: (state, action) => { state.editingNote = action.payload; },
         setModalOpen: (state, action) => { state.isModalOpen = action.payload; },
@@ -99,6 +114,7 @@ export const {
     setActiveView,
     setSearchQuery,
     setSortBy,
+    toggleCategoryFilter,
     toggleSidebar,
     setEditingNote,
     setModalOpen,

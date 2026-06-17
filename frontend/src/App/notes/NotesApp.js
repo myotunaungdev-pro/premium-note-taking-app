@@ -6,21 +6,26 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import NoteCard from './NoteCard';
 import NoteModal from './NoteModal';
-import { setSidebarCollapsed } from '../store/notesSlice';
+import { setSidebarCollapsed, toggleCategoryFilter, selectAllNotes } from '../store/notesSlice';
 import { fetchNotes } from '../store/notesThunks';
-import { selectAllNotes } from '../store/notesSlice';
+import { tagOptions } from './NoteModal';
+import { useTranslation } from 'react-i18next';
 import './NotesApp.css';
 
 const NotesApp = () => {
     const dispatch = useDispatch();
+    const { t } = useTranslation();
 
     useEffect(() => {
         dispatch(fetchNotes());
     }, [dispatch]);
 
-    const { notes, activeView, searchQuery, sortBy, sidebarCollapsed } = useSelector(
+    const { notes, activeView, searchQuery, sortBy, sidebarCollapsed, categoryFilter } = useSelector(
         (state) => state.notes
     );
+
+    // Strict memoization to prevent infinite render loops caused by the empty array reference
+    const safeCategoryFilter = useMemo(() => Array.isArray(categoryFilter) ? categoryFilter : [], [categoryFilter]);
 
     const filteredAndSortedNotes = useMemo(() => {
         let filtered = notes;
@@ -46,6 +51,10 @@ const NotesApp = () => {
             );
         }
 
+        if (safeCategoryFilter.length > 0) {
+            filtered = filtered.filter((note) => safeCategoryFilter.includes(note.tag));
+        }
+
         const sorted = [...filtered];
         switch (sortBy) {
             case 'a-z':
@@ -62,7 +71,7 @@ const NotesApp = () => {
         }
 
         return sorted;
-    }, [notes, activeView, searchQuery, sortBy]);
+    }, [notes, activeView, searchQuery, sortBy, safeCategoryFilter]);
 
     const getEmptyMessage = () => {
         if (searchQuery) {
@@ -94,11 +103,13 @@ const NotesApp = () => {
         dispatch(setSidebarCollapsed(true));
     }, [dispatch]);
 
-    const visibleNotes = notes.filter(note => {
-        if (activeView === 'archive') return note.isArchived && !note.isDeleted;
-        if (activeView === 'trash') return note.isDeleted;
-        return !note.isArchived && !note.isDeleted;
-    });
+    const visibleNotes = useMemo(() => {
+        return notes.filter(note => {
+            if (activeView === 'archive') return note.isArchived && !note.isDeleted;
+            if (activeView === 'trash') return note.isDeleted;
+            return !note.isArchived && !note.isDeleted;
+        });
+    }, [notes, activeView]);
 
     // Ctrl + A shortcut (Event Listener)
     useEffect(() => {
@@ -137,12 +148,45 @@ const NotesApp = () => {
 
     return (
         <div className={`notes-app ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+            {isSidebarOpen && (
+                <div 
+                    className="sidebar-mobile-overlay" 
+                    onClick={closeSidebar}
+                ></div>
+            )}
             <Sidebar />
 
             <main 
                 className={`main-content ${sidebarCollapsed ? 'expanded' : ''}`}
             >
                 <Header onSelectAll={() => dispatch(selectAllNotes(filteredAndSortedNotes.map(n => n._id)))} />
+
+                <div className="category-chips-wrapper">
+                    <div className="category-chips-scroll">
+                        <button
+                            className={`category-chip ${safeCategoryFilter.length === 0 ? 'active' : ''}`}
+                            onClick={() => dispatch(toggleCategoryFilter('All'))}
+                        >
+                            {t('All')}
+                        </button>
+                        {tagOptions.map((tag) => {
+                            const isActive = safeCategoryFilter.includes(tag.label);
+                            return (
+                                <button
+                                    key={tag.label}
+                                    className={`category-chip ${isActive ? 'active' : ''}`}
+                                    style={{
+                                        '--chip-color': tag.color,
+                                    }}
+                                    onClick={() => dispatch(toggleCategoryFilter(tag.label))}
+                                >
+                                    {t(tag.label)}
+                                    {isActive && <i className="bi bi-x chip-close-icon"></i>}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
 
                 <div className="notes-container">
                     {filteredAndSortedNotes.length > 0 ? (

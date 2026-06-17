@@ -26,10 +26,10 @@ body,
     --app-bg: #0b0f19;
     --sidebar-width-expanded: 260px;
     --sidebar-width-collapsed: 80px;
-    --z-close-overlay: 40;
     --z-note-cards: 45;
     --z-header: 50;
-    --z-sidebar: 60;
+    --z-close-overlay: 998;
+    --z-sidebar: 999;
     --z-modal: 1000;
     --grid-min-card: 280px;
 
@@ -60,6 +60,11 @@ body,
     margin-left: var(--sidebar-width-collapsed);
 }
 
+/* ── Mobile Sidebar Overlay ── */
+.sidebar-mobile-overlay {
+    display: none;
+}
+
 .notes-container {
     flex: 1;
     padding: 32px;
@@ -84,19 +89,85 @@ body,
 }
 
 .notes-app:not(.sidebar-open) .notes-grid {
-    --grid-min-card: 280px;
+    --grid-min-card: 290px;
 }
 
 @media (max-width: 1100px) {
     .notes-app.sidebar-open .notes-grid {
-        --grid-min-card: 280px;
+        --grid-min-card: 290px;
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 904px) {
     .notes-app .notes-grid {
-        --grid-min-card: 240px;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
     }
+}
+
+/* ── Category Chips ── */
+.category-chips-wrapper {
+    width: 100%;
+    padding: 6px 32px 0;
+    background-color: var(--app-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    z-index: 10;
+}
+
+.category-chips-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-top: 10px;
+    padding-bottom: 16px;
+    scrollbar-width: none; /* Firefox */
+}
+
+.category-chips-scroll::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Edge */
+}
+
+.category-chip {
+    padding: 8px 16px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    outline: none;
+}
+
+.category-chip:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.category-chip.active {
+    background-color: color-mix(in srgb, var(--chip-color, #f8fafc) 15%, transparent);
+    color: var(--chip-color, #f8fafc);
+    border-color: var(--chip-color, #f8fafc);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--chip-color, #f8fafc) 30%, transparent);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--chip-color, #f8fafc) 50%, transparent);
+}
+
+.category-chip.active:hover {
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--chip-color, #f8fafc) 40%, transparent);
+}
+
+.chip-close-icon {
+    font-size: 16px;
+    margin-right: -4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .empty-state {
@@ -152,16 +223,40 @@ body,
     .notes-container {
         padding: 20px;
     }
+
+    .category-chips-wrapper {
+        padding: 2px 20px 0;
+    }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 904px) {
     .main-content,
     .main-content.expanded {
         margin-left: 0 !important;
         width: 100%;
     }
 
-    .notes-app.sidebar-open .notes-grid {
-        --grid-min-card: 280px;
+    .notes-app .notes-grid {
+        --grid-min-card: 240px;
+    }
+
+    .sidebar-mobile-overlay {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: var(--z-close-overlay, 40);
+        backdrop-filter: blur(3px);
+        opacity: 0;
+        animation: fadeInOverlay 0.3s forwards;
+    }
+}
+
+@keyframes fadeInOverlay {
+    to {
+        opacity: 1;
     }
 }

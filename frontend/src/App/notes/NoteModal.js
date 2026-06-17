@@ -28,6 +28,7 @@ const tagClassSlug = (label) => label.toLowerCase().replace(/\s+/g, '-');
 
 const NoteReadView = ({ note, onClose }) => {
     const { t } = useTranslation();
+    const [viewSize, setViewSize] = useState('default');
     const noteTag = tagOptions.find((t) => t.label === note.tag) || {
         label: note.tag,
         color: note.tagColor || '#94a3b8',
@@ -35,15 +36,28 @@ const NoteReadView = ({ note, onClose }) => {
 
     return (
         <div className="reader-overlay" onClick={onClose}>
-            <div className="reader-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="reader-title">
+            <div className={`reader-modal reader-modal-${viewSize}`} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="reader-title">
                 <div className="reader-header">
                     <h2 className="reader-title" id="reader-title">
                         <i className="bi bi-book"></i>
                         {note.title} <span className="reader-badge">({t('Read-Only')})</span>
                     </h2>
-                    <button className="modal-close" onClick={onClose} aria-label={t("Close View")}>
-                        <i className="bi bi-x-lg"></i>
-                    </button>
+                    <div className="reader-header-actions">
+                        <div className="view-size-controls">
+                            <button className={`size-btn ${viewSize === 'default' ? 'active' : ''}`} onClick={() => setViewSize('default')} title={t('Default Size')}>
+                                <i className="bi bi-window"></i>
+                            </button>
+                            <button className={`size-btn ${viewSize === 'wide' ? 'active' : ''}`} onClick={() => setViewSize('wide')} title={t('Wide Size')}>
+                                <i className="bi bi-aspect-ratio"></i>
+                            </button>
+                            <button className={`size-btn ${viewSize === 'fullscreen' ? 'active' : ''}`} onClick={() => setViewSize('fullscreen')} title={t('Fullscreen')}>
+                                <i className="bi bi-arrows-fullscreen"></i>
+                            </button>
+                        </div>
+                        <button className="modal-close" onClick={onClose} aria-label={t("Close View")}>
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="reader-body">

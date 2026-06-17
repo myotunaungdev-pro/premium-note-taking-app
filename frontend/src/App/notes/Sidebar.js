@@ -7,7 +7,7 @@ import { setActiveView, toggleSidebar, setSidebarCollapsed } from '../store/note
 import { useTranslation } from 'react-i18next';
 import './Sidebar.css';
 
-const MOBILE_BREAKPOINT = 768;
+const MOBILE_BREAKPOINT = 904;
 
 const Sidebar = () => {
     const { t } = useTranslation();
@@ -16,6 +16,8 @@ const Sidebar = () => {
     const { activeView, sidebarCollapsed, notes } = useSelector((state) => state.notes);
     const { user } = useSelector((state) => state.auth);
     const [isMobile, setIsMobile] = useState(false);
+    const [sidebarWidth, setSidebarWidth] = useState(260);
+    const [isResizing, setIsResizing] = useState(false);
 
     useEffect(() => {
         const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
@@ -44,8 +46,48 @@ const Sidebar = () => {
         }
     };
 
+    const startResizing = (e) => {
+        setIsResizing(true);
+        e.preventDefault();
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (!isResizing) return;
+            const newWidth = e.clientX;
+            setSidebarWidth(Math.max(200, Math.min(newWidth, 500)));
+        };
+
+        const handleMouseUp = () => {
+            setIsResizing(false);
+        };
+
+        if (isResizing) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            document.body.classList.add('is-resizing');
+        } else {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.body.classList.remove('is-resizing');
+        }
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.body.classList.remove('is-resizing');
+        };
+    }, [isResizing]);
+
+    useEffect(() => {
+        const appContainer = document.querySelector('.notes-app');
+        if (appContainer) {
+            appContainer.style.setProperty('--sidebar-width-expanded', `${sidebarWidth}px`);
+        }
+    }, [sidebarWidth]);
+
     return (
-        <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+        <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${isResizing ? 'is-resizing' : ''}`}>
                 <div className="sidebar-header">
                     <div className="logo-container">
                         <div className="logo-icon">
@@ -98,6 +140,10 @@ const Sidebar = () => {
                         )}
                     </div>
                 </div>
+                
+                {!isMobile && !sidebarCollapsed && (
+                    <div className="sidebar-resize-handle" onMouseDown={startResizing} />
+                )}
         </aside>
     );
 };
