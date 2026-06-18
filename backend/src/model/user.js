@@ -22,6 +22,16 @@ const userSchema = new mongoose.Schema({
     },
     avatarUrl: {
         type: String
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    otp: {
+        type: String
+    },
+    otpExpires: {
+        type: Date
     }
 }, {
     timestamps: true

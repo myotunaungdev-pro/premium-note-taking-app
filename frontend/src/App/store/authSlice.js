@@ -7,12 +7,52 @@ export const signupUser = createAsyncThunk(
     async (userData, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.post('/auth/signup', userData);
-            // Save token and user to local storage
+            // We do NOT save token here anymore, we wait for OTP verification
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Signup failed');
+        }
+    }
+);
+
+// Async thunk for OTP Verification
+export const verifyOTP = createAsyncThunk(
+    'auth/verifyOTP',
+    async (verificationData, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.post('/auth/verify-otp', verificationData);
+            // Save token and user to local storage after successful verification
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Signup failed');
+            return rejectWithValue(error.response?.data?.message || 'Verification failed');
+        }
+    }
+);
+
+// Async thunk for Forgot Password
+export const forgotPassword = createAsyncThunk(
+    'auth/forgotPassword',
+    async (emailData, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.post('/auth/forgot-password', emailData);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to send OTP');
+        }
+    }
+);
+
+// Async thunk for Reset Password
+export const resetPassword = createAsyncThunk(
+    'auth/resetPassword',
+    async (resetData, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.post('/auth/reset-password', resetData);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to reset password');
         }
     }
 );
@@ -92,10 +132,23 @@ const authSlice = createSlice({
             })
             .addCase(signupUser.fulfilled, (state, action) => {
                 state.isLoading = false;
+                // We don't set user and token here anymore
+            })
+            .addCase(signupUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+            // Verify OTP
+            .addCase(verifyOTP.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(verifyOTP.fulfilled, (state, action) => {
+                state.isLoading = false;
                 state.user = action.payload.user;
                 state.token = action.payload.token;
             })
-            .addCase(signupUser.rejected, (state, action) => {
+            .addCase(verifyOTP.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             })
@@ -123,6 +176,30 @@ const authSlice = createSlice({
                 state.user = action.payload.user;
             })
             .addCase(updateUserProfile.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+            // Forgot Password
+            .addCase(forgotPassword.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(forgotPassword.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(forgotPassword.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+            // Reset Password
+            .addCase(resetPassword.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(resetPassword.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(resetPassword.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             });

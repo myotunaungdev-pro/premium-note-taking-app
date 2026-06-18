@@ -7,6 +7,7 @@ import NotesApp from './App/notes/NotesApp';
 import LandingPage from './App/landing/LandingPage';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
+import ForgotPassword from './components/auth/ForgotPassword';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import PublicRoute from './components/common/PublicRoute';
 import Settings from './components/settings/Settings';
@@ -29,6 +30,7 @@ function App() {
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
                 </Route>
                 <Route element={<ProtectedRoute />}>
                     <Route path="/notes" element={<NotesApp />} />

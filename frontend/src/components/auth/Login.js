@@ -14,14 +14,32 @@ const Login = () => {
     const { isLoading } = useSelector((state) => state.auth);
 
     const [formData, setFormData] = useState({ email: '', password: '' });
+    const [formErrors, setFormErrors] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormErrors({ ...formErrors, [e.target.name]: '' });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        let errors = { email: '', password: '' };
+        let isValid = true;
+
+        if (!formData.email) {
+            errors.email = 'empty';
+            isValid = false;
+        }
+        if (!formData.password) {
+            errors.password = 'empty';
+            isValid = false;
+        }
+
+        setFormErrors(errors);
+        if (!isValid) return;
+
         try {
             await dispatch(loginUser(formData)).unwrap();
             toast.success(t("Login successful!"));
@@ -46,7 +64,7 @@ const Login = () => {
                     <h2 className="auth-title">{t("Login")}</h2>
                     <p className="auth-subtitle">{t("Welcome back to your premium workspace.")}</p>
 
-                    <form onSubmit={handleSubmit} className="auth-form">
+                    <form onSubmit={handleSubmit} className="auth-form" noValidate>
                         <div className="form-group">
                             <label htmlFor="email">{t("Email")}</label>
                             <div className="input-wrapper">
@@ -58,9 +76,9 @@ const Login = () => {
                                     placeholder={t("Enter your email")}
                                     value={formData.email}
                                     onChange={handleChange}
-                                    required
                                 />
                             </div>
+                            {formErrors.email === 'empty' && <div className="validation-error">{t("Please enter your email.")}</div>}
                         </div>
 
                         <div className="form-group">
@@ -74,7 +92,6 @@ const Login = () => {
                                     placeholder={t("Enter your password")}
                                     value={formData.password}
                                     onChange={handleChange}
-                                    required
                                 />
                                 <button 
                                     type="button" 
@@ -85,6 +102,13 @@ const Login = () => {
                                     <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                                 </button>
                             </div>
+                            {formErrors.password === 'empty' && <div className="validation-error">{t("Please enter your password.")}</div>}
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', marginTop: '-10px' }}>
+                            <Link to="/forgot-password" style={{ color: '#00d4aa', fontSize: '13px', textDecoration: 'none' }}>
+                                {t("Forgot Password?")}
+                            </Link>
                         </div>
 
                         <button type="submit" className="btn-auth-submit" disabled={isLoading}>
