@@ -77,21 +77,21 @@ const NotesApp = () => {
         if (searchQuery) {
             return {
                 icon: 'bi-search',
-                title: 'No results found',
-                text: 'Try adjusting your search terms',
+                title: t('No results found'),
+                text: t('Try adjusting your search terms'),
             };
         }
 
         switch (activeView) {
             case 'archive':
-                return { icon: 'bi-archive', title: 'Archive is empty', text: 'Archived notes will appear here' };
+                return { icon: 'bi-archive', title: t('Archive is empty'), text: t('Archived notes will appear here') };
             case 'trash':
-                return { icon: 'bi-trash3', title: 'Trash is empty', text: 'Deleted notes will appear here' };
+                return { icon: 'bi-trash3', title: t('Trash is empty'), text: t('Deleted notes will appear here') };
             default:
                 return {
                     icon: 'bi-journal-plus',
-                    title: 'No notes yet',
-                    text: 'Create your first note to get started',
+                    title: t('No notes yet'),
+                    text: t('Create your first note to get started'),
                 };
         }
     };

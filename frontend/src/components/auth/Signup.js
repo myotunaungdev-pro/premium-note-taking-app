@@ -51,7 +51,7 @@ const Signup = () => {
             toast.success(t("OTP sent to your email. Please verify."));
             setStep(2);
         } catch (error) {
-            toast.error(error || t("Signup failed"));
+            toast.error(t(error || "Signup failed"));
         }
     };
 
@@ -77,7 +77,7 @@ const Signup = () => {
             toast.success(t("Email verified successfully!"));
             navigate('/notes');
         } catch (error) {
-            toast.error(error || t("Verification failed"));
+            toast.error(t(error || "Verification failed"));
         }
     };
 
@@ -95,6 +95,9 @@ const Signup = () => {
                 <div className="auth-card">
                     {step === 1 ? (
                         <>
+                            <Link to="/" className="back-link">
+                                <i className="bi bi-arrow-left"></i> {t("Back to Home")}
+                            </Link>
                             <h2 className="auth-title">{t("Sign Up")}</h2>
                             <p className="auth-subtitle">{t("Create your account to start capturing ideas.")}</p>
 
@@ -147,7 +150,7 @@ const Signup = () => {
                                             type="button" 
                                             className="btn-toggle-password"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            title={showPassword ? t("Hide password") : t("Show password")}
+                                            title={showPassword ? t("hidePassword") : t("showPassword")}
                                         >
                                             <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                                         </button>

@@ -98,6 +98,12 @@ body,
     }
 }
 
+@media (max-width: 1391px) and (min-width: 1051px) {
+    .notes-app .notes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
 @media (max-width: 904px) {
     .notes-app .notes-grid {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;

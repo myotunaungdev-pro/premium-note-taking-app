@@ -45,7 +45,7 @@ const Login = () => {
             toast.success(t("Login successful!"));
             navigate('/notes');
         } catch (error) {
-            toast.error(error || t("Login failed"));
+            toast.error(t(error || "Login failed"));
         }
     };
 
@@ -61,6 +61,9 @@ const Login = () => {
 
             <main className="auth-main">
                 <div className="auth-card">
+                    <Link to="/" className="back-link">
+                        <i className="bi bi-arrow-left"></i> {t("Back to Home")}
+                    </Link>
                     <h2 className="auth-title">{t("Login")}</h2>
                     <p className="auth-subtitle">{t("Welcome back to your premium workspace.")}</p>
 
@@ -97,7 +100,7 @@ const Login = () => {
                                     type="button" 
                                     className="btn-toggle-password"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    title={showPassword ? t("Hide password") : t("Show password")}
+                                    title={showPassword ? t("hidePassword") : t("showPassword")}
                                 >
                                     <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                                 </button>

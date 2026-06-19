@@ -36,8 +36,9 @@ const notesSlice = createSlice({
             if (category === 'All') {
                 state.categoryFilter = [];
             } else {
-                if (state.categoryFilter.includes(category)) {
-                    state.categoryFilter = state.categoryFilter.filter(c => c !== category);
+                const index = state.categoryFilter.findIndex(c => c === category);
+                if (index !== -1) {
+                    state.categoryFilter.splice(index, 1);
                 } else {
                     state.categoryFilter.push(category);
                 }

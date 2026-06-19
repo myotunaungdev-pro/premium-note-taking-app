@@ -10,7 +10,7 @@ import {
     toggleSidebar,
     clearSelection,
 } from '../store/notesSlice';
-import { bulkArchiveOnServer, bulkTrashOnServer, bulkRestoreOnServer } from '../store/notesThunks';
+import { bulkArchiveOnServer, bulkTrashOnServer, bulkRestoreOnServer, permanentlyDeleteFromServer } from '../store/notesThunks';
 import './Header.css';
 import { useTranslation } from 'react-i18next';
 
@@ -26,6 +26,7 @@ const Header = ({ onSelectAll }) => {
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
     const filterDropdownRef = useRef(null);
 
@@ -80,6 +81,22 @@ const Header = ({ onSelectAll }) => {
         }
     };
 
+    const handleTrashOrDelete = () => {
+        if (activeView === 'trash') {
+            setIsConfirmDeleteOpen(true);
+        } else {
+            dispatch(bulkTrashOnServer(selectedNoteIds));
+        }
+    };
+
+    const confirmPermanentDelete = () => {
+        selectedNoteIds.forEach(id => {
+            dispatch(permanentlyDeleteFromServer(id));
+        });
+        dispatch(clearSelection());
+        setIsConfirmDeleteOpen(false);
+    };
+
     if (isSelectionMode) {
         return (
             <header 
@@ -108,14 +125,48 @@ const Header = ({ onSelectAll }) => {
                         </button>
                     )}
 
-                    <button className="action-btn archive-btn" onClick={() => dispatch(bulkArchiveOnServer(selectedNoteIds))}>
-                        <i className="bi bi-archive"></i>
-                    </button>
+                    {activeView !== 'archive' && (
+                        <button className="action-btn archive-btn" onClick={() => dispatch(bulkArchiveOnServer(selectedNoteIds))} title={t("Move to Archive")}>
+                            <i className="bi bi-archive"></i>
+                        </button>
+                    )}
 
-                    <button className="action-btn trash-btn" onClick={() => dispatch(bulkTrashOnServer(selectedNoteIds))}>
-                        <i className="bi bi-trash"></i>
+                    <button 
+                        className={`action-btn trash-btn ${activeView === 'trash' ? 'permanent-delete' : ''}`} 
+                        onClick={handleTrashOrDelete}
+                        title={activeView === 'trash' ? t("Permanently Delete") : t("Move to Trash")}
+                    >
+                        {activeView === 'trash' ? (
+                            <i className="bi bi-trash-fill" style={{ color: '#ef4444' }}></i>
+                        ) : (
+                            <i className="bi bi-trash"></i>
+                        )}
                     </button>
                 </div>
+
+                {isConfirmDeleteOpen && (
+                    <div className="custom-modal-overlay">
+                        <div className="custom-confirm-modal">
+                            <div className="custom-modal-header">
+                                <div className="custom-modal-icon warning">
+                                    <i className="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <h2>{t("Permanently Delete Notes")}</h2>
+                            </div>
+                            <div className="custom-modal-body">
+                                <p>{t("Are you sure you want to permanently delete these notes? This action cannot be undone.")}</p>
+                            </div>
+                            <div className="custom-modal-footer">
+                                <button className="custom-btn cancel-btn" onClick={() => setIsConfirmDeleteOpen(false)}>
+                                    {t("Cancel")}
+                                </button>
+                                <button className="custom-btn danger-btn" onClick={confirmPermanentDelete}>
+                                    {t("Delete Permanently")}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </header>
         );
     };
@@ -154,10 +205,9 @@ const Header = ({ onSelectAll }) => {
 
             <div className="header-right">
                 <button 
-                    className="action-btn" 
+                    className="select-all-btn" 
                     onClick={onSelectAll}
                     title={t("Select All")}
-                    style={{ marginRight: '8px' }}
                 >
                     <i className="bi bi-check2-all"></i>
                 </button>

@@ -68,12 +68,14 @@ const NoteReadView = ({ note, onClose }) => {
                             dangerouslySetInnerHTML={{ __html: note.content }}
                         ></div>
                     </article>
+                </div>
 
+                <div className="reader-footer">
                     <div className="reader-tags-section">
-                        <span className="form-label">{t('Tag')}</span>
                         <div className="tag-selector tag-selector-readonly">
                             {tagOptions.map((tag) => {
                                 const isActive = tag.label === noteTag.label;
+                                if (!isActive) return null; // Only show the active tag to save space
                                 return (
                                     <span
                                         key={tag.label}
@@ -92,11 +94,8 @@ const NoteReadView = ({ note, onClose }) => {
                             })}
                         </div>
                     </div>
-                </div>
-
-                <div className="reader-footer">
                     <button type="button" className="btn-close-view" onClick={onClose}>
-                        <i className="bi bi-arrows-angle-contract"></i>
+                        <i className="bi bi-x-lg"></i>
                         {t('Close View')}
                     </button>
                 </div>
@@ -191,81 +190,79 @@ const NoteEditModal = () => {
 
     return (
         <div className="modal-overlay" onClick={handleClose}>
-            <div className="note-modal" onClick={(e) => e.stopPropagation()}>
+            <form className="note-modal" onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title">
                         <i className={`bi ${editingNote ? 'bi-pencil-square' : 'bi-plus-circle'}`}></i>
                         {editingNote ? t('Edit Note') : t('Create New Note')}
                     </h2>
-                    <button className="modal-close" onClick={handleClose}>
+                    <button type="button" className="modal-close" onClick={handleClose}>
                         <i className="bi bi-x-lg"></i>
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="modal-body">
-                        <div className="form-group">
-                            <label className="form-label">{t('Title')}</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder={t("Enter note title...")}
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-
-                        <div 
-                            className={`form-group quill-group ${isComposing ? 'is-composing' : ''}`}
-                            onCompositionStart={() => setIsComposing(true)}
-                            onCompositionEnd={() => setIsComposing(false)}
-                        >
-                            <label className="form-label">{t('Content')}</label>
-                            <ReactQuill 
-                                theme="snow" 
-                                value={content} 
-                                onChange={setContent} 
-                                modules={quillModules}
-                                placeholder={t("Write your note here...")}
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">{t('Tag')}</label>
-                            <div className="tag-selector">
-                                {tagOptions.map((tag) => (
-                                    <button
-                                        key={tag.label}
-                                        type="button"
-                                        className={`tag-option tag-option--${tagClassSlug(tag.label)} ${selectedTag.label === tag.label ? 'selected' : ''}`}
-                                        style={{
-                                            '--tag-color': tag.color,
-                                            backgroundColor: selectedTag.label === tag.label ? `${tag.color}20` : 'transparent',
-                                            borderColor: selectedTag.label === tag.label ? tag.color : 'rgba(255,255,255,0.1)',
-                                            color: selectedTag.label === tag.label ? tag.color : '#94a3b8',
-                                        }}
-                                        onClick={() => setSelectedTag(tag)}
-                                    >
-                                        <span className="tag-dot" style={{ backgroundColor: tag.color }}></span>
-                                        {t(tag.label)}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                <div className="modal-body">
+                    <div className="form-group">
+                        <label className="form-label">{t('Title')}</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            placeholder={t("Enter note title...")}
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            autoFocus
+                        />
                     </div>
 
-                    <div className="modal-footer">
-                        <button type="button" className="btn-cancel" onClick={handleClose}>
-                            {t('Cancel')}
-                        </button>
-                        <button type="submit" className="btn-save" disabled={isButtonDisabled}>
-                            <i className={`bi ${editingNote ? 'bi-check-lg' : 'bi-plus-lg'}`}></i>
-                            {editingNote ? t('Update Note') : t('Create Note')}
-                        </button>
+                    <div 
+                        className={`form-group quill-group ${isComposing ? 'is-composing' : ''}`}
+                        onCompositionStart={() => setIsComposing(true)}
+                        onCompositionEnd={() => setIsComposing(false)}
+                    >
+                        <label className="form-label">{t('Content')}</label>
+                        <ReactQuill 
+                            theme="snow" 
+                            value={content} 
+                            onChange={setContent} 
+                            modules={quillModules}
+                            placeholder={t("Write your note here...")}
+                        />
                     </div>
-                </form>
-            </div>
+
+                    <div className="form-group">
+                        <label className="form-label">{t('Tag')}</label>
+                        <div className="tag-selector">
+                            {tagOptions.map((tag) => (
+                                <button
+                                    key={tag.label}
+                                    type="button"
+                                    className={`tag-option tag-option--${tagClassSlug(tag.label)} ${selectedTag.label === tag.label ? 'selected' : ''}`}
+                                    style={{
+                                        '--tag-color': tag.color,
+                                        backgroundColor: selectedTag.label === tag.label ? `${tag.color}20` : 'transparent',
+                                        borderColor: selectedTag.label === tag.label ? tag.color : 'rgba(255,255,255,0.1)',
+                                        color: selectedTag.label === tag.label ? tag.color : '#94a3b8',
+                                    }}
+                                    onClick={() => setSelectedTag(tag)}
+                                >
+                                    <span className="tag-dot" style={{ backgroundColor: tag.color }}></span>
+                                    {t(tag.label)}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal-footer">
+                    <button type="button" className="btn-cancel" onClick={handleClose}>
+                        {t('Cancel')}
+                    </button>
+                    <button type="submit" className="btn-save" disabled={isButtonDisabled}>
+                        <i className={`bi ${editingNote ? 'bi-check-lg' : 'bi-plus-lg'}`}></i>
+                        {editingNote ? t('Update Note') : t('Create Note')}
+                    </button>
+                </div>
+            </form>
         </div>
     );
 };

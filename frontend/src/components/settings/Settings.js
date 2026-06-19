@@ -49,10 +49,10 @@ const Settings = () => {
         e.preventDefault();
         try {
             await dispatch(updateUserProfile(formData)).unwrap();
-            toast.success("Profile updated successfully!");
+            toast.success(t("Profile updated successfully!"));
             setIsEditMode(false);
         } catch (error) {
-            toast.error(error || "Failed to update profile");
+            toast.error(t(error || "Failed to update profile"));
         }
     };
 

@@ -33,7 +33,7 @@ const ForgotPassword = () => {
             toast.success(t("Password reset OTP sent to your email."));
             setStep(2);
         } catch (error) {
-            toast.error(error || t("Failed to send OTP"));
+            toast.error(t(error || "Failed to send OTP"));
         }
     };
 
@@ -65,7 +65,7 @@ const ForgotPassword = () => {
             toast.success(t("Password reset successfully! You can now log in."));
             navigate('/login');
         } catch (error) {
-            toast.error(error || t("Failed to reset password"));
+            toast.error(t(error || "Failed to reset password"));
         }
     };
 
@@ -83,6 +83,9 @@ const ForgotPassword = () => {
                 <div className="auth-card">
                     {step === 1 ? (
                         <>
+                            <Link to="/" className="back-link">
+                                <i className="bi bi-arrow-left"></i> {t("Back to Home")}
+                            </Link>
                             <h2 className="auth-title">{t("Forgot Password")}</h2>
                             <p className="auth-subtitle">{t("Enter your email address to receive a secure reset code.")}</p>
 
