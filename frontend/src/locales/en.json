@@ -205,5 +205,8 @@
   "Hide": "Hide",
   "showPassword": "Show Password",
   "hidePassword": "Hide Password",
-  "Failed to update profile": "Failed to update profile"
+  "Failed to update profile": "Failed to update profile",
+  "Permanently Delete Note": "Permanently Delete Note",
+  "Are you sure you want to permanently delete this note? This action cannot be undone.": "Are you sure you want to permanently delete this note? This action cannot be undone.",
+  "Invalid email or password": "Invalid email or password"
 }

@@ -205,5 +205,8 @@
   "Hide": "Hide",
   "showPassword": "စကားဝှက်ကို ပြမည်",
   "hidePassword": "စကားဝှက်ကို ဖျောက်မည်",
-  "Failed to update profile": "ပရိုဖိုင်ကို အပ်ဒိတ်လုပ်ရန် ပျက်ကွက်ခဲ့သည်"
+  "Failed to update profile": "ပရိုဖိုင်ကို အပ်ဒိတ်လုပ်ရန် ပျက်ကွက်ခဲ့သည်",
+  "Permanently Delete Note": "မှတ်စုကို အပြီးအပိုင်ဖျက်မည်",
+  "Are you sure you want to permanently delete this note? This action cannot be undone.": "ဤမှတ်စုကို အပြီးအပိုင်ဖျက်ရန် သေချာပါသလား? ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဆုတ်၍မရပါ။",
+  "Invalid email or password": "အီးမေးလ် သို့မဟုတ် စကားဝှက် မှားယွင်းနေပါသည်"
 }

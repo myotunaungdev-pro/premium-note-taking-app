@@ -201,5 +201,8 @@
   "Deleted notes will appear here": "บันทึกที่ถูกลบจะปรากฏที่นี่",
   "No notes yet": "ยังไม่มีบันทึก",
   "Create your first note to get started": "สร้างบันทึกแรกของคุณเพื่อเริ่มต้น",
-  "Failed to update profile": "ไม่สามารถอัปเดตโปรไฟล์ได้"
+  "Failed to update profile": "ไม่สามารถอัปเดตโปรไฟล์ได้",
+  "Permanently Delete Note": "ลบบันทึกอย่างถาวร",
+  "Are you sure you want to permanently delete this note? This action cannot be undone.": "คุณแน่ใจหรือไม่ว่าต้องการลบบันทึกนี้อย่างถาวร? การดำเนินการนี้ไม่สามารถยกเลิกได้",
+  "Invalid email or password": "อีเมลหรือรหัสผ่านไม่ถูกต้อง"
 }

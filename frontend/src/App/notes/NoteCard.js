@@ -9,11 +9,11 @@ import {
     setReaderOpen,
     toggleSelectNote
 } from '../store/notesSlice';
-import { updateNoteOnServer, permanentlyDeleteFromServer } from '../store/notesThunks';
+import { updateNoteOnServer } from '../store/notesThunks';
 import './NoteCard.css';
 import { useTranslation } from 'react-i18next';
 
-const NoteCard = ({ note }) => {
+const NoteCard = ({ note, onDeleteRequest }) => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const { activeView } = useSelector((state) => state.notes);
@@ -85,9 +85,11 @@ const NoteCard = ({ note }) => {
     };
 
     // Permanent Delete
-    const handlePermanentDelete = (e) => {
+    const handlePermanentDeleteClick = (e) => {
         e.stopPropagation();
-        dispatch(permanentlyDeleteFromServer(note._id));
+        if (onDeleteRequest) {
+            onDeleteRequest(note);
+        }
     };
 
     return (
@@ -152,8 +154,8 @@ const NoteCard = ({ note }) => {
                             <button className="action-btn restore" onClick={handleRestore} title={t("Restore")}>
                                 <i className="bi bi-arrow-counterclockwise"></i>
                             </button>
-                            <button className="action-btn delete-permanent" onClick={handlePermanentDelete} title={t("Delete Forever")}>
-                                <i className="bi bi-trash3-fill"></i>
+                            <button className="action-btn delete-permanent" onClick={handlePermanentDeleteClick} title={t("Delete Forever")}>
+                                <i className="bi bi-trash-fill" style={{ color: '#ef4444' }}></i>
                             </button>
                         </>
                     ) : (

@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import NoteCard from './NoteCard';
 import NoteModal from './NoteModal';
 import { setSidebarCollapsed, toggleCategoryFilter, selectAllNotes } from '../store/notesSlice';
-import { fetchNotes } from '../store/notesThunks';
+import { fetchNotes, permanentlyDeleteFromServer } from '../store/notesThunks';
 import { tagOptions } from './NoteModal';
 import { useTranslation } from 'react-i18next';
 import './NotesApp.css';
@@ -15,6 +15,14 @@ import './NotesApp.css';
 const NotesApp = () => {
     const dispatch = useDispatch();
     const { t } = useTranslation();
+    const [noteToDelete, setNoteToDelete] = useState(null);
+
+    const confirmPermanentDelete = () => {
+        if (noteToDelete) {
+            dispatch(permanentlyDeleteFromServer(noteToDelete._id));
+            setNoteToDelete(null);
+        }
+    };
 
     useEffect(() => {
         dispatch(fetchNotes());
@@ -192,7 +200,7 @@ const NotesApp = () => {
                     {filteredAndSortedNotes.length > 0 ? (
                         <div className="notes-grid">
                             {filteredAndSortedNotes.map((note) => (
-                                <NoteCard key={note._id} note={note} />
+                                <NoteCard key={note._id} note={note} onDeleteRequest={(note) => setNoteToDelete(note)} />
                             ))}
                         </div>
                     ) : (
@@ -208,6 +216,30 @@ const NotesApp = () => {
             </main>
 
             <NoteModal />
+
+            {noteToDelete && (
+                <div className="custom-modal-overlay" onClick={() => setNoteToDelete(null)}>
+                    <div className="custom-confirm-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="custom-modal-header">
+                            <div className="custom-modal-icon warning">
+                                <i className="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <h2>{t("Permanently Delete Note")}</h2>
+                        </div>
+                        <div className="custom-modal-body">
+                            <p>{t("Are you sure you want to permanently delete this note? This action cannot be undone.")}</p>
+                        </div>
+                        <div className="custom-modal-footer">
+                            <button className="custom-btn cancel-btn" onClick={() => setNoteToDelete(null)}>
+                                {t("Cancel")}
+                            </button>
+                            <button className="custom-btn danger-btn" onClick={confirmPermanentDelete}>
+                                {t("Delete Permanently")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
