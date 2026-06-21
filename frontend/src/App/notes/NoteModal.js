@@ -16,7 +16,23 @@ import { useTranslation } from 'react-i18next';
 import Lightbox from '../../components/common/Lightbox';
 
 const Font = Quill.import('formats/font');
-Font.whitelist = ['lora', 'padauk', 'dancing-script', 'playfair-display'];
+Font.whitelist = ['', 'lora', 'padauk', 'dancing-script', 'playfair-display'];
+
+// Phase 1.5 Strict Normalization: Quill's default ClassAttributor splits class names 
+// by the last hyphen. For multi-word fonts (e.g., ql-font-dancing-script), this incorrectly 
+// yields 'ql-font-dancing' as the key, causing string matching errors during HTML hydration.
+// We safely normalize the keys() parsing so it exactly matches the 'ql-font' whitelist.
+if (Font.constructor && Font.constructor.keys) {
+    Font.constructor.keys = function(node) {
+        return Array.from(node.classList).map(name => {
+            if (name.startsWith('ql-font-')) {
+                return 'ql-font';
+            }
+            return name.split('-').slice(0, -1).join('-');
+        }).filter(name => name !== '');
+    };
+}
+
 Quill.register(Font, true);
 
 export const tagOptions = [
@@ -79,10 +95,15 @@ const NoteReadView = ({ note, onClose }) => {
                         <h1 className={`reader-page-title ${note.titleFontFamily ? `ql-font-${note.titleFontFamily}` : ''}`}>{note.title}</h1>
                         <div 
                             ref={contentRef}
-                            className="reader-page-content ql-editor"
-                            dangerouslySetInnerHTML={{ __html: note.content }}
+                            className="reader-page-content"
                             onClick={handleContentClick}
-                        ></div>
+                        >
+                            <ReactQuill 
+                                value={note.content} 
+                                readOnly={true} 
+                                theme="bubble" 
+                            />
+                        </div>
                     </article>
                 </div>
 

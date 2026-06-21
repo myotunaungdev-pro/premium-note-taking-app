@@ -203,6 +203,28 @@
     white-space: pre;
 }
 
+/* Restore list markers hidden by aggressive inline/padding resets */
+.note-content ol,
+.note-content ul {
+    display: block !important;
+    padding-left: 1.5em !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    list-style-position: outside !important;
+}
+
+.note-content ol {
+    list-style-type: decimal !important;
+}
+
+.note-content ul {
+    list-style-type: disc !important;
+}
+
+.note-content li {
+    display: list-item !important;
+}
+
 /* Hide images and non-text elements from the preview */
 .note-content img,
 .note-content iframe,

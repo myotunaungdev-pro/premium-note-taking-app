@@ -510,17 +510,17 @@
     color: #3b82f6 !important;
 }
 
-.light-theme .reader-page-content.ql-editor {
-    color: #334155 !important;
+.light-theme .reader-page-content .ql-editor {
+    color: #1e293b !important;
 }
 
-.light-theme .reader-page-content.ql-editor h1,
-.light-theme .reader-page-content.ql-editor h2,
-.light-theme .reader-page-content.ql-editor h3 {
-    color: #0f172a;
+.light-theme .reader-page-content .ql-editor h1,
+.light-theme .reader-page-content .ql-editor h2,
+.light-theme .reader-page-content .ql-editor h3 {
+    color: #0f172a !important;
 }
 
-.light-theme .reader-page-content.ql-editor a {
+.light-theme .reader-page-content .ql-editor a {
     color: #3b82f6;
 }
 
@@ -787,12 +787,13 @@ h1.reader-page-title {
     overflow-x: hidden;
     position: relative;
     max-height: none !important;
-    overflow-y: visible !important;
+    overflow-y: auto !important; /* Wrapper handles scrolling */
     flex: 1;
+    min-height: 0; /* Ensures flex container can shrink and scroll */
 }
 
 .reader-page-content p,
-.reader-page-content.ql-editor p {
+.reader-page-content .ql-editor p {
     overflow-wrap: anywhere !important;
     word-break: break-word !important;
     white-space: pre-wrap !important;
@@ -801,23 +802,33 @@ h1.reader-page-title {
     min-width: 0;
 }
 
-.reader-page-content > *:first-child {
+.reader-page-content > *:first-child,
+.reader-page-content .ql-editor > *:first-child {
     margin-top: 0 !important;
 }
 
-.reader-page-content.ql-editor {
+.reader-page-content .ql-container,
+.reader-page-content .ql-editor {
+    height: auto !important; /* Remove ReactQuill fixed heights */
+}
+
+.reader-page-content .ql-editor {
     color: #0f172a !important;
     padding: 0 !important; /* Neutralize Quill's default padding */
+    overflow-y: visible !important; /* Let wrapper handle scrolling */
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: pre-wrap !important; /* Force long strings to wrap */
 }
 
 /* Force Point C - Bottom Spacing */
-.reader-page-content.ql-editor > *:last-child {
+.reader-page-content .ql-editor > *:last-child {
     padding-bottom: 56px !important;
 }
 
 /* Responsive Image Handling for Note Contents */
 .reader-page-content img,
-.reader-page-content.ql-editor img {
+.reader-page-content .ql-editor img {
     cursor: pointer;
     max-width: 100% !important;
     height: auto !important;
