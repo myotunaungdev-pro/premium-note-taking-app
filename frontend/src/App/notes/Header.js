@@ -151,10 +151,10 @@ const Header = ({ onSelectAll }) => {
                                 <div className="custom-modal-icon warning">
                                     <i className="bi bi-exclamation-triangle"></i>
                                 </div>
-                                <h2>{t("Permanently Delete Notes")}</h2>
+                                <h2>{selectedNoteIds.length === 1 ? t("Permanently Delete Note") : t("Permanently Delete Notes")}</h2>
                             </div>
                             <div className="custom-modal-body">
-                                <p>{t("Are you sure you want to permanently delete these notes? This action cannot be undone.")}</p>
+                                <p>{selectedNoteIds.length === 1 ? t("Are you sure you want to permanently delete this note? This action cannot be undone.") : t("Are you sure you want to permanently delete these notes? This action cannot be undone.")}</p>
                             </div>
                             <div className="custom-modal-footer">
                                 <button className="custom-btn cancel-btn" onClick={() => setIsConfirmDeleteOpen(false)}>

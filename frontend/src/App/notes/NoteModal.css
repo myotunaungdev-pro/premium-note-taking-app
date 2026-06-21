@@ -1,4 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Padauk:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* Quill Custom Fonts */
+.ql-font-lora { font-family: 'Lora', serif !important; }
+.ql-font-padauk { font-family: 'Padauk', sans-serif !important; }
+.ql-font-dancing-script { font-family: 'Dancing Script', cursive !important; }
+.ql-font-playfair-display { font-family: 'Playfair Display', serif !important; }
+
+/* Font Picker Styles */
+.ql-snow .ql-picker.ql-font {
+    width: 140px;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item::before {
+    content: 'Sans Serif';
+    font-family: inherit;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="lora"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="lora"]::before {
+    content: 'Lora';
+    font-family: 'Lora', serif;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="padauk"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="padauk"]::before {
+    content: 'Padauk (Myanmar)';
+    font-family: 'Padauk', sans-serif;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="dancing-script"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="dancing-script"]::before {
+    content: 'Dancing Script';
+    font-family: 'Dancing Script', cursive;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="playfair-display"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="playfair-display"]::before {
+    content: 'Playfair Display';
+    font-family: 'Playfair Display', serif;
+}
 
 /* Tag palette (mirrors tagOptions in NoteModal.js) */
 :root {
@@ -238,6 +274,70 @@
     display: none !important;
 }
 
+/* --- Custom Title Font Dropdown --- */
+.title-font-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 140px;
+}
+
+.title-font-dropdown-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.title-font-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 6px 0;
+    min-width: 160px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    animation: fadeIn 0.2s ease;
+}
+
+.title-font-dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: #cbd5e1;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.title-font-dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #00d4aa;
+}
+
+.title-font-dropdown-item.active {
+    color: #00d4aa;
+    background: rgba(0, 212, 170, 0.1);
+}
+
+.title-font-dropdown-item i {
+    font-size: 14px;
+}
+
 /* Toolbar Buttons styling */
 .ql-snow .ql-picker {
     color: #cbd5e1 !important;
@@ -360,6 +460,38 @@
 .light-theme .ql-snow.ql-toolbar button:hover,
 .light-theme .ql-snow.ql-toolbar button:focus,
 .light-theme .ql-snow.ql-toolbar button.ql-active {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* Light Theme Title Font Dropdown */
+.light-theme .title-font-dropdown-toggle {
+    background: #f1f5f9;
+    border-color: rgba(15, 23, 42, 0.1);
+    color: #1e293b;
+}
+
+.light-theme .title-font-dropdown-toggle:hover {
+    background: #e2e8f0;
+    border-color: rgba(15, 23, 42, 0.2);
+}
+
+.light-theme .title-font-dropdown-menu {
+    background: #ffffff;
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.light-theme .title-font-dropdown-item {
+    color: #475569;
+}
+
+.light-theme .title-font-dropdown-item:hover {
+    background: #f1f5f9;
+    color: #3b82f6;
+}
+
+.light-theme .title-font-dropdown-item.active {
+    color: #3b82f6;
     background: rgba(59, 130, 246, 0.1);
 }
 
@@ -637,6 +769,8 @@ h1.reader-page-title {
     margin: 0 0 48px 0 !important; /* Force Point B */
     line-height: 1.35;
     position: relative;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .reader-page-content {
@@ -679,6 +813,19 @@ h1.reader-page-title {
 /* Force Point C - Bottom Spacing */
 .reader-page-content.ql-editor > *:last-child {
     padding-bottom: 56px !important;
+}
+
+/* Responsive Image Handling for Note Contents */
+.reader-page-content img,
+.reader-page-content.ql-editor img {
+    cursor: pointer;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain;
+    display: block;
+    margin: 24px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Extra premium touch */
 }
 
 .reader-tags-section {
@@ -773,6 +920,14 @@ h1.reader-page-title {
 
     .view-size-controls {
         display: none;
+    }
+
+    article.reader-page {
+        padding: 20px 16px 0px 16px !important;
+    }
+
+    .reader-body {
+        padding: 12px 10px;
     }
 
     .reader-footer {

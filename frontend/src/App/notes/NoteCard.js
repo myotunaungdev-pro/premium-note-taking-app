@@ -29,10 +29,7 @@ const NoteCard = ({ note, onDeleteRequest }) => {
         });
     };
 
-    const stripHtml = (html) => {
-        const doc = new DOMParser().parseFromString(html || '', 'text/html');
-        return doc.body.textContent || "";
-    };
+    // Removed stripHtml, safely rendering HTML directly
 
     const handleReadNote = () => {
         dispatch(setReadingNote(note));
@@ -132,8 +129,8 @@ const NoteCard = ({ note, onDeleteRequest }) => {
                 tabIndex={0}
                 aria-label={`Read note: ${note.title}`}
             >
-                <h3 className="note-title">{note.title}</h3>
-                <p className="note-content">{stripHtml(note.content)}</p>
+                <h3 className={`note-title ${note.titleFontFamily ? `ql-font-${note.titleFontFamily}` : ''}`}>{note.title}</h3>
+                <div className="note-content" dangerouslySetInnerHTML={{ __html: note.content }}></div>
             </div>
 
             <div className="note-card-footer" onClick={(e) => e.stopPropagation()}>

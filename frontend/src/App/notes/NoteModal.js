@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     setModalOpen,
@@ -9,10 +9,15 @@ import {
     setReaderOpen,
 } from '../store/notesSlice';
 import { addNoteToServer, updateNoteOnServer } from '../store/notesThunks';
-import ReactQuill from 'react-quill-new';
+import ReactQuill, { Quill } from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import './NoteModal.css';
 import { useTranslation } from 'react-i18next';
+import Lightbox from '../../components/common/Lightbox';
+
+const Font = Quill.import('formats/font');
+Font.whitelist = ['lora', 'padauk', 'dancing-script', 'playfair-display'];
+Quill.register(Font, true);
 
 export const tagOptions = [
     { label: 'Work', color: '#00d4aa' },
@@ -29,12 +34,21 @@ const tagClassSlug = (label) => label.toLowerCase().replace(/\s+/g, '-');
 const NoteReadView = ({ note, onClose }) => {
     const { t } = useTranslation();
     const [viewSize, setViewSize] = useState('default');
+    const [activeLightboxImage, setActiveLightboxImage] = useState(null);
+    const contentRef = useRef(null);
     const noteTag = tagOptions.find((t) => t.label === note.tag) || {
         label: note.tag,
         color: note.tagColor || '#94a3b8',
     };
 
+    const handleContentClick = (e) => {
+        if (e.target.tagName === 'IMG') {
+            setActiveLightboxImage(e.target.src);
+        }
+    };
+
     return (
+        <>
         <div className="reader-overlay" onClick={onClose}>
             <div className={`reader-modal reader-modal-${viewSize}`} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="reader-title">
                 <div className="reader-header">
@@ -62,10 +76,12 @@ const NoteReadView = ({ note, onClose }) => {
 
                 <div className="reader-body">
                     <article className="reader-page">
-                        <h1 className="reader-page-title">{note.title}</h1>
+                        <h1 className={`reader-page-title ${note.titleFontFamily ? `ql-font-${note.titleFontFamily}` : ''}`}>{note.title}</h1>
                         <div 
+                            ref={contentRef}
                             className="reader-page-content ql-editor"
                             dangerouslySetInnerHTML={{ __html: note.content }}
+                            onClick={handleContentClick}
                         ></div>
                     </article>
                 </div>
@@ -101,6 +117,10 @@ const NoteReadView = ({ note, onClose }) => {
                 </div>
             </div>
         </div>
+        {activeLightboxImage && (
+            <Lightbox src={activeLightboxImage} onClose={() => setActiveLightboxImage(null)} />
+        )}
+        </>
     );
 };
 
@@ -110,15 +130,28 @@ const NoteEditModal = () => {
     const { editingNote } = useSelector((state) => state.notes);
 
     const [isComposing, setIsComposing] = useState(false);
+    const quillWrapperRef = useRef(null);
 
     const [title, setTitle] = useState(editingNote?.title || '');
+    const [titleFontFamily, setTitleFontFamily] = useState(editingNote?.titleFontFamily || '');
     const [content, setContent] = useState(editingNote?.content || '');
+    const [isTitleFontDropdownOpen, setIsTitleFontDropdownOpen] = useState(false);
+    const fontDropdownRef = useRef(null);
+
+    const titleFontOptions = [
+        { label: 'Sans Serif', value: '', fontFamily: 'inherit' },
+        { label: 'Lora', value: 'lora', fontFamily: "'Lora', serif" },
+        { label: 'Padauk', value: 'padauk', fontFamily: "'Padauk', sans-serif" },
+        { label: 'Dancing Script', value: 'dancing-script', fontFamily: "'Dancing Script', cursive" },
+        { label: 'Playfair Display', value: 'playfair-display', fontFamily: "'Playfair Display', serif" }
+    ];
     const [selectedTag, setSelectedTag] = useState(
         editingNote ? (tagOptions.find((t) => t.label === editingNote.tag) || tagOptions[0]) : tagOptions[0]
     );
 
     const quillModules = {
         toolbar: [
+            [{ 'font': ['', 'lora', 'padauk', 'dancing-script', 'playfair-display'] }],
             [{ 'header': [1, 2, 3, false] }],
             ['bold', 'italic', 'underline'],
             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
@@ -129,6 +162,7 @@ const NoteEditModal = () => {
 
     const isUnchanged =
         title.trim() === (editingNote?.title || '').trim() &&
+        titleFontFamily === (editingNote?.titleFontFamily || '') &&
         content.trim() === (editingNote?.content || '').trim() &&
         selectedTag.label === (editingNote?.tag || '');
 
@@ -139,15 +173,47 @@ const NoteEditModal = () => {
     useEffect(() => {
         if (editingNote) {
             setTitle(editingNote.title || '');
+            setTitleFontFamily(editingNote.titleFontFamily || '');
             setContent(editingNote.content || '');
             const tag = tagOptions.find((t) => t.label === editingNote.tag) || tagOptions[0];
             setSelectedTag(tag);
         } else {
             setTitle('');
+            setTitleFontFamily('');
             setContent('');
             setSelectedTag(tagOptions[0]);
         }
     }, [editingNote]);
+
+    // Advanced dropdown UX: close on outside clicks, close on editor focus, and ensure mutual exclusivity
+    useEffect(() => {
+        const handleDocumentClick = (event) => {
+            // Quill Pickers
+            if (quillWrapperRef.current) {
+                const isOutsideQuill = !quillWrapperRef.current.contains(event.target);
+                const clickedPicker = event.target.closest('.ql-picker');
+                const expandedPickers = quillWrapperRef.current.querySelectorAll('.ql-picker.ql-expanded');
+                
+                expandedPickers.forEach(picker => {
+                    if (isOutsideQuill) {
+                        picker.classList.remove('ql-expanded');
+                    } else if (picker !== clickedPicker) {
+                        picker.classList.remove('ql-expanded');
+                    }
+                });
+            }
+
+            // Title Font Dropdown
+            if (fontDropdownRef.current && !fontDropdownRef.current.contains(event.target)) {
+                setIsTitleFontDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleDocumentClick);
+        return () => {
+            document.removeEventListener('mousedown', handleDocumentClick);
+        };
+    }, []);
 
     const handleClose = () => {
         dispatch(setModalOpen(false));
@@ -162,6 +228,7 @@ const NoteEditModal = () => {
         const updatedNoteData = {
             ...editingNote,
             title: title.trim(),
+            titleFontFamily,
             content: content.trim(),
             tag: selectedTag.label,
             tagColor: selectedTag.color,
@@ -170,6 +237,7 @@ const NoteEditModal = () => {
 
         const noteData = {
             title: title.trim(),
+            titleFontFamily,
             content: content.trim(),
             tag: selectedTag.label,
             tagColor: selectedTag.color,
@@ -203,10 +271,44 @@ const NoteEditModal = () => {
 
                 <div className="modal-body">
                     <div className="form-group">
-                        <label className="form-label">{t('Title')}</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                            <label className="form-label" style={{ marginBottom: 0 }}>{t('Title')}</label>
+                            <div className="title-font-dropdown-container" ref={fontDropdownRef} style={{ position: 'relative' }}>
+                                <button 
+                                    type="button"
+                                    className="title-font-dropdown-toggle"
+                                    onClick={() => setIsTitleFontDropdownOpen(!isTitleFontDropdownOpen)}
+                                >
+                                    <span style={{ fontFamily: titleFontOptions.find(opt => opt.value === titleFontFamily)?.fontFamily || 'inherit' }}>
+                                        {titleFontOptions.find(opt => opt.value === titleFontFamily)?.label || 'Sans Serif'}
+                                    </span>
+                                    <i className="bi bi-chevron-down" style={{ fontSize: '12px', marginLeft: '6px' }}></i>
+                                </button>
+                                
+                                {isTitleFontDropdownOpen && (
+                                    <div className="title-font-dropdown-menu">
+                                        {titleFontOptions.map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                type="button"
+                                                className={`title-font-dropdown-item ${titleFontFamily === opt.value ? 'active' : ''}`}
+                                                style={{ fontFamily: opt.fontFamily }}
+                                                onClick={() => {
+                                                    setTitleFontFamily(opt.value);
+                                                    setIsTitleFontDropdownOpen(false);
+                                                }}
+                                            >
+                                                {opt.label}
+                                                {titleFontFamily === opt.value && <i className="bi bi-check2"></i>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         <input
                             type="text"
-                            className="form-input"
+                            className={`form-input ${titleFontFamily ? `ql-font-${titleFontFamily}` : ''}`}
                             placeholder={t("Enter note title...")}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
@@ -215,6 +317,7 @@ const NoteEditModal = () => {
                     </div>
 
                     <div 
+                        ref={quillWrapperRef}
                         className={`form-group quill-group ${isComposing ? 'is-composing' : ''}`}
                         onCompositionStart={() => setIsComposing(true)}
                         onCompositionEnd={() => setIsComposing(false)}

@@ -22,6 +22,10 @@ const noteSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    titleFontFamily: {
+        type: String,
+        default: ''
+    },
     content: {
         type: String,
         default: ''

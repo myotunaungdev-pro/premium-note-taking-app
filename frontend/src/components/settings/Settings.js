@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { logout, updateUserProfile } from '../../App/store/authSlice';
 import LanguageSwitcher from '../common/LanguageSwitcher';
+import Lightbox from '../common/Lightbox';
 import './Settings.css';
 
 const Settings = () => {
@@ -307,20 +308,15 @@ const Settings = () => {
             )}
 
             {isLightboxOpen && (
-                <div className="lightbox-overlay" onClick={() => setIsLightboxOpen(false)}>
-                    <button className="lightbox-close" onClick={() => setIsLightboxOpen(false)}>
-                        <i className="bi bi-x-lg"></i>
-                    </button>
-                    <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-                        {user?.avatarUrl ? (
-                            <img src={user.avatarUrl} alt="Full Profile" className="lightbox-image" />
-                        ) : (
-                            <div className="lightbox-initials">
-                                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                            </div>
-                        )}
-                    </div>
-                </div>
+                <Lightbox onClose={() => setIsLightboxOpen(false)}>
+                    {user?.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="Full Profile" className="lightbox-image" />
+                    ) : (
+                        <div className="lightbox-initials">
+                            {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                    )}
+                </Lightbox>
             )}
         </div>
     );

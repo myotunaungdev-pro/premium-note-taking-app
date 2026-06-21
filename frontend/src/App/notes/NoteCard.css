@@ -156,6 +156,7 @@
     transition: all 0.3s ease;
     overflow-wrap: break-word;
     word-break: break-word;
+    white-space: pre-wrap;
 }
 
 .note-content {
@@ -163,11 +164,50 @@
     color: #94a3b8;
     line-height: 1.6;
     margin: 0;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-    word-break: break-word;
+    
+    /* Strict height cap (exactly 3 lines at 1.6 line-height) */
+    max-height: 4.8em;
     overflow: hidden;
-    max-height: calc(1.6em * 3);
+    position: relative;
+    
+    /* Premium fade-out effect on the 3rd line (starts fading at 3.2em) */
+    -webkit-mask-image: linear-gradient(to bottom, black 3.2em, transparent 4.8em);
+    mask-image: linear-gradient(to bottom, black 3.2em, transparent 4.8em);
+    
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Safely force all rich text elements to behave like continuous inline text */
+.note-content * {
+    display: inline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: inherit !important;
+    font-weight: normal !important;
+    line-height: inherit !important;
+    background: transparent !important;
+}
+
+/* Ensure block elements get a line break so paragraphs don't mash together */
+.note-content p::after,
+.note-content h1::after,
+.note-content h2::after,
+.note-content h3::after,
+.note-content h4::after,
+.note-content h5::after,
+.note-content h6::after,
+.note-content li::after,
+.note-content div::after {
+    content: '\A';
+    white-space: pre;
+}
+
+/* Hide images and non-text elements from the preview */
+.note-content img,
+.note-content iframe,
+.note-content video {
+    display: none !important;
 }
 
 .note-card-footer {

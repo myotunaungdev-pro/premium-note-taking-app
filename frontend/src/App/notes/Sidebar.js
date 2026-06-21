@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setActiveView, toggleSidebar, setSidebarCollapsed } from '../store/notesSlice';
 import { useTranslation } from 'react-i18next';
+import Lightbox from '../../components/common/Lightbox';
 import './Sidebar.css';
 
 const MOBILE_BREAKPOINT = 904;
@@ -18,6 +19,7 @@ const Sidebar = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [sidebarWidth, setSidebarWidth] = useState(260);
     const [isResizing, setIsResizing] = useState(false);
+    const [activeLightboxImage, setActiveLightboxImage] = useState(null);
 
     useEffect(() => {
         const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
@@ -125,7 +127,16 @@ const Sidebar = () => {
 
                 <div className="sidebar-footer">
                     <div className="user-profile clickable" onClick={() => navigate('/settings')}>
-                        <div className={`avatar ${user?.avatarUrl ? '' : 'initials-avatar'}`}>
+                        <div 
+                            className={`avatar ${user?.avatarUrl ? '' : 'initials-avatar'} ${user?.avatarUrl ? 'avatar-lightbox-trigger' : ''}`}
+                            onClick={(e) => {
+                                if (user?.avatarUrl) {
+                                    e.stopPropagation();
+                                    setActiveLightboxImage(user.avatarUrl);
+                                }
+                            }}
+                            style={{ cursor: user?.avatarUrl ? 'pointer' : 'default' }}
+                        >
                             {user?.avatarUrl ? (
                                 <img src={user.avatarUrl} alt="Avatar" className="avatar-image" />
                             ) : (
@@ -143,6 +154,10 @@ const Sidebar = () => {
                 
                 {!isMobile && !sidebarCollapsed && (
                     <div className="sidebar-resize-handle" onMouseDown={startResizing} />
+                )}
+                
+                {activeLightboxImage && (
+                    <Lightbox src={activeLightboxImage} onClose={() => setActiveLightboxImage(null)} />
                 )}
         </aside>
     );
