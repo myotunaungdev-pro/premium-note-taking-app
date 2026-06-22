@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     setModalOpen,
@@ -13,7 +13,9 @@ import ReactQuill, { Quill } from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import './NoteModal.css';
 import { useTranslation } from 'react-i18next';
-import Lightbox from '../../components/common/Lightbox';
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
 
 const Font = Quill.import('formats/font');
 Font.whitelist = ['', 'lora', 'padauk', 'dancing-script', 'playfair-display'];
@@ -50,16 +52,30 @@ const tagClassSlug = (label) => label.toLowerCase().replace(/\s+/g, '-');
 const NoteReadView = ({ note, onClose }) => {
     const { t } = useTranslation();
     const [viewSize, setViewSize] = useState('default');
-    const [activeLightboxImage, setActiveLightboxImage] = useState(null);
+    const [lightboxIndex, setLightboxIndex] = useState(-1);
     const contentRef = useRef(null);
     const noteTag = tagOptions.find((t) => t.label === note.tag) || {
         label: note.tag,
         color: note.tagColor || '#94a3b8',
     };
 
+    // Extract all images from the note content for the Lightbox gallery
+    const lightboxSlides = useMemo(() => {
+        if (!note || !note.content) return [];
+        const regex = /<img[^>]+src="([^">]+)"/g;
+        let match;
+        const images = [];
+        while ((match = regex.exec(note.content)) !== null) {
+            images.push({ src: match[1] });
+        }
+        return images;
+    }, [note]);
+
     const handleContentClick = (e) => {
         if (e.target.tagName === 'IMG') {
-            setActiveLightboxImage(e.target.src);
+            const src = e.target.src;
+            const index = lightboxSlides.findIndex(slide => slide.src === src);
+            setLightboxIndex(index !== -1 ? index : 0);
         }
     };
 
@@ -138,9 +154,18 @@ const NoteReadView = ({ note, onClose }) => {
                 </div>
             </div>
         </div>
-        {activeLightboxImage && (
-            <Lightbox src={activeLightboxImage} onClose={() => setActiveLightboxImage(null)} />
-        )}
+        <Lightbox
+            open={lightboxIndex >= 0}
+            close={() => setLightboxIndex(-1)}
+            index={lightboxIndex >= 0 ? lightboxIndex : 0}
+            slides={lightboxSlides}
+            plugins={[Zoom]}
+            on={{ view: ({ index: currentIndex }) => setLightboxIndex(currentIndex) }}
+            render={{
+                buttonPrev: lightboxSlides.length <= 1 ? () => null : undefined,
+                buttonNext: lightboxSlides.length <= 1 ? () => null : undefined,
+            }}
+        />
         </>
     );
 };
@@ -175,7 +200,7 @@ const NoteEditModal = () => {
             [{ 'font': ['', 'lora', 'padauk', 'dancing-script', 'playfair-display'] }],
             [{ 'header': [1, 2, 3, false] }],
             ['bold', 'italic', 'underline'],
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
             ['link', 'image'],
             ['clean']
         ],

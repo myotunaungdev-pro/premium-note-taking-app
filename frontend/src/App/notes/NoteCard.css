@@ -225,6 +225,37 @@
     display: list-item !important;
 }
 
+/* Checklist Support for Note Card Preview */
+.note-content li[data-list="checked"],
+.note-content li[data-list="unchecked"] {
+    list-style-type: none !important;
+    position: relative;
+}
+
+.note-content li[data-list="checked"]::before,
+.note-content li[data-list="unchecked"]::before {
+    position: absolute;
+    left: -1.2em;
+    font-size: 1.1em;
+    line-height: 1;
+    margin-top: 0.2em;
+}
+
+.note-content li[data-list="checked"] {
+    text-decoration: line-through !important;
+    opacity: 0.5;
+}
+
+.note-content li[data-list="checked"]::before {
+    content: '☑';
+    color: #00d4aa;
+}
+
+.note-content li[data-list="unchecked"]::before {
+    content: '☐';
+    color: #94a3b8;
+}
+
 /* Hide images and non-text elements from the preview */
 .note-content img,
 .note-content iframe,

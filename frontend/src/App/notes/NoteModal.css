@@ -898,6 +898,21 @@ h1.reader-page-title {
     color: #e2e8f0;
 }
 
+.ql-editor li[data-list='checked'],
+.ql-editor li[data-list='unchecked'] {
+    padding-left: 1.2em !important;
+}
+
+.ql-editor li[data-list='checked']::before,
+.ql-editor li[data-list='unchecked']::before {
+    margin-left: -1.2em !important;
+}
+
+.ql-editor li[data-list='checked'] {
+    text-decoration: line-through !important;
+    opacity: 0.5;
+}
+
 @media (max-width: 904px) {
     .reader-page {
         padding: 24px 20px;
