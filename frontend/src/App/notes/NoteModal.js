@@ -120,6 +120,45 @@ const ImageCropModal = ({ imageSrc, onClose }) => {
     );
 };
 
+const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect }) => {
+    const { t } = useTranslation();
+    const galleryRef = useRef(null);
+    const cameraRef = useRef(null);
+
+    if (!isOpen) return null;
+
+    return createPortal(
+        <div className="image-menu-overlay" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+            <div className="image-menu-sheet" onClick={e => e.stopPropagation()}>
+                <div className="image-menu-header">
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#ffffff' }}>{t('Add Image')}</h3>
+                    <button type="button" className="image-menu-close" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+                        <i className="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div className="image-menu-options">
+                    <button className="image-menu-option" onClick={() => cameraRef.current.click()}>
+                        <i className="bi bi-camera"></i>
+                        <span>{t('Take Photo')}</span>
+                    </button>
+                    <button className="image-menu-option" onClick={() => galleryRef.current.click()}>
+                        <i className="bi bi-image"></i>
+                        <span>{t('Select Photo')}</span>
+                    </button>
+                    <button className="image-menu-option" onClick={() => alert("Recognize Text OCR logic coming soon!")}>
+                        <i className="bi bi-fonts"></i>
+                        <span>{t('Recognize Text')}</span>
+                    </button>
+                </div>
+                
+                <input type="file" accept="image/*" ref={galleryRef} style={{ display: 'none' }} onChange={onGallerySelect} />
+                <input type="file" accept="image/*" capture="environment" ref={cameraRef} style={{ display: 'none' }} onChange={onCameraSelect} />
+            </div>
+        </div>,
+        document.body
+    );
+};
+
 const Font = Quill.import('formats/font');
 Font.whitelist = ['', 'lora', 'padauk', 'dancing-script', 'playfair-display'];
 
@@ -384,15 +423,55 @@ const NoteEditModal = () => {
         editingNote ? (tagOptions.find((t) => t.label === editingNote.tag) || tagOptions[0]) : tagOptions[0]
     );
 
-    const quillModules = {
-        toolbar: [
-            [{ 'font': ['', 'lora', 'padauk', 'dancing-script', 'playfair-display'] }],
-            [{ 'header': [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline'],
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-            ['link', 'image'],
-            ['clean']
-        ],
+    const quillRef = useRef(null);
+    const [showImageMenu, setShowImageMenu] = useState(false);
+    
+    // Use a ref to ensure the memoized Quill config always has access to the latest state setter
+    const setShowImageMenuRef = useRef(setShowImageMenu);
+    setShowImageMenuRef.current = setShowImageMenu;
+
+    const quillModules = useMemo(() => ({
+        toolbar: {
+            container: [
+                [{ 'font': ['', 'lora', 'padauk', 'dancing-script', 'playfair-display'] }],
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                ['link', 'image'],
+                ['clean']
+            ],
+            handlers: {
+                image: () => {
+                    setShowImageMenuRef.current(true);
+                }
+            }
+        }
+    }), []);
+
+    const insertImageToEditor = (file) => {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (quillRef.current) {
+                const editor = quillRef.current.getEditor();
+                const range = editor.getSelection(true);
+                editor.insertEmbed(range ? range.index : 0, 'image', e.target.result);
+                if (range) editor.setSelection(range.index + 1);
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleGallerySelect = (e) => {
+        const file = e.target.files[0];
+        insertImageToEditor(file);
+        setShowImageMenu(false);
+    };
+
+    const handleCameraSelect = (e) => {
+        const file = e.target.files[0];
+        insertImageToEditor(file);
+        setShowImageMenu(false);
     };
 
     const isUnchanged =
@@ -559,6 +638,7 @@ const NoteEditModal = () => {
                     >
                         <label className="form-label">{t('Content')}</label>
                         <ReactQuill 
+                            ref={quillRef}
                             theme="snow" 
                             value={content} 
                             onChange={setContent} 
@@ -601,6 +681,13 @@ const NoteEditModal = () => {
                     </button>
                 </div>
             </form>
+            
+            <ImageInputMenu 
+                isOpen={showImageMenu} 
+                onClose={() => setShowImageMenu(false)} 
+                onGallerySelect={handleGallerySelect} 
+                onCameraSelect={handleCameraSelect} 
+            />
         </div>
     );
 };
