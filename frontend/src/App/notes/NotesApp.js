@@ -154,6 +154,53 @@ const NotesApp = () => {
         return () => window.removeEventListener('keydown', handleEscape);
     }, [sidebarCollapsed, closeSidebar]);
 
+    const groupedNotes = useMemo(() => {
+        // Only group if we are sorting by date (the default sort)
+        const isDateSorted = !['a-z', 'done', 'not-done'].includes(sortBy);
+        if (!isDateSorted) return null;
+
+        const groups = {
+            'Today': [],
+            'Previous 7 Days': [],
+            'Previous 30 Days': [],
+        };
+
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        const thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+
+        filteredAndSortedNotes.forEach((note) => {
+            const noteDate = new Date(note.createdAt);
+            const noteDay = new Date(noteDate.getFullYear(), noteDate.getMonth(), noteDate.getDate());
+
+            if (noteDay.getTime() === today.getTime()) {
+                groups['Today'].push(note);
+            } else if (noteDay >= sevenDaysAgo) {
+                groups['Previous 7 Days'].push(note);
+            } else if (noteDay >= thirtyDaysAgo) {
+                groups['Previous 30 Days'].push(note);
+            } else {
+                const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(noteDate);
+                if (!groups[monthYear]) {
+                    groups[monthYear] = [];
+                }
+                groups[monthYear].push(note);
+            }
+        });
+
+        // Filter out empty groups
+        const result = {};
+        Object.keys(groups).forEach(key => {
+            if (groups[key].length > 0) {
+                result[key] = groups[key];
+            }
+        });
+        return result;
+    }, [filteredAndSortedNotes, sortBy]);
+
     return (
         <div className={`notes-app ${isSidebarOpen ? 'sidebar-open' : ''}`}>
             {isSidebarOpen && (
@@ -198,11 +245,26 @@ const NotesApp = () => {
 
                 <div className="notes-container">
                     {filteredAndSortedNotes.length > 0 ? (
-                        <div className="notes-grid">
-                            {filteredAndSortedNotes.map((note) => (
-                                <NoteCard key={note._id} note={note} onDeleteRequest={(note) => setNoteToDelete(note)} />
-                            ))}
-                        </div>
+                        groupedNotes ? (
+                            <div className="notes-grouped-container">
+                                {Object.keys(groupedNotes).map((groupKey) => (
+                                    <div className="note-group" key={groupKey}>
+                                        <h3 className="note-group-header">{t(groupKey)}</h3>
+                                        <div className="notes-grid">
+                                            {groupedNotes[groupKey].map((note) => (
+                                                <NoteCard key={note._id} note={note} onDeleteRequest={(note) => setNoteToDelete(note)} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="notes-grid">
+                                {filteredAndSortedNotes.map((note) => (
+                                    <NoteCard key={note._id} note={note} onDeleteRequest={(note) => setNoteToDelete(note)} />
+                                ))}
+                            </div>
+                        )
                     ) : (
                         <div className="empty-state">
                             <div className="empty-icon">

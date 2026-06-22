@@ -80,6 +80,48 @@ const NoteReadView = ({ note, onClose }) => {
         }
     };
 
+    const handleDownloadImage = async () => {
+        if (lightboxIndex < 0 || !lightboxSlides[lightboxIndex]) return;
+        const src = lightboxSlides[lightboxIndex].src;
+        try {
+            // Fetch the image as a blob to force download instead of opening in a new tab
+            const response = await fetch(src);
+            const blob = await response.blob();
+            // Extract filename or use default
+            let filename = src.split('/').pop() || 'image';
+            if (!filename.includes('.')) filename += '.jpg';
+
+            try {
+                // Advanced File System Access API (Desktop Chrome/Edge)
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: filename,
+                    types: [{
+                        description: 'Image',
+                        accept: { [blob.type || 'image/jpeg']: ['.' + filename.split('.').pop()] },
+                    }],
+                });
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+            } catch (err) {
+                // If user aborted the dialog, do nothing
+                if (err.name === 'AbortError') return;
+
+                // Fallback for Safari, Firefox, and Mobile browsers
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+            }
+        } catch (error) {
+            console.error('Image download failed:', error);
+        }
+    };
+
     return (
         <>
         <div className="reader-overlay" onClick={onClose}>
@@ -172,6 +214,25 @@ const NoteReadView = ({ note, onClose }) => {
             slides={lightboxSlides}
             plugins={[Zoom]}
             on={{ view: ({ index: currentIndex }) => setLightboxIndex(currentIndex) }}
+            toolbar={{
+                buttons: [
+                    <button 
+                        key="download" 
+                        type="button" 
+                        className="yarl__button" 
+                        onClick={handleDownloadImage} 
+                        title={t("Download Image")}
+                        aria-label={t("Download Image")}
+                        style={{ marginRight: 'auto' }}
+                    >
+                        <svg className="yarl__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                        </svg>
+                    </button>,
+                    "zoom",
+                    "close"
+                ]
+            }}
             render={{
                 buttonPrev: lightboxSlides.length <= 1 ? () => null : undefined,
                 buttonNext: lightboxSlides.length <= 1 ? () => null : undefined,
