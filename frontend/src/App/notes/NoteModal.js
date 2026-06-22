@@ -52,6 +52,7 @@ const tagClassSlug = (label) => label.toLowerCase().replace(/\s+/g, '-');
 const NoteReadView = ({ note, onClose }) => {
     const { t } = useTranslation();
     const [viewSize, setViewSize] = useState('default');
+    const [isImageGrid, setIsImageGrid] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(-1);
     const contentRef = useRef(null);
     const noteTag = tagOptions.find((t) => t.label === note.tag) || {
@@ -89,6 +90,16 @@ const NoteReadView = ({ note, onClose }) => {
                         {note.title} <span className="reader-badge">({t('Read-Only')})</span>
                     </h2>
                     <div className="reader-header-actions">
+                        <div className="image-toggle-controls">
+                            <button 
+                                className="size-btn image-toggle-btn" 
+                                onClick={() => setIsImageGrid(!isImageGrid)} 
+                                title={isImageGrid ? t('Switch to Full-Width Stack') : t('Switch to Grid Gallery')}
+                            >
+                                <i className={`bi ${isImageGrid ? 'bi-distribute-vertical' : 'bi-grid-fill'}`}></i>
+                            </button>
+                            <div className="toggle-divider"></div>
+                        </div>
                         <div className="view-size-controls">
                             <button className={`size-btn ${viewSize === 'default' ? 'active' : ''}`} onClick={() => setViewSize('default')} title={t('Default Size')}>
                                 <i className="bi bi-window"></i>
@@ -111,7 +122,7 @@ const NoteReadView = ({ note, onClose }) => {
                         <h1 className={`reader-page-title ${note.titleFontFamily ? `ql-font-${note.titleFontFamily}` : ''}`}>{note.title}</h1>
                         <div 
                             ref={contentRef}
-                            className="reader-page-content"
+                            className={`reader-page-content ${isImageGrid ? 'editor-image-grid' : 'editor-image-stack'}`}
                             onClick={handleContentClick}
                         >
                             <ReactQuill 

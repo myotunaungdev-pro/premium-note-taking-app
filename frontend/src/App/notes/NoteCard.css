@@ -256,11 +256,26 @@
     color: #94a3b8;
 }
 
-/* Hide images and non-text elements from the preview */
-.note-content img,
+/* Hide heavy non-text elements from the preview */
 .note-content iframe,
 .note-content video {
     display: none !important;
+}
+
+/* Hide all images by default on the card */
+.note-card .note-content img {
+    display: none !important;
+}
+
+/* Show ONLY the first image as a beautiful thumbnail */
+.note-card .note-content img:first-of-type {
+    display: block !important;
+    width: 100% !important;
+    height: 140px !important;
+    object-fit: cover !important;
+    border-radius: 6px !important;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
 }
 
 .note-card-footer {

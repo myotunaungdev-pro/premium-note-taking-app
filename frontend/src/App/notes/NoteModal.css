@@ -826,17 +826,35 @@ h1.reader-page-title {
     padding-bottom: 56px !important;
 }
 
-/* Responsive Image Handling for Note Contents */
-.reader-page-content img,
-.reader-page-content .ql-editor img {
-    cursor: pointer;
+/* Responsive Image Handling for Note Contents (Grid vs Stack Toggle) */
+.reader-page-content.editor-image-stack img,
+.reader-page-content.editor-image-stack .ql-editor img {
+    display: block !important;
+    width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
-    object-fit: contain;
-    display: block;
-    margin: 24px auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Extra premium touch */
+    max-height: 400px !important;
+    object-fit: cover !important;
+    margin: 15px 0 !important;
+    border-radius: 8px !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.reader-page-content.editor-image-grid img,
+.reader-page-content.editor-image-grid .ql-editor img {
+    display: inline-block !important;
+    width: calc(50% - 10px) !important;
+    max-width: calc(50% - 10px) !important;
+    height: 150px !important;
+    object-fit: cover !important;
+    margin: 5px !important;
+    border-radius: 8px !important;
+    vertical-align: top;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .reader-tags-section {
@@ -1000,5 +1018,47 @@ h1.reader-page-title {
     
     .quill {
         flex: 1;
+    }
+}
+
+/* --- Responsive Mobile Image Toggle --- */
+.image-toggle-controls {
+    display: flex;
+    align-items: center;
+}
+
+.image-toggle-btn {
+    color: #00d4aa !important;
+}
+
+.toggle-divider {
+    width: 1px;
+    height: 16px;
+    background: rgba(255,255,255,0.1);
+    margin: 0 8px;
+}
+
+@media (max-width: 600px) {
+    .image-toggle-btn {
+        padding: 8px 12px !important;
+        font-size: 1.2rem !important;
+    }
+    
+    .toggle-divider {
+        display: none;
+    }
+
+    .reader-page-content.editor-image-grid img,
+    .reader-page-content.editor-image-grid .ql-editor img {
+        width: calc(50% - 8px) !important;
+        max-width: calc(50% - 8px) !important;
+        height: 120px !important;
+        margin: 4px !important;
+    }
+
+    .reader-page-content.editor-image-stack img,
+    .reader-page-content.editor-image-stack .ql-editor img {
+        width: 100% !important;
+        height: auto !important;
     }
 }
