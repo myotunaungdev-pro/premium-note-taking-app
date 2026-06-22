@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     setModalOpen,
@@ -16,6 +17,108 @@ import { useTranslation } from 'react-i18next';
 import Lightbox from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+
+async function getCroppedImg(image, crop) {
+  const canvas = document.createElement('canvas')
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+  const ctx = canvas.getContext('2d')
+
+  if (!ctx) {
+    return null
+  }
+
+  canvas.width = Math.floor(crop.width * scaleX);
+  canvas.height = Math.floor(crop.height * scaleY);
+
+  ctx.imageSmoothingQuality = 'high';
+
+  ctx.drawImage(
+    image,
+    crop.x * scaleX,
+    crop.y * scaleY,
+    crop.width * scaleX,
+    crop.height * scaleY,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  )
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((file) => {
+      if (!file) {
+        reject(new Error('Canvas is empty'));
+        return;
+      }
+      resolve(file);
+    }, 'image/jpeg', 1.0)
+  })
+}
+
+const ImageCropModal = ({ imageSrc, onClose }) => {
+    const { t } = useTranslation();
+    const [crop, setCrop] = useState();
+    const [completedCrop, setCompletedCrop] = useState(null);
+    const imgRef = useRef(null);
+
+    const handleConfirm = async () => {
+        if (!completedCrop || !completedCrop.width || !completedCrop.height || !imgRef.current) return;
+        try {
+            const blob = await getCroppedImg(imgRef.current, completedCrop);
+            
+            let filename = imageSrc.split('/').pop() || 'cropped-image';
+            if (!filename.includes('.')) filename += '.jpg';
+            else filename = filename.replace(/\.[^/.]+$/, "") + "-cropped.jpg";
+
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: filename,
+                    types: [{
+                        description: 'Image',
+                        accept: { 'image/jpeg': ['.jpg'] },
+                    }],
+                });
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                onClose();
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+                onClose();
+            }
+        } catch (e) {
+            console.error('Failed to crop image', e);
+        }
+    };
+
+    return createPortal(
+        <div className="crop-modal-overlay" onClick={onClose}>
+            <div className="crop-modal-content" onClick={e => e.stopPropagation()}>
+                <div className="crop-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto', paddingBottom: '100px' }}>
+                    <ReactCrop crop={crop} onChange={c => setCrop(c)} onComplete={c => setCompletedCrop(c)}>
+                        <img ref={imgRef} src={imageSrc} style={{ maxWidth: '100%', maxHeight: '75vh', objectFit: 'contain' }} alt="Crop target" />
+                    </ReactCrop>
+                </div>
+                <div className="crop-action-bar">
+                    <button className="custom-btn cancel-btn" onClick={onClose}>{t('Cancel')}</button>
+                    <button className="custom-btn primary-btn" onClick={handleConfirm}>{t('Confirm & Download')}</button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+};
 
 const Font = Quill.import('formats/font');
 Font.whitelist = ['', 'lora', 'padauk', 'dancing-script', 'playfair-display'];
@@ -54,6 +157,7 @@ const NoteReadView = ({ note, onClose }) => {
     const [viewSize, setViewSize] = useState('default');
     const [isImageGrid, setIsImageGrid] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(-1);
+    const [cropImageSrc, setCropImageSrc] = useState(null);
     const contentRef = useRef(null);
     const noteTag = tagOptions.find((t) => t.label === note.tag) || {
         label: note.tag,
@@ -217,6 +321,18 @@ const NoteReadView = ({ note, onClose }) => {
             toolbar={{
                 buttons: [
                     <button 
+                        key="crop" 
+                        type="button" 
+                        className="yarl__button" 
+                        onClick={() => setCropImageSrc(lightboxSlides[lightboxIndex]?.src)} 
+                        title={t("Crop Image")}
+                        aria-label={t("Crop Image")}
+                    >
+                        <svg className="yarl__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z" />
+                        </svg>
+                    </button>,
+                    <button 
                         key="download" 
                         type="button" 
                         className="yarl__button" 
@@ -238,6 +354,7 @@ const NoteReadView = ({ note, onClose }) => {
                 buttonNext: lightboxSlides.length <= 1 ? () => null : undefined,
             }}
         />
+        {cropImageSrc && <ImageCropModal imageSrc={cropImageSrc} onClose={() => setCropImageSrc(null)} />}
         </>
     );
 };
