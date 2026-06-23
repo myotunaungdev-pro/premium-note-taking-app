@@ -19,6 +19,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import { ReactSketchCanvas } from 'react-sketch-canvas';
 
 async function getCroppedImg(image, crop) {
   const canvas = document.createElement('canvas')
@@ -107,7 +108,7 @@ const ImageCropModal = ({ imageSrc, onClose }) => {
             <div className="crop-modal-content" onClick={e => e.stopPropagation()}>
                 <div className="crop-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto', paddingBottom: '100px' }}>
                     <ReactCrop crop={crop} onChange={c => setCrop(c)} onComplete={c => setCompletedCrop(c)}>
-                        <img ref={imgRef} src={imageSrc} style={{ maxWidth: '100%', maxHeight: '75vh', objectFit: 'contain' }} alt="Crop target" />
+                        <img ref={imgRef} src={imageSrc} style={{ maxWidth: '100%', maxHeight: '75vh', objectFit: 'contain' }} alt="Crop target" crossOrigin="anonymous" />
                     </ReactCrop>
                 </div>
                 <div className="crop-action-bar">
@@ -120,12 +121,206 @@ const ImageCropModal = ({ imageSrc, onClose }) => {
     );
 };
 
-const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect }) => {
+const DoodleModal = ({ imageSrc, onClose }) => {
+    const { t } = useTranslation();
+    const [strokeColor, setStrokeColor] = useState('#ff0000');
+    const [strokeWidth] = useState(4);
+    const canvasRef = useRef(null);
+    const imgRef = useRef(null);
+    const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
+
+    const handleImageLoad = (e) => {
+        setImgDimensions({ width: e.target.width, height: e.target.height });
+    };
+
+    const handleConfirm = async () => {
+        if (!canvasRef.current || !imgRef.current) return;
+        
+        try {
+            const sketchBase64 = await canvasRef.current.exportImage("png");
+            const originalImg = imgRef.current;
+            const naturalWidth = originalImg.naturalWidth;
+            const naturalHeight = originalImg.naturalHeight;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = naturalWidth;
+            canvas.height = naturalHeight;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw original
+            ctx.drawImage(originalImg, 0, 0, naturalWidth, naturalHeight);
+            
+            // Load sketch image and draw
+            const sketchImg = new Image();
+            sketchImg.onload = () => {
+                ctx.drawImage(sketchImg, 0, 0, naturalWidth, naturalHeight);
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+                    let filename = imageSrc.split('/').pop() || 'doodle.jpg';
+                    if (!filename.includes('.')) filename += '.jpg';
+                    try {
+                        const handle = await window.showSaveFilePicker({
+                            suggestedName: `doodled_${filename}`,
+                            types: [{
+                                description: 'Image',
+                                accept: { [blob.type || 'image/jpeg']: ['.' + filename.split('.').pop()] },
+                            }],
+                        });
+                        const writable = await handle.createWritable();
+                        await writable.write(blob);
+                        await writable.close();
+                        onClose();
+                    } catch (e) {
+                        // user aborted
+                    }
+                }, 'image/jpeg', 1.0);
+            };
+            sketchImg.src = sketchBase64;
+            
+        } catch (error) {
+            console.error("Failed to export doodle:", error);
+        }
+    };
+
+    const presetColors = ['#ff0000', '#f59e0b', '#00d4aa', '#ffffff'];
+
+    return createPortal(
+        <div className="crop-modal-overlay doodle-modal-overlay" onClick={onClose}>
+            <div className="crop-modal-content" onClick={e => e.stopPropagation()}>
+                <div className="crop-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto', paddingBottom: '150px' }}>
+                    <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%', maxHeight: '75vh' }}>
+                        <img 
+                            ref={imgRef} 
+                            src={imageSrc} 
+                            onLoad={handleImageLoad} 
+                            style={{ display: 'block', maxWidth: '100%', maxHeight: '75vh', width: 'auto', height: 'auto', userSelect: 'none' }} 
+                            alt="Doodle target" 
+                            crossOrigin="anonymous" 
+                        />
+                        {imgDimensions.width > 0 && (
+                            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', touchAction: 'none' }}>
+                                <ReactSketchCanvas 
+                                    ref={canvasRef} 
+                                    strokeWidth={strokeWidth} 
+                                    strokeColor={strokeColor} 
+                                    width="100%" 
+                                    height="100%" 
+                                    canvasColor="transparent" 
+                                />
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className="crop-action-bar doodle-action-bar" style={{ flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            {presetColors.map(c => (
+                                <button 
+                                    key={c}
+                                    onClick={() => setStrokeColor(c)}
+                                    style={{
+                                        width: '28px', height: '28px', borderRadius: '50%', backgroundColor: c,
+                                        border: strokeColor === c ? '3px solid #fff' : '2px solid rgba(255,255,255,0.2)',
+                                        cursor: 'pointer', outline: 'none', padding: 0
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button className="custom-btn" style={{ padding: '8px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', flex: 'none', maxWidth: 'none' }} onClick={() => canvasRef.current?.undo()}><i className="bi bi-arrow-counterclockwise"></i></button>
+                            <button className="custom-btn" style={{ padding: '8px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', flex: 'none', maxWidth: 'none' }} onClick={() => canvasRef.current?.clearCanvas()}><i className="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', width: '100%', justifyContent: 'center' }}>
+                        <button className="custom-btn cancel-btn" onClick={onClose}>{t('Cancel')}</button>
+                        <button className="custom-btn primary-btn" onClick={handleConfirm}>{t('Confirm & Download')}</button>
+                    </div>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+};
+
+const WebcamCaptureModal = ({ onClose, onCapture }) => {
+    const { t } = useTranslation();
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        let stream = null;
+        const startCamera = async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                }
+            } catch (err) {
+                console.error("Failed to access webcam:", err);
+                alert("Could not access camera. Please check permissions.");
+            }
+        };
+        startCamera();
+
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, []);
+
+    const handleCapture = () => {
+        if (!videoRef.current) return;
+        const video = videoRef.current;
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        onCapture(dataUrl);
+        onClose();
+    };
+
+    return createPortal(
+        <div className="image-menu-overlay" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+            <div className="image-menu-sheet" style={{ maxWidth: '640px', maxHeight: '90dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+                <div className="image-menu-header" style={{ flexShrink: 0 }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#ffffff' }}>{t('Webcam Capture')}</h3>
+                    <button type="button" className="image-menu-close" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+                        <i className="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', flex: 1, minHeight: 0 }}>
+                    <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'contain' }}></video>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', width: '100%', justifyContent: 'center', flexShrink: 0, paddingBottom: '16px' }}>
+                    <button className="custom-btn cancel-btn" onClick={onClose}>{t('Cancel')}</button>
+                    <button className="custom-btn primary-btn" onClick={handleCapture}>{t('Capture')}</button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+};
+
+const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDesktopCameraSelect }) => {
     const { t } = useTranslation();
     const galleryRef = useRef(null);
     const cameraRef = useRef(null);
 
     if (!isOpen) return null;
+
+    // Strict Mobile OS detection (prevents narrowed desktop windows from triggering mobile fallback)
+    const isMobileDevice = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) || 
+                           (navigator.maxTouchPoints > 0 && navigator.userAgent.includes('Mac'));
+    
+    const handleTakePhoto = () => {
+        if (isMobileDevice) {
+            cameraRef.current.click();
+        } else {
+            onDesktopCameraSelect();
+        }
+    };
 
     return createPortal(
         <div className="image-menu-overlay" onClick={(e) => { e.stopPropagation(); onClose(); }}>
@@ -137,7 +332,7 @@ const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect }) =>
                     </button>
                 </div>
                 <div className="image-menu-options">
-                    <button className="image-menu-option" onClick={() => cameraRef.current.click()}>
+                    <button className="image-menu-option" onClick={handleTakePhoto}>
                         <i className="bi bi-camera"></i>
                         <span>{t('Take Photo')}</span>
                     </button>
@@ -197,6 +392,7 @@ const NoteReadView = ({ note, onClose }) => {
     const [isImageGrid, setIsImageGrid] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(-1);
     const [cropImageSrc, setCropImageSrc] = useState(null);
+    const [doodleImageSrc, setDoodleImageSrc] = useState(null);
     const contentRef = useRef(null);
     const noteTag = tagOptions.find((t) => t.label === note.tag) || {
         label: note.tag,
@@ -372,6 +568,18 @@ const NoteReadView = ({ note, onClose }) => {
                         </svg>
                     </button>,
                     <button 
+                        key="doodle" 
+                        type="button" 
+                        className="yarl__button" 
+                        onClick={() => setDoodleImageSrc(lightboxSlides[lightboxIndex]?.src)} 
+                        title={t("Draw on Image")}
+                        aria-label={t("Draw on Image")}
+                    >
+                        <svg className="yarl__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.995.995 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg>
+                    </button>,
+                    <button 
                         key="download" 
                         type="button" 
                         className="yarl__button" 
@@ -394,6 +602,7 @@ const NoteReadView = ({ note, onClose }) => {
             }}
         />
         {cropImageSrc && <ImageCropModal imageSrc={cropImageSrc} onClose={() => setCropImageSrc(null)} />}
+        {doodleImageSrc && <DoodleModal imageSrc={doodleImageSrc} onClose={() => setDoodleImageSrc(null)} />}
         </>
     );
 };
@@ -425,6 +634,7 @@ const NoteEditModal = () => {
 
     const quillRef = useRef(null);
     const [showImageMenu, setShowImageMenu] = useState(false);
+    const [showWebcamModal, setShowWebcamModal] = useState(false);
     
     // Use a ref to ensure the memoized Quill config always has access to the latest state setter
     const setShowImageMenuRef = useRef(setShowImageMenu);
@@ -448,18 +658,31 @@ const NoteEditModal = () => {
         }
     }), []);
 
+    const insertBase64ToEditor = (base64) => {
+        if (quillRef.current) {
+            const editor = quillRef.current.getEditor();
+            const range = editor.getSelection(true);
+            editor.insertEmbed(range ? range.index : 0, 'image', base64);
+            if (range) editor.setSelection(range.index + 1);
+        }
+    };
+
     const insertImageToEditor = (file) => {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            if (quillRef.current) {
-                const editor = quillRef.current.getEditor();
-                const range = editor.getSelection(true);
-                editor.insertEmbed(range ? range.index : 0, 'image', e.target.result);
-                if (range) editor.setSelection(range.index + 1);
-            }
+            insertBase64ToEditor(e.target.result);
         };
         reader.readAsDataURL(file);
+    };
+
+    const handleWebcamCapture = (dataUrl) => {
+        insertBase64ToEditor(dataUrl);
+    };
+
+    const handleDesktopCameraSelect = () => {
+        setShowImageMenu(false);
+        setShowWebcamModal(true);
     };
 
     const handleGallerySelect = (e) => {
@@ -686,8 +909,16 @@ const NoteEditModal = () => {
                 isOpen={showImageMenu} 
                 onClose={() => setShowImageMenu(false)} 
                 onGallerySelect={handleGallerySelect} 
-                onCameraSelect={handleCameraSelect} 
+                onCameraSelect={handleCameraSelect}
+                onDesktopCameraSelect={handleDesktopCameraSelect} 
             />
+            
+            {showWebcamModal && (
+                <WebcamCaptureModal 
+                    onClose={() => setShowWebcamModal(false)} 
+                    onCapture={handleWebcamCapture} 
+                />
+            )}
         </div>
     );
 };

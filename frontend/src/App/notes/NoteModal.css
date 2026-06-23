@@ -1269,4 +1269,9 @@ h1.reader-page-title {
         max-width: 440px;
         padding: 24px;
     }
+    
+    .cancel-btn, .primary-btn {
+        flex: 0 1 220px;
+        max-width: 220px;
+    }
 }
