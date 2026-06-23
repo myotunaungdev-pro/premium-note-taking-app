@@ -346,7 +346,7 @@ const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDe
                     </button>
                 </div>
                 
-                <input type="file" accept="image/*" ref={galleryRef} style={{ display: 'none' }} onChange={onGallerySelect} />
+                <input type="file" accept="image/*" multiple ref={galleryRef} style={{ display: 'none' }} onChange={onGallerySelect} />
                 <input type="file" accept="image/*" capture="environment" ref={cameraRef} style={{ display: 'none' }} onChange={onCameraSelect} />
             </div>
         </div>,
@@ -662,8 +662,10 @@ const NoteEditModal = () => {
         if (quillRef.current) {
             const editor = quillRef.current.getEditor();
             const range = editor.getSelection(true);
-            editor.insertEmbed(range ? range.index : 0, 'image', base64);
-            if (range) editor.setSelection(range.index + 1);
+            const index = range ? range.index : 0;
+            editor.insertEmbed(index, 'image', base64);
+            editor.insertText(index + 1, '\n');
+            if (range) editor.setSelection(index + 2);
         }
     };
 
@@ -685,10 +687,19 @@ const NoteEditModal = () => {
         setShowWebcamModal(true);
     };
 
-    const handleGallerySelect = (e) => {
-        const file = e.target.files[0];
-        insertImageToEditor(file);
+    const handleGallerySelect = async (e) => {
+        const files = Array.from(e.target.files);
         setShowImageMenu(false);
+        for (const file of files) {
+            await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    insertBase64ToEditor(event.target.result);
+                    resolve();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
     };
 
     const handleCameraSelect = (e) => {
