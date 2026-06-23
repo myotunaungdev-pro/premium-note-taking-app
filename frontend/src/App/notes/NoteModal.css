@@ -1069,7 +1069,8 @@ h1.reader-page-title {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
+    right: 0;
+    width: 100%;
     height: 100dvh;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(8px);
@@ -1077,13 +1078,13 @@ h1.reader-page-title {
     z-index: 99999999 !important;
     display: flex;
     pointer-events: auto !important;
-    display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .crop-modal-content {
     position: relative;
+    box-sizing: border-box;
     width: 100%;
     height: 100%;
     display: flex;
@@ -1104,7 +1105,7 @@ h1.reader-page-title {
     bottom: 0;
     left: 0;
     display: flex;
-    gap: 10px;
+    gap: 12px;
     width: 100%;
     box-sizing: border-box;
     z-index: 10;
@@ -1112,11 +1113,28 @@ h1.reader-page-title {
     padding: 16px;
     backdrop-filter: blur(12px);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    justify-content: center;
+    justify-content: flex-end;
+}
+
+.crop-action-bar.doodle-action-bar {
+    justify-content: space-between;
+}
+
+.doodle-tools-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.modal-action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-direction: row-reverse;
 }
 
 .custom-btn {
-    flex: 1;
+    flex: none;
+    min-width: 120px;
     border: none;
     outline: none;
     font-size: 1rem;
@@ -1134,6 +1152,23 @@ h1.reader-page-title {
 
 .cancel-btn:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+.secondary-btn {
+    background: rgba(0, 212, 170, 0.1);
+    color: #00d4aa;
+    border: 1px solid rgba(0, 212, 170, 0.3);
+}
+
+.secondary-btn:hover {
+    background: rgba(0, 212, 170, 0.2);
+    border-color: rgba(0, 212, 170, 0.5);
+}
+
+.doodle-tool-btn {
+    flex: 0 0 auto !important;
+    width: fit-content !important;
+    min-width: auto !important;
 }
 
 .image-menu-option:hover {
@@ -1158,9 +1193,27 @@ h1.reader-page-title {
     box-shadow: 0 6px 20px rgba(0, 212, 170, 0.4);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .crop-action-bar {
+        flex-direction: column;
         padding: 12px;
+        gap: 16px;
+    }
+
+    .doodle-tools-container {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .modal-action-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .modal-action-buttons .custom-btn {
+        width: 100%;
+        min-width: 100%;
     }
 }
 

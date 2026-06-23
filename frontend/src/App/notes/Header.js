@@ -145,23 +145,19 @@ const Header = ({ onSelectAll }) => {
                 </div>
 
                 {isConfirmDeleteOpen && (
-                    <div className="custom-modal-overlay">
-                        <div className="custom-confirm-modal">
-                            <div className="custom-modal-header">
-                                <div className="custom-modal-icon warning">
-                                    <i className="bi bi-exclamation-triangle"></i>
-                                </div>
-                                <h2>{selectedNoteIds.length === 1 ? t("Permanently Delete Note") : t("Permanently Delete Notes")}</h2>
+                    <div className="logout-modal-overlay">
+                        <div className="logout-modal">
+                            <div className="logout-modal-icon">
+                                <i className="bi bi-exclamation-triangle"></i>
                             </div>
-                            <div className="custom-modal-body">
-                                <p>{selectedNoteIds.length === 1 ? t("Are you sure you want to permanently delete this note? This action cannot be undone.") : t("Are you sure you want to permanently delete these notes? This action cannot be undone.")}</p>
-                            </div>
-                            <div className="custom-modal-footer">
-                                <button className="custom-btn cancel-btn" onClick={() => setIsConfirmDeleteOpen(false)}>
+                            <h3>{selectedNoteIds.length === 1 ? t("Permanently Delete Note") : t("Permanently Delete Notes")}</h3>
+                            <p>{selectedNoteIds.length === 1 ? t("Are you sure you want to permanently delete this note? This action cannot be undone.") : t("Are you sure you want to permanently delete these notes? This action cannot be undone.")}</p>
+                            <div className="logout-modal-actions">
+                                <button className="btn-modal-cancel" onClick={() => setIsConfirmDeleteOpen(false)}>
                                     {t("Cancel")}
                                 </button>
-                                <button className="custom-btn danger-btn" onClick={confirmPermanentDelete}>
-                                    {t("Delete Permanently")}
+                                <button className="btn-modal-confirm" onClick={confirmPermanentDelete}>
+                                    {t("Delete")}
                                 </button>
                             </div>
                         </div>

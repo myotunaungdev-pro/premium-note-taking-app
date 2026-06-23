@@ -59,47 +59,81 @@ async function getCroppedImg(image, crop) {
   })
 }
 
-const ImageCropModal = ({ imageSrc, onClose }) => {
+const compressImage = async (file) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1920;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > MAX_WIDTH) {
+                height = Math.floor(height * (MAX_WIDTH / width));
+                width = MAX_WIDTH;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    const compressedFile = new File([blob], file.name || "compressed.jpg", {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    });
+                    resolve(compressedFile);
+                } else {
+                    reject(new Error('Canvas is empty'));
+                }
+            }, 'image/jpeg', 0.95);
+        };
+        img.onerror = reject;
+        img.src = URL.createObjectURL(file);
+    });
+};
+
+const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'note_uploads');
+
+    const res = await fetch('https://api.cloudinary.com/v1_1/daiusa7bt/image/upload', {
+        method: 'POST',
+        body: formData,
+    });
+    const data = await res.json();
+    if (data.secure_url) {
+        return data.secure_url;
+    } else {
+        throw new Error(data.error?.message || "Upload failed");
+    }
+};
+
+const ImageCropModal = ({ imageSrc, onClose, onUpdateImage }) => {
     const { t } = useTranslation();
     const [crop, setCrop] = useState();
     const [completedCrop, setCompletedCrop] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
     const imgRef = useRef(null);
 
-    const handleConfirm = async () => {
+    const handleSave = async (mode) => {
         if (!completedCrop || !completedCrop.width || !completedCrop.height || !imgRef.current) return;
+        setIsUploading(true);
         try {
             const blob = await getCroppedImg(imgRef.current, completedCrop);
-            
-            let filename = imageSrc.split('/').pop() || 'cropped-image';
-            if (!filename.includes('.')) filename += '.jpg';
-            else filename = filename.replace(/\.[^/.]+$/, "") + "-cropped.jpg";
-
-            try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: filename,
-                    types: [{
-                        description: 'Image',
-                        accept: { 'image/jpeg': ['.jpg'] },
-                    }],
-                });
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-                onClose();
-            } catch (err) {
-                if (err.name === 'AbortError') return;
-                const blobUrl = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(blobUrl);
-                onClose();
+            const file = new File([blob], 'crop.jpg', { type: 'image/jpeg' });
+            const url = await uploadToCloudinary(file);
+            if (onUpdateImage) {
+                onUpdateImage(imageSrc, url, mode);
             }
         } catch (e) {
-            console.error('Failed to crop image', e);
+            console.error('Failed to upload cropped image', e);
+        } finally {
+            setIsUploading(false);
+            onClose();
         }
     };
 
@@ -112,8 +146,15 @@ const ImageCropModal = ({ imageSrc, onClose }) => {
                     </ReactCrop>
                 </div>
                 <div className="crop-action-bar">
-                    <button className="custom-btn cancel-btn" onClick={onClose}>{t('Cancel')}</button>
-                    <button className="custom-btn primary-btn" onClick={handleConfirm}>{t('Confirm & Download')}</button>
+                    <div className="modal-action-buttons">
+                        <button className="custom-btn primary-btn" onClick={() => handleSave('replace')} disabled={isUploading}>
+                            {isUploading ? t('Uploading...') : t('Replace Original')}
+                        </button>
+                        <button className="custom-btn secondary-btn" onClick={() => handleSave('copy')} disabled={isUploading}>
+                            {isUploading ? t('Uploading...') : t('Save as Copy')}
+                        </button>
+                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={isUploading}>{t('Cancel')}</button>
+                    </div>
                 </div>
             </div>
         </div>,
@@ -121,10 +162,11 @@ const ImageCropModal = ({ imageSrc, onClose }) => {
     );
 };
 
-const DoodleModal = ({ imageSrc, onClose }) => {
+const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
     const { t } = useTranslation();
     const [strokeColor, setStrokeColor] = useState('#ff0000');
     const [strokeWidth] = useState(4);
+    const [isUploading, setIsUploading] = useState(false);
     const canvasRef = useRef(null);
     const imgRef = useRef(null);
     const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
@@ -133,7 +175,7 @@ const DoodleModal = ({ imageSrc, onClose }) => {
         setImgDimensions({ width: e.target.width, height: e.target.height });
     };
 
-    const handleConfirm = async () => {
+    const handleSave = async (mode) => {
         if (!canvasRef.current || !imgRef.current) return;
         
         try {
@@ -147,31 +189,25 @@ const DoodleModal = ({ imageSrc, onClose }) => {
             canvas.height = naturalHeight;
             const ctx = canvas.getContext('2d');
             
-            // Draw original
             ctx.drawImage(originalImg, 0, 0, naturalWidth, naturalHeight);
             
-            // Load sketch image and draw
             const sketchImg = new Image();
             sketchImg.onload = () => {
                 ctx.drawImage(sketchImg, 0, 0, naturalWidth, naturalHeight);
                 canvas.toBlob(async (blob) => {
                     if (!blob) return;
-                    let filename = imageSrc.split('/').pop() || 'doodle.jpg';
-                    if (!filename.includes('.')) filename += '.jpg';
+                    setIsUploading(true);
                     try {
-                        const handle = await window.showSaveFilePicker({
-                            suggestedName: `doodled_${filename}`,
-                            types: [{
-                                description: 'Image',
-                                accept: { [blob.type || 'image/jpeg']: ['.' + filename.split('.').pop()] },
-                            }],
-                        });
-                        const writable = await handle.createWritable();
-                        await writable.write(blob);
-                        await writable.close();
-                        onClose();
+                        const file = new File([blob], 'doodle.jpg', { type: 'image/jpeg' });
+                        const url = await uploadToCloudinary(file);
+                        if (onUpdateImage) {
+                            onUpdateImage(imageSrc, url, mode);
+                        }
                     } catch (e) {
-                        // user aborted
+                        console.error("Failed to upload doodle:", e);
+                    } finally {
+                        setIsUploading(false);
+                        onClose();
                     }
                 }, 'image/jpeg', 1.0);
             };
@@ -211,8 +247,8 @@ const DoodleModal = ({ imageSrc, onClose }) => {
                         )}
                     </div>
                 </div>
-                <div className="crop-action-bar doodle-action-bar" style={{ flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                <div className="crop-action-bar doodle-action-bar">
+                    <div className="doodle-tools-container">
                         <div style={{ display: 'flex', gap: '12px' }}>
                             {presetColors.map(c => (
                                 <button 
@@ -227,13 +263,18 @@ const DoodleModal = ({ imageSrc, onClose }) => {
                             ))}
                         </div>
                         <div style={{ display: 'flex', gap: '12px' }}>
-                            <button className="custom-btn" style={{ padding: '8px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', flex: 'none', maxWidth: 'none' }} onClick={() => canvasRef.current?.undo()}><i className="bi bi-arrow-counterclockwise"></i></button>
-                            <button className="custom-btn" style={{ padding: '8px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', flex: 'none', maxWidth: 'none' }} onClick={() => canvasRef.current?.clearCanvas()}><i className="bi bi-trash"></i></button>
+                            <button className="custom-btn doodle-tool-btn" onClick={() => canvasRef.current?.undo()} disabled={isUploading}><i className="bi bi-arrow-counterclockwise"></i></button>
+                            <button className="custom-btn doodle-tool-btn" onClick={() => canvasRef.current?.clearCanvas()} disabled={isUploading}><i className="bi bi-trash"></i></button>
                         </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '12px', width: '100%', justifyContent: 'center' }}>
-                        <button className="custom-btn cancel-btn" onClick={onClose}>{t('Cancel')}</button>
-                        <button className="custom-btn primary-btn" onClick={handleConfirm}>{t('Confirm & Download')}</button>
+                    <div className="modal-action-buttons">
+                        <button className="custom-btn primary-btn" onClick={() => handleSave('replace')} disabled={isUploading}>
+                            {isUploading ? t('Uploading...') : t('Replace Original')}
+                        </button>
+                        <button className="custom-btn secondary-btn" onClick={() => handleSave('copy')} disabled={isUploading}>
+                            {isUploading ? t('Uploading...') : t('Save as Copy')}
+                        </button>
+                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={isUploading}>{t('Cancel')}</button>
                     </div>
                 </div>
             </div>
@@ -303,7 +344,7 @@ const WebcamCaptureModal = ({ onClose, onCapture }) => {
     );
 };
 
-const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDesktopCameraSelect }) => {
+const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDesktopCameraSelect, isUploading }) => {
     const { t } = useTranslation();
     const galleryRef = useRef(null);
     const cameraRef = useRef(null);
@@ -315,6 +356,7 @@ const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDe
                            (navigator.maxTouchPoints > 0 && navigator.userAgent.includes('Mac'));
     
     const handleTakePhoto = () => {
+        if (isUploading) return;
         if (isMobileDevice) {
             cameraRef.current.click();
         } else {
@@ -324,30 +366,49 @@ const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDe
 
     return createPortal(
         <div className="image-menu-overlay" onClick={(e) => { e.stopPropagation(); onClose(); }}>
-            <div className="image-menu-sheet" onClick={e => e.stopPropagation()}>
+            <div className="image-menu-sheet" onClick={e => { if(isUploading) return; e.stopPropagation(); }}>
                 <div className="image-menu-header">
-                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#ffffff' }}>{t('Add Image')}</h3>
-                    <button type="button" className="image-menu-close" onClick={(e) => { e.stopPropagation(); onClose(); }}>
-                        <i className="bi bi-x-lg"></i>
-                    </button>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#ffffff' }}>
+                        {isUploading ? t('Uploading to Cloud...') : t('Add Image')}
+                    </h3>
+                    {!isUploading && (
+                        <button type="button" className="image-menu-close" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+                    )}
                 </div>
-                <div className="image-menu-options">
-                    <button className="image-menu-option" onClick={handleTakePhoto}>
-                        <i className="bi bi-camera"></i>
-                        <span>{t('Take Photo')}</span>
-                    </button>
-                    <button className="image-menu-option" onClick={() => galleryRef.current.click()}>
-                        <i className="bi bi-image"></i>
-                        <span>{t('Select Photo')}</span>
-                    </button>
-                    <button className="image-menu-option" onClick={() => alert("Recognize Text OCR logic coming soon!")}>
-                        <i className="bi bi-fonts"></i>
-                        <span>{t('Recognize Text')}</span>
-                    </button>
-                </div>
+                {isUploading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0', gap: '16px' }}>
+                        <div style={{ 
+                            width: '40px', 
+                            height: '40px', 
+                            border: '3px solid rgba(255, 255, 255, 0.1)', 
+                            borderTopColor: '#00d4aa', 
+                            borderRadius: '50%', 
+                            animation: 'spin 1s linear infinite' 
+                        }}></div>
+                        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+                        <span style={{ color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>{t('Uploading to Cloud...')}</span>
+                    </div>
+                ) : (
+                    <div className="image-menu-options">
+                        <button className="image-menu-option" onClick={handleTakePhoto}>
+                            <i className="bi bi-camera"></i>
+                            <span>{t('Take Photo')}</span>
+                        </button>
+                        <button className="image-menu-option" onClick={() => galleryRef.current.click()}>
+                            <i className="bi bi-image"></i>
+                            <span>{t('Select Photo')}</span>
+                        </button>
+                        <button className="image-menu-option" onClick={() => alert("Recognize Text OCR logic coming soon!")}>
+                            <i className="bi bi-fonts"></i>
+                            <span>{t('Recognize Text')}</span>
+                        </button>
+                    </div>
+                )}
                 
-                <input type="file" accept="image/*" multiple ref={galleryRef} style={{ display: 'none' }} onChange={onGallerySelect} />
-                <input type="file" accept="image/*" capture="environment" ref={cameraRef} style={{ display: 'none' }} onChange={onCameraSelect} />
+                <input type="file" accept="image/*" multiple ref={galleryRef} style={{ display: 'none' }} onChange={onGallerySelect} disabled={isUploading} />
+                <input type="file" accept="image/*" capture="environment" ref={cameraRef} style={{ display: 'none' }} onChange={onCameraSelect} disabled={isUploading} />
             </div>
         </div>,
         document.body
@@ -388,6 +449,7 @@ const tagClassSlug = (label) => label.toLowerCase().replace(/\s+/g, '-');
 
 const NoteReadView = ({ note, onClose }) => {
     const { t } = useTranslation();
+    const dispatch = useDispatch();
     const [viewSize, setViewSize] = useState('default');
     const [isImageGrid, setIsImageGrid] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(-1);
@@ -459,6 +521,23 @@ const NoteReadView = ({ note, onClose }) => {
         } catch (error) {
             console.error('Image download failed:', error);
         }
+    };
+
+    const handleUpdateImage = (oldSrc, newSrc, mode) => {
+        if (!note || !note.content) return;
+        let newContent = note.content;
+        if (mode === 'replace') {
+            newContent = note.content.split(oldSrc).join(newSrc);
+        } else if (mode === 'copy') {
+            const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const imgTagRegex = new RegExp(`<img[^>]+src="${escapeRegExp(oldSrc)}"[^>]*>`, 'g');
+            newContent = note.content.replace(imgTagRegex, (match) => {
+                return `${match}<br><img src="${newSrc}">`;
+            });
+        }
+        const updatedNote = { ...note, content: newContent };
+        dispatch(updateNoteOnServer(updatedNote));
+        dispatch(setReadingNote(updatedNote));
     };
 
     return (
@@ -601,8 +680,8 @@ const NoteReadView = ({ note, onClose }) => {
                 buttonNext: lightboxSlides.length <= 1 ? () => null : undefined,
             }}
         />
-        {cropImageSrc && <ImageCropModal imageSrc={cropImageSrc} onClose={() => setCropImageSrc(null)} />}
-        {doodleImageSrc && <DoodleModal imageSrc={doodleImageSrc} onClose={() => setDoodleImageSrc(null)} />}
+        {cropImageSrc && <ImageCropModal imageSrc={cropImageSrc} onClose={() => setCropImageSrc(null)} onUpdateImage={handleUpdateImage} />}
+        {doodleImageSrc && <DoodleModal imageSrc={doodleImageSrc} onClose={() => setDoodleImageSrc(null)} onUpdateImage={handleUpdateImage} />}
         </>
     );
 };
@@ -635,6 +714,7 @@ const NoteEditModal = () => {
     const quillRef = useRef(null);
     const [showImageMenu, setShowImageMenu] = useState(false);
     const [showWebcamModal, setShowWebcamModal] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     
     // Use a ref to ensure the memoized Quill config always has access to the latest state setter
     const setShowImageMenuRef = useRef(setShowImageMenu);
@@ -669,17 +749,20 @@ const NoteEditModal = () => {
         }
     };
 
-    const insertImageToEditor = (file) => {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            insertBase64ToEditor(e.target.result);
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleWebcamCapture = (dataUrl) => {
-        insertBase64ToEditor(dataUrl);
+    const handleWebcamCapture = async (dataUrl) => {
+        setIsUploading(true);
+        try {
+            const res = await fetch(dataUrl);
+            const blob = await res.blob();
+            const file = new File([blob], "webcam.jpg", { type: "image/jpeg" });
+            const compressed = await compressImage(file);
+            const url = await uploadToCloudinary(compressed);
+            insertBase64ToEditor(url);
+        } catch (e) {
+            console.error("Webcam upload failed", e);
+        } finally {
+            setIsUploading(false);
+        }
     };
 
     const handleDesktopCameraSelect = () => {
@@ -689,23 +772,35 @@ const NoteEditModal = () => {
 
     const handleGallerySelect = async (e) => {
         const files = Array.from(e.target.files);
-        setShowImageMenu(false);
-        for (const file of files) {
-            await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    insertBase64ToEditor(event.target.result);
-                    resolve();
-                };
-                reader.readAsDataURL(file);
-            });
+        setIsUploading(true);
+        try {
+            for (const file of files) {
+                const compressed = await compressImage(file);
+                const url = await uploadToCloudinary(compressed);
+                insertBase64ToEditor(url);
+            }
+        } catch (e) {
+            console.error("Gallery upload failed", e);
+        } finally {
+            setIsUploading(false);
+            setShowImageMenu(false);
         }
     };
 
-    const handleCameraSelect = (e) => {
+    const handleCameraSelect = async (e) => {
         const file = e.target.files[0];
-        insertImageToEditor(file);
-        setShowImageMenu(false);
+        if (!file) return;
+        setIsUploading(true);
+        try {
+            const compressed = await compressImage(file);
+            const url = await uploadToCloudinary(compressed);
+            insertBase64ToEditor(url);
+        } catch (e) {
+            console.error("Camera upload failed", e);
+        } finally {
+            setIsUploading(false);
+            setShowImageMenu(false);
+        }
     };
 
     const isUnchanged =
@@ -922,6 +1017,7 @@ const NoteEditModal = () => {
                 onGallerySelect={handleGallerySelect} 
                 onCameraSelect={handleCameraSelect}
                 onDesktopCameraSelect={handleDesktopCameraSelect} 
+                isUploading={isUploading}
             />
             
             {showWebcamModal && (
