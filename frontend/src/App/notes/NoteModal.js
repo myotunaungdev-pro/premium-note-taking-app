@@ -20,6 +20,7 @@ import "yet-another-react-lightbox/styles.css";
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
+import { Pencil, PenTool, Highlighter, Eraser, Undo2, Trash2 } from 'lucide-react';
 
 async function getCroppedImg(image, crop) {
   const canvas = document.createElement('canvas')
@@ -116,12 +117,12 @@ const ImageCropModal = ({ imageSrc, onClose, onUpdateImage }) => {
     const { t } = useTranslation();
     const [crop, setCrop] = useState();
     const [completedCrop, setCompletedCrop] = useState(null);
-    const [isUploading, setIsUploading] = useState(false);
+    const [savingAction, setSavingAction] = useState(null); // 'copy' | 'replace' | null
     const imgRef = useRef(null);
 
     const handleSave = async (mode) => {
         if (!completedCrop || !completedCrop.width || !completedCrop.height || !imgRef.current) return;
-        setIsUploading(true);
+        setSavingAction(mode);
         try {
             const blob = await getCroppedImg(imgRef.current, completedCrop);
             const file = new File([blob], 'crop.jpg', { type: 'image/jpeg' });
@@ -132,7 +133,7 @@ const ImageCropModal = ({ imageSrc, onClose, onUpdateImage }) => {
         } catch (e) {
             console.error('Failed to upload cropped image', e);
         } finally {
-            setIsUploading(false);
+            setSavingAction(null);
             onClose();
         }
     };
@@ -147,13 +148,13 @@ const ImageCropModal = ({ imageSrc, onClose, onUpdateImage }) => {
                 </div>
                 <div className="crop-action-bar">
                     <div className="modal-action-buttons">
-                        <button className="custom-btn primary-btn" onClick={() => handleSave('replace')} disabled={isUploading}>
-                            {isUploading ? t('Uploading...') : t('Replace Original')}
+                        <button className="custom-btn primary-btn" onClick={() => handleSave('replace')} disabled={savingAction !== null}>
+                            {savingAction === 'replace' ? t('Uploading...') : t('Replace Original')}
                         </button>
-                        <button className="custom-btn secondary-btn" onClick={() => handleSave('copy')} disabled={isUploading}>
-                            {isUploading ? t('Uploading...') : t('Save as Copy')}
+                        <button className="custom-btn secondary-btn" onClick={() => handleSave('copy')} disabled={savingAction !== null}>
+                            {savingAction === 'copy' ? t('Uploading...') : t('Save as Copy')}
                         </button>
-                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={isUploading}>{t('Cancel')}</button>
+                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={savingAction !== null}>{t('Cancel')}</button>
                     </div>
                 </div>
             </div>
@@ -164,9 +165,11 @@ const ImageCropModal = ({ imageSrc, onClose, onUpdateImage }) => {
 
 const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
     const { t } = useTranslation();
-    const [strokeColor, setStrokeColor] = useState('#ff0000');
-    const [strokeWidth] = useState(4);
-    const [isUploading, setIsUploading] = useState(false);
+    const [strokeColor, setStrokeColor] = useState('#ef4444');
+    const [brushType, setBrushType] = useState('pen'); // 'pencil' | 'pen' | 'highlighter' | 'eraser'
+    const [eraserWidth, setEraserWidth] = useState(20);
+    const [isEraserSliderOpen, setIsEraserSliderOpen] = useState(false);
+    const [savingAction, setSavingAction] = useState(null); // 'copy' | 'replace' | null
     const canvasRef = useRef(null);
     const imgRef = useRef(null);
     const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
@@ -196,7 +199,7 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
                 ctx.drawImage(sketchImg, 0, 0, naturalWidth, naturalHeight);
                 canvas.toBlob(async (blob) => {
                     if (!blob) return;
-                    setIsUploading(true);
+                    setSavingAction(mode);
                     try {
                         const file = new File([blob], 'doodle.jpg', { type: 'image/jpeg' });
                         const url = await uploadToCloudinary(file);
@@ -206,7 +209,7 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
                     } catch (e) {
                         console.error("Failed to upload doodle:", e);
                     } finally {
-                        setIsUploading(false);
+                        setSavingAction(null);
                         onClose();
                     }
                 }, 'image/jpeg', 1.0);
@@ -218,11 +221,76 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
         }
     };
 
-    const presetColors = ['#ff0000', '#f59e0b', '#00d4aa', '#ffffff'];
+    const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+    
+    const presetColors = [
+        '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', 
+        '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', 
+        '#f43f5e', '#ffffff', '#94a3b8', '#475569', '#0f172a'
+    ];
+
+    const hexToRgba = (hex, alpha) => {
+        let cleanHex = hex.replace('#', '');
+        if (cleanHex.length === 3) {
+            cleanHex = cleanHex.split('').map(char => char + char).join('');
+        }
+        const r = parseInt(cleanHex.slice(0, 2), 16) || 0;
+        const g = parseInt(cleanHex.slice(2, 4), 16) || 0;
+        const b = parseInt(cleanHex.slice(4, 6), 16) || 0;
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
+    useEffect(() => {
+        if (canvasRef.current) {
+            canvasRef.current.eraseMode(brushType === 'eraser');
+        }
+    }, [brushType]);
+
+    const getActualStrokeWidth = () => {
+        if (brushType === 'pencil') return 2;
+        if (brushType === 'pen') return 5;
+        if (brushType === 'highlighter') return 20;
+        if (brushType === 'eraser') return eraserWidth;
+        return 5;
+    };
+
+    const getCanvasCursor = () => {
+        const isEraser = brushType === 'eraser';
+        const w = getActualStrokeWidth();
+        
+        if (!isEraser && w <= 5) return 'crosshair';
+
+        const radius = Math.max(1, w / 2);
+        const fill = isEraser ? 'none' : hexToRgba(strokeColor, 0.4);
+        const outlineColor = isEraser ? 'black' : strokeColor;
+        
+        const svg = `<svg width="${w}" height="${w}" xmlns="http://www.w3.org/2000/svg"><circle cx="${radius}" cy="${radius}" r="${radius - 1}" fill="none" stroke="white" stroke-width="2" /><circle cx="${radius}" cy="${radius}" r="${Math.max(0.1, radius - 2)}" fill="${fill}" stroke="${outlineColor}" stroke-width="1" /></svg>`;
+        const encoded = btoa(svg);
+        return `url('data:image/svg+xml;base64,${encoded}') ${radius} ${radius}, crosshair`;
+    };
+
+    const getActiveBrushStyle = (toolType) => {
+        if (brushType !== toolType) return {};
+        return {
+            background: hexToRgba(strokeColor, 0.2),
+            color: strokeColor,
+            boxShadow: `0 2px 8px ${hexToRgba(strokeColor, 0.3)}`
+        };
+    };
+
+    const getActualStrokeColor = () => {
+        if (brushType === 'highlighter') {
+            return hexToRgba(strokeColor, 0.4);
+        }
+        return strokeColor;
+    };
 
     return createPortal(
         <div className="crop-modal-overlay doodle-modal-overlay" onClick={onClose}>
-            <div className="crop-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="crop-modal-content" onClick={e => {
+                e.stopPropagation();
+                if (isColorPickerOpen) setIsColorPickerOpen(false);
+            }}>
                 <div className="crop-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto', paddingBottom: '150px' }}>
                     <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%', maxHeight: '75vh' }}>
                         <img 
@@ -234,11 +302,15 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
                             crossOrigin="anonymous" 
                         />
                         {imgDimensions.width > 0 && (
-                            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', touchAction: 'none' }}>
+                            <div 
+                                className="doodle-canvas-wrapper" 
+                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', touchAction: 'none', cursor: getCanvasCursor() }}
+                            >
                                 <ReactSketchCanvas 
                                     ref={canvasRef} 
-                                    strokeWidth={strokeWidth} 
-                                    strokeColor={strokeColor} 
+                                    strokeWidth={getActualStrokeWidth()} 
+                                    eraserWidth={eraserWidth}
+                                    strokeColor={getActualStrokeColor()} 
                                     width="100%" 
                                     height="100%" 
                                     canvasColor="transparent" 
@@ -248,33 +320,95 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
                     </div>
                 </div>
                 <div className="crop-action-bar doodle-action-bar">
-                    <div className="doodle-tools-container">
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                            {presetColors.map(c => (
-                                <button 
-                                    key={c}
-                                    onClick={() => setStrokeColor(c)}
-                                    style={{
-                                        width: '28px', height: '28px', borderRadius: '50%', backgroundColor: c,
-                                        border: strokeColor === c ? '3px solid #fff' : '2px solid rgba(255,255,255,0.2)',
-                                        cursor: 'pointer', outline: 'none', padding: 0
-                                    }}
-                                />
-                            ))}
+                    <div className="doodle-tools-container" style={{ position: 'relative' }}>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <div className="brush-selector-group" style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.1)', padding: '4px', borderRadius: '50px' }}>
+                                <button className={`brush-btn ${brushType === 'pencil' ? 'active' : ''}`} style={getActiveBrushStyle('pencil')} onClick={() => { setBrushType('pencil'); setIsEraserSliderOpen(false); }} title="Pencil"><Pencil size={18} /></button>
+                                <button className={`brush-btn ${brushType === 'pen' ? 'active' : ''}`} style={getActiveBrushStyle('pen')} onClick={() => { setBrushType('pen'); setIsEraserSliderOpen(false); }} title="Fountain Pen"><PenTool size={18} /></button>
+                                <button className={`brush-btn ${brushType === 'highlighter' ? 'active' : ''}`} style={getActiveBrushStyle('highlighter')} onClick={() => { setBrushType('highlighter'); setIsEraserSliderOpen(false); }} title="Highlighter"><Highlighter size={18} /></button>
+                            </div>
+                            <button 
+                                className="current-color-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsColorPickerOpen(!isColorPickerOpen);
+                                }}
+                                style={{
+                                    width: '36px', height: '36px', borderRadius: '50%', backgroundColor: strokeColor,
+                                    border: '3px solid #fff', cursor: 'pointer', outline: 'none', padding: 0,
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                                }}
+                            />
+                            
+                            {isColorPickerOpen && (
+                                <div className="color-picker-popover" onClick={e => e.stopPropagation()}>
+                                    <div className="color-palette-grid">
+                                        {presetColors.map(c => (
+                                            <button 
+                                                key={c}
+                                                className="color-swatch"
+                                                onClick={() => {
+                                                    setStrokeColor(c);
+                                                    setIsColorPickerOpen(false);
+                                                }}
+                                                style={{ backgroundColor: c }}
+                                            />
+                                        ))}
+                                        <div className="color-swatch rainbow-swatch">
+                                            <input 
+                                                type="color" 
+                                                className="custom-color-input"
+                                                value={strokeColor}
+                                                onChange={(e) => setStrokeColor(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                            <button className="custom-btn doodle-tool-btn" onClick={() => canvasRef.current?.undo()} disabled={isUploading}><i className="bi bi-arrow-counterclockwise"></i></button>
-                            <button className="custom-btn doodle-tool-btn" onClick={() => canvasRef.current?.clearCanvas()} disabled={isUploading}><i className="bi bi-trash"></i></button>
+                        <div style={{ position: 'relative' }}>
+                            <div className="brush-selector-group" style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.1)', padding: '4px', borderRadius: '50px' }}>
+                                <button 
+                                    className={`brush-btn ${brushType === 'eraser' ? 'active' : ''}`} 
+                                    onClick={() => {
+                                        if (brushType === 'eraser') {
+                                            setIsEraserSliderOpen(!isEraserSliderOpen);
+                                        } else {
+                                            setBrushType('eraser');
+                                            setIsEraserSliderOpen(true);
+                                        }
+                                    }} 
+                                    title="Eraser"
+                                >
+                                    <Eraser size={18} />
+                                </button>
+                                <button className="brush-btn" onClick={() => canvasRef.current?.undo()} disabled={savingAction !== null} title="Undo"><Undo2 size={18} /></button>
+                                <button className="brush-btn" onClick={() => canvasRef.current?.clearCanvas()} disabled={savingAction !== null} title="Clear Canvas"><Trash2 size={18} /></button>
+                            </div>
+                            
+                            {isEraserSliderOpen && brushType === 'eraser' && (
+                                <div className="eraser-slider-popover" onClick={e => e.stopPropagation()}>
+                                    <span style={{ color: '#fff', fontSize: '12px', fontWeight: '500' }}>Size: {eraserWidth}px</span>
+                                    <input 
+                                        type="range" 
+                                        min="5" 
+                                        max="50" 
+                                        value={eraserWidth}
+                                        onChange={(e) => setEraserWidth(Number(e.target.value))}
+                                        className="custom-range-input"
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="modal-action-buttons">
-                        <button className="custom-btn primary-btn" onClick={() => handleSave('replace')} disabled={isUploading}>
-                            {isUploading ? t('Uploading...') : t('Replace Original')}
+                        <button className="custom-btn primary-btn" onClick={() => handleSave('replace')} disabled={savingAction !== null}>
+                            {savingAction === 'replace' ? t('Uploading...') : t('Replace Original')}
                         </button>
-                        <button className="custom-btn secondary-btn" onClick={() => handleSave('copy')} disabled={isUploading}>
-                            {isUploading ? t('Uploading...') : t('Save as Copy')}
+                        <button className="custom-btn secondary-btn" onClick={() => handleSave('copy')} disabled={savingAction !== null}>
+                            {savingAction === 'copy' ? t('Uploading...') : t('Save as Copy')}
                         </button>
-                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={isUploading}>{t('Cancel')}</button>
+                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={savingAction !== null}>{t('Cancel')}</button>
                     </div>
                 </div>
             </div>

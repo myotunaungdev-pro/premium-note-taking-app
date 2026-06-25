@@ -1139,10 +1139,13 @@ h1.reader-page-title {
     outline: none;
     font-size: 1rem;
     font-weight: 500;
-    padding: 10px 24px;
+    padding: 16px 20px;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .cancel-btn {
@@ -1158,6 +1161,9 @@ h1.reader-page-title {
     background: rgba(0, 212, 170, 0.1);
     color: #00d4aa;
     border: 1px solid rgba(0, 212, 170, 0.3);
+    width: 200px !important;
+    box-sizing: border-box;
+    white-space: nowrap;
 }
 
 .secondary-btn:hover {
@@ -1169,6 +1175,142 @@ h1.reader-page-title {
     flex: 0 0 auto !important;
     width: fit-content !important;
     min-width: auto !important;
+}
+
+.current-color-btn {
+    transition: transform 0.2s ease;
+}
+.current-color-btn:hover {
+    transform: scale(1.1);
+}
+
+.brush-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.brush-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.brush-btn.active {
+    background: #00d4aa;
+    color: #1e1e1e;
+    box-shadow: 0 2px 8px rgba(0, 212, 170, 0.3);
+}
+
+.doodle-canvas-wrapper path[stroke*="rgba"] {
+    mix-blend-mode: multiply;
+}
+
+.doodle-canvas-wrapper.eraser-mode * {
+    cursor: inherit !important;
+}
+
+.eraser-slider-popover {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    left: auto;
+    margin-bottom: 16px;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.custom-range-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 120px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    outline: none;
+}
+
+.custom-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00d4aa;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+}
+
+.color-picker-popover {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 16px;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.color-palette-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    outline: none;
+}
+
+.color-swatch:hover {
+    transform: scale(1.15);
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.rainbow-swatch {
+    background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-color-input {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 60px;
+    height: 60px;
+    opacity: 0;
+    cursor: pointer;
 }
 
 .image-menu-option:hover {
@@ -1185,6 +1327,9 @@ h1.reader-page-title {
     color: #1e1e1e;
     font-weight: 600;
     box-shadow: 0 4px 14px rgba(0, 212, 170, 0.3);
+    width: 200px !important;
+    box-sizing: border-box;
+    white-space: nowrap;
 }
 
 .primary-btn:hover {
@@ -1206,14 +1351,75 @@ h1.reader-page-title {
     }
 
     .modal-action-buttons {
-        flex-direction: column;
+        flex-direction: row-reverse;
         width: 100%;
-        gap: 10px;
+        gap: 8px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-action-buttons::-webkit-scrollbar {
+        display: none;
     }
 
     .modal-action-buttons .custom-btn {
-        width: 100%;
-        min-width: 100%;
+        width: auto !important;
+        min-width: 0 !important;
+        flex: 1 1 0px !important;
+        padding: 14px 4px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        border-radius: 50px;
+    }
+}
+
+.doodle-canvas-wrapper * {
+    cursor: inherit !important;
+}
+
+@media (max-width: 640px) {
+    .modal-action-buttons {
+        gap: 6px;
+    }
+    
+    .modal-action-buttons .custom-btn {
+        padding: 14px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .crop-action-bar.doodle-action-bar {
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .doodle-tools-container {
+        position: static;
+        left: auto;
+        transform: none;
+    }
+
+    .brush-btn {
+        width: 48px !important;
+        height: 48px !important;
+    }
+
+    .brush-btn svg {
+        width: 22px !important;
+        height: 22px !important;
+    }
+
+    .current-color-btn {
+        width: 48px !important;
+        height: 48px !important;
+    }
+
+    .brush-selector-group {
+        padding: 6px !important;
+        gap: 8px !important;
     }
 }
 
