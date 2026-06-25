@@ -246,6 +246,23 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
         }
     }, [brushType]);
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key.toLowerCase() === 'z' && !e.shiftKey) {
+                    e.preventDefault();
+                    canvasRef.current?.undo();
+                } else if (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey)) {
+                    e.preventDefault();
+                    canvasRef.current?.redo();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     const getActualStrokeWidth = () => {
         if (brushType === 'pencil') return 2;
         if (brushType === 'pen') return 5;
@@ -258,15 +275,20 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
         const isEraser = brushType === 'eraser';
         const w = getActualStrokeWidth();
         
-        if (!isEraser && w <= 5) return 'crosshair';
+        const svgSize = Math.max(w, 4);
+        const halfWidth = svgSize / 2;
+        const circleRadius = w / 2;
 
-        const radius = Math.max(1, w / 2);
-        const fill = isEraser ? 'none' : hexToRgba(strokeColor, 0.4);
-        const outlineColor = isEraser ? 'black' : strokeColor;
+        let svg = '';
+        if (isEraser) {
+            svg = `<svg width="${svgSize}" height="${svgSize}" xmlns="http://www.w3.org/2000/svg"><circle cx="${halfWidth}" cy="${halfWidth}" r="${Math.max(0.1, circleRadius - 1)}" fill="none" stroke="black" stroke-width="1" /><circle cx="${halfWidth}" cy="${halfWidth}" r="${Math.max(0.1, circleRadius - 2)}" fill="none" stroke="white" stroke-width="1" /></svg>`;
+        } else {
+            const fill = brushType === 'highlighter' ? hexToRgba(strokeColor, 0.4) : strokeColor;
+            svg = `<svg width="${svgSize}" height="${svgSize}" xmlns="http://www.w3.org/2000/svg"><circle cx="${halfWidth}" cy="${halfWidth}" r="${Math.max(0.1, circleRadius - 0.5)}" fill="${fill}" stroke="white" stroke-width="1" /></svg>`;
+        }
         
-        const svg = `<svg width="${w}" height="${w}" xmlns="http://www.w3.org/2000/svg"><circle cx="${radius}" cy="${radius}" r="${radius - 1}" fill="none" stroke="white" stroke-width="2" /><circle cx="${radius}" cy="${radius}" r="${Math.max(0.1, radius - 2)}" fill="${fill}" stroke="${outlineColor}" stroke-width="1" /></svg>`;
-        const encoded = btoa(svg);
-        return `url('data:image/svg+xml;base64,${encoded}') ${radius} ${radius}, crosshair`;
+        const encoded = encodeURIComponent(svg);
+        return `url('data:image/svg+xml;utf8,${encoded}') ${halfWidth} ${halfWidth}, crosshair`;
     };
 
     const getActiveBrushStyle = (toolType) => {
