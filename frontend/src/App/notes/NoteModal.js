@@ -1160,7 +1160,7 @@ const NoteEditModal = () => {
                     <button type="button" className="btn-cancel" onClick={handleClose}>
                         {t('Cancel')}
                     </button>
-                    <button type="submit" className="btn-save" disabled={isButtonDisabled}>
+                    <button id="global-save-note-btn" type="submit" className="btn-save" disabled={isButtonDisabled}>
                         <i className={`bi ${editingNote ? 'bi-check-lg' : 'bi-plus-lg'}`}></i>
                         {editingNote ? t('Update Note') : t('Create Note')}
                     </button>

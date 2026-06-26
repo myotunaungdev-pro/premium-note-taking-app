@@ -101,10 +101,22 @@ const Settings = () => {
         setIsLogoutModalOpen(true);
     };
 
-    const confirmLogout = () => {
+    const confirmLogout = React.useCallback(() => {
         dispatch(logout());
         navigate('/');
-    };
+    }, [dispatch, navigate]);
+
+    React.useEffect(() => {
+        const handleSettingsKeyDown = (e) => {
+            if (e.key === 'Enter' && isLogoutModalOpen) {
+                e.preventDefault();
+                confirmLogout();
+            }
+        };
+
+        window.addEventListener('keydown', handleSettingsKeyDown);
+        return () => window.removeEventListener('keydown', handleSettingsKeyDown);
+    }, [isLogoutModalOpen, confirmLogout]);
 
     return (
         <div className="settings-page">

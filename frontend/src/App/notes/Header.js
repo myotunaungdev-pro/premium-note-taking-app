@@ -60,6 +60,22 @@ const Header = ({ onSelectAll }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isFilterOpen]);
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Delete' && selectedNoteIds.length > 0) {
+                const activeTag = document.activeElement.tagName;
+                if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || document.activeElement.isContentEditable) {
+                    return;
+                }
+                e.preventDefault();
+                handleTrashOrDelete();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedNoteIds, activeView, dispatch]);
+
     const handleSortSelect = (value) => {
         dispatch(setSortBy(value));
         setIsFilterOpen(false);
@@ -185,6 +201,7 @@ const Header = ({ onSelectAll }) => {
                 <div className="search-container">
                     <i className="bi bi-search search-icon"></i>
                     <input
+                        id="global-search-input"
                         type="text"
                         className="search-input"
                         placeholder={t("Search notes...")}

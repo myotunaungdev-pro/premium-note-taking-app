@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useMemo, useCallback, useState } from 'react';
+import React, { useEffect, useMemo, useCallback, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import NoteCard from './NoteCard';
 import NoteModal from './NoteModal';
-import { setSidebarCollapsed, toggleCategoryFilter, selectAllNotes } from '../store/notesSlice';
+import { setSidebarCollapsed, toggleCategoryFilter, selectAllNotes, clearSelection, setModalOpen, setReaderOpen, setEditingNote, toggleSelectNote } from '../store/notesSlice';
 import { fetchNotes, permanentlyDeleteFromServer } from '../store/notesThunks';
 import { tagOptions } from './NoteModal';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ const NotesApp = () => {
         dispatch(fetchNotes());
     }, [dispatch]);
 
-    const { notes, activeView, searchQuery, sortBy, sidebarCollapsed, categoryFilter } = useSelector(
+    const { notes, activeView, searchQuery, sortBy, sidebarCollapsed, categoryFilter, selectedNoteIds, isModalOpen, isReaderOpen } = useSelector(
         (state) => state.notes
     );
 
@@ -75,7 +75,7 @@ const NotesApp = () => {
                 sorted.sort((a, b) => (a.isDone === b.isDone ? 0 : a.isDone ? 1 : -1));
                 break;
             default:
-                sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                sorted.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
         }
 
         return sorted;
@@ -111,13 +111,11 @@ const NotesApp = () => {
         dispatch(setSidebarCollapsed(true));
     }, [dispatch]);
 
-    const visibleNotes = useMemo(() => {
-        return notes.filter(note => {
-            if (activeView === 'archive') return note.isArchived && !note.isDeleted;
-            if (activeView === 'trash') return note.isDeleted;
-            return !note.isArchived && !note.isDeleted;
-        });
-    }, [notes, activeView]);
+    // Workspace Navigation Reset Effect
+    useEffect(() => {
+        dispatch(toggleCategoryFilter('All'));
+        dispatch(clearSelection());
+    }, [activeView, dispatch]);
 
     // Ctrl + A shortcut (Event Listener)
     useEffect(() => {
@@ -131,7 +129,7 @@ const NotesApp = () => {
 
                 e.preventDefault();
 
-                const allVisibleIds = visibleNotes.map((note) => note._id);
+                const allVisibleIds = filteredAndSortedNotes.map((note) => note._id);
 
                 dispatch(selectAllNotes(allVisibleIds));
             }
@@ -142,17 +140,132 @@ const NotesApp = () => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [visibleNotes, dispatch]);
+    }, [filteredAndSortedNotes, dispatch]);
 
+    // Global Shortcuts (Search, Save, Escape, New Note)
     useEffect(() => {
-        const handleEscape = (e) => {
-            if (e.key === 'Escape' && !sidebarCollapsed) {
-                closeSidebar();
+        const handleGlobalKeyDown = (e) => {
+            // Ctrl + Enter to Save Note
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                if (isModalOpen) {
+                    e.preventDefault();
+                    document.getElementById('global-save-note-btn')?.click();
+                    return;
+                }
+            }
+
+            // New Note (Ctrl+N or Cmd+N)
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+                const activeTag = document.activeElement?.tagName;
+                if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || document.activeElement?.isContentEditable) {
+                    return;
+                }
+                e.preventDefault();
+                dispatch(setEditingNote(null));
+                dispatch(setModalOpen(true));
+            }
+
+            // Search (Ctrl+F or Cmd+F)
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+                const searchInput = document.getElementById('global-search-input');
+                if (searchInput) searchInput.focus();
+            }
+
+            // Save (Ctrl+S or Cmd+S)
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                const saveBtn = document.getElementById('global-save-note-btn');
+                if (saveBtn) {
+                    saveBtn.click();
+                }
+            }
+
+            // Escape
+            if (e.key === 'Escape') {
+                if (selectedNoteIds && selectedNoteIds.length > 0) {
+                    dispatch(clearSelection());
+                } else if (isModalOpen) {
+                    dispatch(setModalOpen(false));
+                } else if (isReaderOpen) {
+                    dispatch(setReaderOpen(false));
+                } else if (!sidebarCollapsed) {
+                    closeSidebar();
+                }
+                document.activeElement?.blur();
+            }
+
+            // Enter (Confirm Modal or Open Selected Note)
+            if (e.key === 'Enter') {
+                const activeTag = document.activeElement?.tagName;
+                if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || document.activeElement?.isContentEditable) {
+                    return;
+                }
+                
+                // Priority Check: Confirmation Modal (Delete / Logout)
+                const confirmBtn = document.querySelector('.btn-modal-confirm') || document.querySelector('.btn-logout-confirm');
+                if (confirmBtn) {
+                    e.preventDefault();
+                    confirmBtn.click();
+                    return;
+                }
+                
+                // Secondary Action: Open Single Selected Note
+                if (selectedNoteIds && selectedNoteIds.length === 1 && !isModalOpen && !isReaderOpen) {
+                    e.preventDefault();
+                    const noteToEdit = notes.find(n => n._id === selectedNoteIds[0]);
+                    if (noteToEdit) {
+                        dispatch(setEditingNote(noteToEdit));
+                        dispatch(setModalOpen(true));
+                    }
+                }
+            }
+
+            // Toggle Sidebar (Ctrl + \ or Cmd + \)
+            if ((e.ctrlKey || e.metaKey) && e.key === '\\') {
+                e.preventDefault();
+                dispatch(setSidebarCollapsed(!sidebarCollapsed));
             }
         };
-        window.addEventListener('keydown', handleEscape);
-        return () => window.removeEventListener('keydown', handleEscape);
-    }, [sidebarCollapsed, closeSidebar]);
+
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    }, [dispatch, selectedNoteIds, isModalOpen, isReaderOpen, sidebarCollapsed, closeSidebar, notes]);
+
+    const lastSelectedNoteIndexRef = useRef(null);
+
+    const handleNoteSelect = useCallback((noteId, e) => {
+        const flatNotes = filteredAndSortedNotes;
+        const currentIndex = flatNotes.findIndex(n => n._id === noteId);
+
+        if (e.shiftKey && lastSelectedNoteIndexRef.current !== null && currentIndex !== -1) {
+            const start = Math.min(lastSelectedNoteIndexRef.current, currentIndex);
+            const end = Math.max(lastSelectedNoteIndexRef.current, currentIndex);
+            
+            const noteIdsInRange = flatNotes.slice(start, end + 1).map(n => n._id);
+            const newSelection = new Set(selectedNoteIds);
+            noteIdsInRange.forEach(id => newSelection.add(id));
+            
+            dispatch(selectAllNotes(Array.from(newSelection)));
+            window.getSelection()?.removeAllRanges();
+        } else {
+            dispatch(toggleSelectNote(noteId));
+        }
+        
+        lastSelectedNoteIndexRef.current = currentIndex;
+    }, [filteredAndSortedNotes, selectedNoteIds, dispatch]);
+
+    // Selection Syncing (Dynamic Deselect)
+    useEffect(() => {
+        if (!selectedNoteIds || selectedNoteIds.length === 0) return;
+
+        const visibleIds = new Set(filteredAndSortedNotes.map(note => note._id));
+        const syncedSelection = selectedNoteIds.filter(id => visibleIds.has(id));
+
+        if (syncedSelection.length !== selectedNoteIds.length) {
+            dispatch(selectAllNotes(syncedSelection));
+        }
+    }, [filteredAndSortedNotes, selectedNoteIds, dispatch]);
 
     const groupedNotes = useMemo(() => {
         // Only group if we are sorting by date (the default sort)
@@ -173,7 +286,7 @@ const NotesApp = () => {
         thirtyDaysAgo.setDate(today.getDate() - 30);
 
         filteredAndSortedNotes.forEach((note) => {
-            const noteDate = new Date(note.createdAt);
+            const noteDate = new Date(note.updatedAt || note.createdAt);
             const noteDay = new Date(noteDate.getFullYear(), noteDate.getMonth(), noteDate.getDate());
 
             if (noteDay.getTime() === today.getTime()) {
@@ -252,7 +365,7 @@ const NotesApp = () => {
                                         <h3 className="note-group-header">{t(groupKey)}</h3>
                                         <div className="notes-grid">
                                             {groupedNotes[groupKey].map((note) => (
-                                                <NoteCard key={note._id} note={note} onDeleteRequest={(note) => setNoteToDelete(note)} />
+                                                <NoteCard key={note._id} note={note} onDeleteRequest={(note) => setNoteToDelete(note)} onSelectToggle={(e) => handleNoteSelect(note._id, e)} />
                                             ))}
                                         </div>
                                     </div>
@@ -261,7 +374,7 @@ const NotesApp = () => {
                         ) : (
                             <div className="notes-grid">
                                 {filteredAndSortedNotes.map((note) => (
-                                    <NoteCard key={note._id} note={note} onDeleteRequest={(note) => setNoteToDelete(note)} />
+                                    <NoteCard key={note._id} note={note} onDeleteRequest={(note) => setNoteToDelete(note)} onSelectToggle={(e) => handleNoteSelect(note._id, e)} />
                                 ))}
                             </div>
                         )

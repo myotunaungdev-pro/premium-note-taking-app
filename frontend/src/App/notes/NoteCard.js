@@ -13,7 +13,7 @@ import { updateNoteOnServer } from '../store/notesThunks';
 import './NoteCard.css';
 import { useTranslation } from 'react-i18next';
 
-const NoteCard = ({ note, onDeleteRequest }) => {
+const NoteCard = ({ note, onDeleteRequest, onSelectToggle }) => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const { activeView } = useSelector((state) => state.notes);
@@ -93,11 +93,18 @@ const NoteCard = ({ note, onDeleteRequest }) => {
         <div 
             className={`note-card ${note.isDone ? 'done' : '' && note.isSelected ? 'selected' : ''}  `}
             onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => {
+                if (e.shiftKey) e.preventDefault();
+            }}
         >
 
             <div className={`${isSelected ? 'note-checkbox-wrapper-selected' : 'note-checkbox-wrapper'}`} onClick={(e) => {
                 e.stopPropagation();
-                dispatch(toggleSelectNote(note._id));
+                if (onSelectToggle) {
+                    onSelectToggle(e);
+                } else {
+                    dispatch(toggleSelectNote(note._id));
+                }
             }}>
                 <div className={`custom-checkbox ${isSelected ? 'checked' : ''}`}>
                     {isSelected && <i className="bi bi-check"></i>}
@@ -112,7 +119,7 @@ const NoteCard = ({ note, onDeleteRequest }) => {
                 </span>
                 <span className="note-date">
                     <i className="bi bi-calendar3"></i>
-                    {formatDate(note.createdAt)}
+                    {formatDate(note.updatedAt || note.createdAt)}
                 </span>
             </div>
 

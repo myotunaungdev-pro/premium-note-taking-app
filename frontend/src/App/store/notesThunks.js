@@ -15,8 +15,8 @@ export const addNoteToServer = createAsyncThunk('notes/addNote', async (newNote)
 
 // Update an existing note
 export const updateNoteOnServer = createAsyncThunk('notes/updateNote', async (updatedNote) => {
-    await axiosInstance.put(`/notes/${updatedNote._id}`, updatedNote);
-    return updatedNote;
+    const response = await axiosInstance.put(`/notes/${updatedNote._id}`, updatedNote);
+    return response.data.updatedNote;
 });
 
 // Permanently delete a note
