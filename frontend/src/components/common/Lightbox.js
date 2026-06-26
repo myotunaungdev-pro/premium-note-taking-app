@@ -16,7 +16,7 @@ const Lightbox = ({ src, alt, onClose, children }) => {
 
     return (
         <div className="lightbox-overlay-reusable" onClick={onClose}>
-            <button className="lightbox-close-reusable" onClick={onClose}>
+            <button className="lightbox-close-reusable" onClick={onClose} data-tooltip-id="global-tooltip" data-tooltip-content="Close (Esc)">
                 <i className="bi bi-x-lg"></i>
             </button>
             <div className="lightbox-content-reusable" onClick={(e) => e.stopPropagation()}>

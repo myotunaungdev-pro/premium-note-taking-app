@@ -22,7 +22,8 @@ const notesSlice = createSlice({
         isModalOpen: false,
         readingNote: null,
         selectedNoteIds: [],
-        categoryFilter: []
+        categoryFilter: [],
+        isShortcutModalOpen: false
     },
     reducers: {
         setActiveView: (state, action) => { state.activeView = action.payload; },
@@ -50,6 +51,7 @@ const notesSlice = createSlice({
         setSidebarCollapsed: (state, action) => { state.sidebarCollapsed = action.payload; },
         setReadingNote: (state, action) => { state.readingNote = action.payload; },
         setReaderOpen: (state, action) => { state.isReaderOpen = action.payload; },
+        setShortcutModalOpen: (state, action) => { state.isShortcutModalOpen = action.payload; },
         toggleSelectNote: (state, action) => {
             if (state.selectedNoteIds.includes(action.payload)) {
                 state.selectedNoteIds = state.selectedNoteIds.filter(id => id !== action.payload);
@@ -122,6 +124,7 @@ export const {
     setSidebarCollapsed,
     setReadingNote,
     setReaderOpen,
+    setShortcutModalOpen,
     toggleSelectNote,
     clearSelection,
     selectAllNotes

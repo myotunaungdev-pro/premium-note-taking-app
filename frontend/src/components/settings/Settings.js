@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { logout, updateUserProfile } from '../../App/store/authSlice';
+import { setShortcutModalOpen } from '../../App/store/notesSlice';
 import LanguageSwitcher from '../common/LanguageSwitcher';
 import Lightbox from '../common/Lightbox';
 import './Settings.css';
@@ -220,6 +221,16 @@ const Settings = () => {
                         <div className="preference-divider"></div>
                         <div className="preference-item">
                             <div className="preference-info">
+                                <i className="bi bi-keyboard"></i>
+                                <span>{t('Keyboard Shortcuts')}</span>
+                            </div>
+                            <button className="btn-upgrade" onClick={() => dispatch(setShortcutModalOpen(true))} style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'inherit' }}>
+                                {t('View Cheat Sheet')}
+                            </button>
+                        </div>
+                        <div className="preference-divider"></div>
+                        <div className="preference-item">
+                            <div className="preference-info">
                                 <i className="bi bi-translate"></i>
                                 <span>{t('Language')}</span>
                             </div>
@@ -268,7 +279,7 @@ const Settings = () => {
                             <button className="btn-modal-cancel" onClick={() => setIsLogoutModalOpen(false)}>
                                 {t('Cancel')}
                             </button>
-                            <button className="btn-modal-confirm" onClick={confirmLogout}>
+                            <button className="btn-modal-confirm" onClick={confirmLogout} data-tooltip-id="global-tooltip" data-tooltip-content={t('Confirm (Enter)')}>
                                 {t('Confirm Logout')}
                             </button>
                         </div>
@@ -279,7 +290,7 @@ const Settings = () => {
             {isAvatarModalOpen && (
                 <div className="logout-modal-overlay" onClick={() => setIsAvatarModalOpen(false)}>
                     <div className="logout-modal avatar-options-modal" onClick={(e) => e.stopPropagation()}>
-                        <button className="modal-close-icon" onClick={() => setIsAvatarModalOpen(false)}>
+                        <button className="modal-close-icon" onClick={() => setIsAvatarModalOpen(false)} data-tooltip-id="global-tooltip" data-tooltip-content={t('Close (Esc)')}>
                             <i className="bi bi-x-lg"></i>
                         </button>
 

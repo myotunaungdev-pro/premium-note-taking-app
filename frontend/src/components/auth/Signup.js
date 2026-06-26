@@ -150,7 +150,6 @@ const Signup = () => {
                                             type="button" 
                                             className="btn-toggle-password"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            title={showPassword ? t("hidePassword") : t("showPassword")}
                                         >
                                             <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                                         </button>

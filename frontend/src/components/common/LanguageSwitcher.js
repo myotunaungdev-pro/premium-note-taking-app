@@ -34,7 +34,6 @@ const LanguageSwitcher = () => {
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => setIsOpen((open) => !open)}
-                title={t("Toggle Language", "Toggle Language")}
             >
                 <i className="bi bi-globe"></i>
                 <span>{i18n.language?.toUpperCase() || 'EN'}</span>

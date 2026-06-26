@@ -165,7 +165,6 @@ const ForgotPassword = () => {
                                             type="button" 
                                             className="btn-toggle-password"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            title={showPassword ? t("Hide password") : t("Show password")}
                                         >
                                             <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                                         </button>

@@ -345,9 +345,9 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
                     <div className="doodle-tools-container" style={{ position: 'relative' }}>
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className="brush-selector-group" style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.1)', padding: '4px', borderRadius: '50px' }}>
-                                <button className={`brush-btn ${brushType === 'pencil' ? 'active' : ''}`} style={getActiveBrushStyle('pencil')} onClick={() => { setBrushType('pencil'); setIsEraserSliderOpen(false); }} title="Pencil"><Pencil size={18} /></button>
-                                <button className={`brush-btn ${brushType === 'pen' ? 'active' : ''}`} style={getActiveBrushStyle('pen')} onClick={() => { setBrushType('pen'); setIsEraserSliderOpen(false); }} title="Fountain Pen"><PenTool size={18} /></button>
-                                <button className={`brush-btn ${brushType === 'highlighter' ? 'active' : ''}`} style={getActiveBrushStyle('highlighter')} onClick={() => { setBrushType('highlighter'); setIsEraserSliderOpen(false); }} title="Highlighter"><Highlighter size={18} /></button>
+                                <button className={`brush-btn ${brushType === 'pencil' ? 'active' : ''}`} style={getActiveBrushStyle('pencil')} onClick={() => { setBrushType('pencil'); setIsEraserSliderOpen(false); }}><Pencil size={18} /></button>
+                                <button className={`brush-btn ${brushType === 'pen' ? 'active' : ''}`} style={getActiveBrushStyle('pen')} onClick={() => { setBrushType('pen'); setIsEraserSliderOpen(false); }}><PenTool size={18} /></button>
+                                <button className={`brush-btn ${brushType === 'highlighter' ? 'active' : ''}`} style={getActiveBrushStyle('highlighter')} onClick={() => { setBrushType('highlighter'); setIsEraserSliderOpen(false); }}><Highlighter size={18} /></button>
                             </div>
                             <button 
                                 className="current-color-btn"
@@ -400,12 +400,12 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
                                             setIsEraserSliderOpen(true);
                                         }
                                     }} 
-                                    title="Eraser"
+                                    
                                 >
                                     <Eraser size={18} />
                                 </button>
-                                <button className="brush-btn" onClick={() => canvasRef.current?.undo()} disabled={savingAction !== null} title="Undo"><Undo2 size={18} /></button>
-                                <button className="brush-btn" onClick={() => canvasRef.current?.clearCanvas()} disabled={savingAction !== null} title="Clear Canvas"><Trash2 size={18} /></button>
+                                <button className="brush-btn" onClick={() => canvasRef.current?.undo()} disabled={savingAction !== null}><Undo2 size={18} /></button>
+                                <button className="brush-btn" onClick={() => canvasRef.current?.clearCanvas()} disabled={savingAction !== null}><Trash2 size={18} /></button>
                             </div>
                             
                             {isEraserSliderOpen && brushType === 'eraser' && (
@@ -528,7 +528,7 @@ const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDe
                         {isUploading ? t('Uploading to Cloud...') : t('Add Image')}
                     </h3>
                     {!isUploading && (
-                        <button type="button" className="image-menu-close" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+                        <button type="button" className="image-menu-close" onClick={(e) => { e.stopPropagation(); onClose(); }} data-tooltip-id="global-tooltip" data-tooltip-content={t('Close (Esc)')}>
                             <i className="bi bi-x-lg"></i>
                         </button>
                     )}
@@ -710,20 +710,19 @@ const NoteReadView = ({ note, onClose }) => {
                             <button 
                                 className="size-btn image-toggle-btn" 
                                 onClick={() => setIsImageGrid(!isImageGrid)} 
-                                title={isImageGrid ? t('Switch to Full-Width Stack') : t('Switch to Grid Gallery')}
                             >
                                 <i className={`bi ${isImageGrid ? 'bi-distribute-vertical' : 'bi-grid-fill'}`}></i>
                             </button>
                             <div className="toggle-divider"></div>
                         </div>
                         <div className="view-size-controls">
-                            <button className={`size-btn ${viewSize === 'default' ? 'active' : ''}`} onClick={() => setViewSize('default')} title={t('Default Size')}>
+                            <button className={`size-btn ${viewSize === 'default' ? 'active' : ''}`} onClick={() => setViewSize('default')}>
                                 <i className="bi bi-window"></i>
                             </button>
-                            <button className={`size-btn ${viewSize === 'wide' ? 'active' : ''}`} onClick={() => setViewSize('wide')} title={t('Wide Size')}>
+                            <button className={`size-btn ${viewSize === 'wide' ? 'active' : ''}`} onClick={() => setViewSize('wide')}>
                                 <i className="bi bi-aspect-ratio"></i>
                             </button>
-                            <button className={`size-btn ${viewSize === 'fullscreen' ? 'active' : ''}`} onClick={() => setViewSize('fullscreen')} title={t('Fullscreen')}>
+                            <button className={`size-btn ${viewSize === 'fullscreen' ? 'active' : ''}`} onClick={() => setViewSize('fullscreen')}>
                                 <i className="bi bi-arrows-fullscreen"></i>
                             </button>
                         </div>
@@ -795,7 +794,7 @@ const NoteReadView = ({ note, onClose }) => {
                         type="button" 
                         className="yarl__button" 
                         onClick={() => setCropImageSrc(lightboxSlides[lightboxIndex]?.src)} 
-                        title={t("Crop Image")}
+                        
                         aria-label={t("Crop Image")}
                     >
                         <svg className="yarl__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -807,7 +806,7 @@ const NoteReadView = ({ note, onClose }) => {
                         type="button" 
                         className="yarl__button" 
                         onClick={() => setDoodleImageSrc(lightboxSlides[lightboxIndex]?.src)} 
-                        title={t("Draw on Image")}
+                        
                         aria-label={t("Draw on Image")}
                     >
                         <svg className="yarl__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -819,7 +818,7 @@ const NoteReadView = ({ note, onClose }) => {
                         type="button" 
                         className="yarl__button" 
                         onClick={handleDownloadImage} 
-                        title={t("Download Image")}
+                        
                         aria-label={t("Download Image")}
                         style={{ marginRight: 'auto' }}
                     >
@@ -1063,7 +1062,7 @@ const NoteEditModal = () => {
                         <i className={`bi ${editingNote ? 'bi-pencil-square' : 'bi-plus-circle'}`}></i>
                         {editingNote ? t('Edit Note') : t('Create New Note')}
                     </h2>
-                    <button type="button" className="modal-close" onClick={handleClose}>
+                    <button type="button" className="modal-close" onClick={handleClose} data-tooltip-id="global-tooltip" data-tooltip-content={t('Close (Esc)')}>
                         <i className="bi bi-x-lg"></i>
                     </button>
                 </div>
@@ -1160,7 +1159,7 @@ const NoteEditModal = () => {
                     <button type="button" className="btn-cancel" onClick={handleClose}>
                         {t('Cancel')}
                     </button>
-                    <button id="global-save-note-btn" type="submit" className="btn-save" disabled={isButtonDisabled}>
+                    <button id="global-save-note-btn" type="submit" className="btn-save" disabled={isButtonDisabled} data-tooltip-id="global-tooltip" data-tooltip-content={t('Save Note (Ctrl + Enter)')}>
                         <i className={`bi ${editingNote ? 'bi-check-lg' : 'bi-plus-lg'}`}></i>
                         {editingNote ? t('Update Note') : t('Create Note')}
                     </button>

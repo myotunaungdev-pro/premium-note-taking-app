@@ -145,7 +145,6 @@ const NoteCard = ({ note, onDeleteRequest, onSelectToggle }) => {
                     <button
                         className={`status-btn ${note.isDone ? 'completed' : ''}`}
                         onClick={handleToggleDone}
-                        title={note.isDone ? t('Mark as incomplete') : t('Mark as complete')}
                     >
                         <i className={`bi ${note.isDone ? 'bi-check-circle-fill' : 'bi-circle'}`}></i>
                         <span>{note.isDone ? t('Done') : t('Pending')}</span>
@@ -155,28 +154,27 @@ const NoteCard = ({ note, onDeleteRequest, onSelectToggle }) => {
                 <div className="note-actions">
                     {activeView === 'trash' ? (
                         <>
-                            <button className="action-btn restore" onClick={handleRestore} title={t("Restore")}>
+                            <button className="action-btn restore" onClick={handleRestore}>
                                 <i className="bi bi-arrow-counterclockwise"></i>
                             </button>
-                            <button className="action-btn delete-permanent" onClick={handlePermanentDeleteClick} title={t("Delete Forever")}>
+                            <button className="action-btn delete-permanent" onClick={handlePermanentDeleteClick}>
                                 <i className="bi bi-trash-fill" style={{ color: '#ef4444' }}></i>
                             </button>
                         </>
                     ) : (
                         <>
-                            <button className="action-btn edit" onClick={handleEdit} title={t("Edit")}>
+                            <button className="action-btn edit" onClick={handleEdit}>
                                 <i className="bi bi-pencil"></i>
                             </button>
 
                             <button
                                 className={`action-btn ${note.isArchived ? 'unarchive' : 'archive'}`}
                                 onClick={handleArchiveToggle}
-                                title={note.isArchived ? t('Unarchive') : t('Archive')}
                             >
                                 <i className={`bi ${note.isArchived ? 'bi-box-arrow-up' : 'bi-archive'}`}></i>
                             </button>
 
-                            <button className="action-btn delete" onClick={handleDelete} title={t("Delete")}>
+                            <button className="action-btn delete" onClick={handleDelete}>
                                 <i className="bi bi-trash3"></i>
                             </button>
                         </>

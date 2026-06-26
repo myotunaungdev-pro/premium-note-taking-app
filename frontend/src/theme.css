@@ -160,3 +160,23 @@ body.light-theme {
     border-color: rgba(0, 0, 0, 0.1) !important;
     color: #64748b !important;
 }
+
+/* React Tooltip Custom Premium Styling */
+.custom-react-tooltip {
+    background: rgba(15, 15, 20, 0.9) !important;
+    color: #ffffff !important;
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    z-index: 99999 !important;
+}
+
+.light-theme .custom-react-tooltip {
+    background: rgba(30, 41, 59, 0.9) !important;
+    color: #ffffff !important;
+}
+
+

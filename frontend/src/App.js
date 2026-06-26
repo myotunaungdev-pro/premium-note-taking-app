@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 
 import NotesApp from './App/notes/NotesApp';
 import LandingPage from './App/landing/LandingPage';
@@ -11,6 +13,8 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import PublicRoute from './components/common/PublicRoute';
 import Settings from './components/settings/Settings';
+import ShortcutModal from './components/common/ShortcutModal';
+import HelpGuide from './components/help/HelpGuide';
 
 function App() {
     useEffect(() => {
@@ -24,6 +28,8 @@ function App() {
 
     return (
         <BrowserRouter>
+            <Tooltip id="global-tooltip" className="custom-react-tooltip" />
+            <ShortcutModal />
             <ToastContainer theme="dark" position="top-right" autoClose={3000} />
             <Routes>
                 <Route element={<PublicRoute />}>
@@ -35,6 +41,7 @@ function App() {
                 <Route element={<ProtectedRoute />}>
                     <Route path="/notes" element={<NotesApp />} />
                     <Route path="/settings" element={<Settings />} />
+                    <Route path="/help" element={<HelpGuide />} />
                 </Route>
             </Routes>
         </BrowserRouter>

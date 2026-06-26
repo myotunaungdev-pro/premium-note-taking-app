@@ -1,0 +1,210 @@
+.help-guide-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--bg-color);
+    color: #e0e0e0;
+}
+
+.help-guide-header {
+    display: flex;
+    align-items: center;
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.help-guide-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.help-guide-header .back-btn {
+    background: transparent;
+    border: none;
+    color: #e0e0e0;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 24px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.help-guide-header .back-btn:hover {
+    background: var(--surface-color);
+    color: #ffffff;
+}
+
+.help-guide-content-wrapper {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.help-guide-sidebar {
+    width: 280px;
+    border-right: 1px solid var(--border-color);
+    background: rgba(15, 23, 42, 0.2);
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.help-tabs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.help-tab {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #e0e0e0;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.help-tab i {
+    font-size: 18px;
+}
+
+.help-tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.help-tab.active {
+    background: var(--primary-color-alpha);
+    color: var(--primary-color);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.help-guide-main {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    background: var(--bg-color);
+}
+
+.help-section {
+    max-width: 800px;
+}
+
+.help-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 28px;
+    margin-bottom: 24px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.help-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.help-list li {
+    padding: 20px;
+    border-radius: 12px;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: #e0e0e0;
+    line-height: 1.6;
+    font-size: 15px;
+    transition: transform 0.2s ease;
+}
+
+.help-list li:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.help-list li strong {
+    color: #ffffff;
+    font-size: 16px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.help-text {
+    color: #e0e0e0;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.shortcut-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.shortcut-highlight kbd {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 16px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .help-guide-content-wrapper {
+        flex-direction: column;
+    }
+    .help-guide-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px;
+    }
+    .help-tabs {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 8px;
+    }
+    .help-tab {
+        white-space: nowrap;
+    }
+    .help-guide-main {
+        padding: 24px;
+    }
+}

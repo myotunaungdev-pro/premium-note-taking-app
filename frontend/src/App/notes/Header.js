@@ -132,7 +132,6 @@ const Header = ({ onSelectAll }) => {
                         <button
                             className="action-btn restore-btn"
                             onClick={() => dispatch(bulkRestoreOnServer(selectedNoteIds))}
-                            title={t("Restore to All Notes")}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M3 7v6h6" />
@@ -142,7 +141,7 @@ const Header = ({ onSelectAll }) => {
                     )}
 
                     {activeView !== 'archive' && (
-                        <button className="action-btn archive-btn" onClick={() => dispatch(bulkArchiveOnServer(selectedNoteIds))} title={t("Move to Archive")}>
+                        <button className="action-btn archive-btn" onClick={() => dispatch(bulkArchiveOnServer(selectedNoteIds))}>
                             <i className="bi bi-archive"></i>
                         </button>
                     )}
@@ -150,7 +149,6 @@ const Header = ({ onSelectAll }) => {
                     <button 
                         className={`action-btn trash-btn ${activeView === 'trash' ? 'permanent-delete' : ''}`} 
                         onClick={handleTrashOrDelete}
-                        title={activeView === 'trash' ? t("Permanently Delete") : t("Move to Trash")}
                     >
                         {activeView === 'trash' ? (
                             <i className="bi bi-trash-fill" style={{ color: '#ef4444' }}></i>
@@ -172,7 +170,7 @@ const Header = ({ onSelectAll }) => {
                                 <button className="btn-modal-cancel" onClick={() => setIsConfirmDeleteOpen(false)}>
                                     {t("Cancel")}
                                 </button>
-                                <button className="btn-modal-confirm" onClick={confirmPermanentDelete}>
+                                <button className="btn-modal-confirm" onClick={confirmPermanentDelete} data-tooltip-id="global-tooltip" data-tooltip-content={t('Confirm (Enter)')}>
                                     {t("Delete")}
                                 </button>
                             </div>
@@ -190,7 +188,7 @@ const Header = ({ onSelectAll }) => {
             onKeyDown={(e) => e.stopPropagation()}
         >
             <div className="header-left">
-                <button className="mobile-menu-btn" onClick={() => dispatch(toggleSidebar())}>
+                <button className="mobile-menu-btn" onClick={() => dispatch(toggleSidebar())} data-tooltip-id="global-tooltip" data-tooltip-content={t('Toggle Sidebar (Ctrl + \\)')}>
                     <i className="bi bi-list"></i>
                 </button>
 
@@ -220,7 +218,8 @@ const Header = ({ onSelectAll }) => {
                 <button 
                     className="select-all-btn" 
                     onClick={onSelectAll}
-                    title={t("Select All")}
+                    data-tooltip-id="global-tooltip"
+                    data-tooltip-content={t("Select All Visible (Ctrl + A)")}
                 >
                     <i className="bi bi-check2-all"></i>
                 </button>
@@ -286,7 +285,7 @@ const Header = ({ onSelectAll }) => {
                 </div>
 
                 {activeView === 'all' && (
-                    <button className="new-note-btn" onClick={handleNewNote}>
+                    <button className="new-note-btn" onClick={handleNewNote} data-tooltip-id="global-tooltip" data-tooltip-content={t('New Note (Ctrl + N)')}>
                         <i className="bi bi-plus-lg"></i>
                         <span>{t('New Note')}</span>
                     </button>

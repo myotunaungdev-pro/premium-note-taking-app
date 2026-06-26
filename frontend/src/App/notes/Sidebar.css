@@ -102,6 +102,8 @@ body.is-resizing * {
 .sidebar-nav {
     flex: 1;
     padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
 }
 
 .nav-list {

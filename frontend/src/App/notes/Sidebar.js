@@ -41,6 +41,13 @@ const Sidebar = () => {
 
     // When click menu item run function
     const handleNavItemClick = (id) => {
+        if (id === 'help') {
+            navigate('/help');
+            if (isMobile) {
+                dispatch(setSidebarCollapsed(true));
+            }
+            return;
+        }
         dispatch(setActiveView(id)); // Change first view
 
         if (isMobile) {
@@ -97,7 +104,7 @@ const Sidebar = () => {
                         </div>
                         {!sidebarCollapsed && <span className="logo-text">{t('My Notes')}</span>}
                     </div>
-                    <button className="toggle-btn" onClick={() => dispatch(toggleSidebar())}>
+                    <button className="toggle-btn" onClick={() => dispatch(toggleSidebar())} data-tooltip-id="global-tooltip" data-tooltip-content={t('Toggle Sidebar (Ctrl + \\)')}>
                         <i className={`bi ${sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'}`}></i>
                     </button>
                 </div>
@@ -109,6 +116,7 @@ const Sidebar = () => {
                                 <button
                                     className={`nav-item ${activeView === item.id ? 'active' : ''}`}
                                     onClick={() => handleNavItemClick(item.id)}
+                                    
                                 >
                                     <i className={`bi ${item.icon}`}></i>
                                     {!sidebarCollapsed && (
@@ -116,13 +124,31 @@ const Sidebar = () => {
                                             <span className={`nav-label ${sidebarCollapsed ? 'hidden' : 'visible'}`}>
                                                 {item.label}
                                             </span>
-                                            <span className="nav-count">{item.count}</span>
+                                            <span className="nav-count">{item.count !== undefined ? item.count : ''}</span>
                                         </>
                                     )}
                                 </button>
                             </li>
                         ))}
                     </ul>
+                    
+                    <div style={{ marginTop: 'auto' }}>
+                        <ul className="nav-list">
+                            <li>
+                                <button
+                                    className={`nav-item ${activeView === 'help' ? 'active' : ''}`}
+                                    onClick={() => handleNavItemClick('help')}
+                                >
+                                    <i className="bi bi-question-circle"></i>
+                                    {!sidebarCollapsed && (
+                                        <span className={`nav-label ${sidebarCollapsed ? 'hidden' : 'visible'}`}>
+                                            {t('Help & Guide')}
+                                        </span>
+                                    )}
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
                 </nav>
 
                 <div className="sidebar-footer">

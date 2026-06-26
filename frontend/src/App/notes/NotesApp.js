@@ -404,7 +404,7 @@ const NotesApp = () => {
                             <button className="btn-modal-cancel" onClick={() => setNoteToDelete(null)}>
                                 {t("Cancel")}
                             </button>
-                            <button className="btn-modal-confirm" onClick={confirmPermanentDelete}>
+                            <button className="btn-modal-confirm" onClick={confirmPermanentDelete} data-tooltip-id="global-tooltip" data-tooltip-content={t('Confirm (Enter)')}>
                                 {t("Delete")}
                             </button>
                         </div>
