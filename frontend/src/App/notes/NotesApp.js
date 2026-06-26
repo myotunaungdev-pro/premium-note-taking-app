@@ -117,6 +117,7 @@ const NotesApp = () => {
         dispatch(clearSelection());
     }, [activeView, dispatch]);
 
+
     // Ctrl + A shortcut (Event Listener)
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -333,7 +334,10 @@ const NotesApp = () => {
                     <div className="category-chips-scroll">
                         <button
                             className={`category-chip ${safeCategoryFilter.length === 0 ? 'active' : ''}`}
-                            onClick={() => dispatch(toggleCategoryFilter('All'))}
+                            onClick={() => {
+                                dispatch(toggleCategoryFilter('All'));
+                                dispatch(clearSelection());
+                            }}
                         >
                             {t('All')}
                         </button>
@@ -346,7 +350,10 @@ const NotesApp = () => {
                                     style={{
                                         '--chip-color': tag.color,
                                     }}
-                                    onClick={() => dispatch(toggleCategoryFilter(tag.label))}
+                                    onClick={() => {
+                                        dispatch(toggleCategoryFilter(tag.label));
+                                        dispatch(clearSelection());
+                                    }}
                                 >
                                     {t(tag.label)}
                                     {isActive && <i className="bi bi-x chip-close-icon"></i>}

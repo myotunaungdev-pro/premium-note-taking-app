@@ -13,6 +13,7 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import PublicRoute from './components/common/PublicRoute';
 import Settings from './components/settings/Settings';
+import SystemSettings from './components/settings/SystemSettings';
 import ShortcutModal from './components/common/ShortcutModal';
 import HelpGuide from './components/help/HelpGuide';
 
@@ -41,6 +42,7 @@ function App() {
                 <Route element={<ProtectedRoute />}>
                     <Route path="/notes" element={<NotesApp />} />
                     <Route path="/settings" element={<Settings />} />
+                    <Route path="/system-settings" element={<SystemSettings />} />
                     <Route path="/help" element={<HelpGuide />} />
                 </Route>
             </Routes>

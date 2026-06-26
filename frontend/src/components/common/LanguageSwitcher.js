@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import './LanguageSwitcher.css';
 
 const LanguageSwitcher = () => {
-    const { t, i18n } = useTranslation();
+    const { i18n } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 

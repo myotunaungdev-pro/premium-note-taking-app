@@ -60,6 +60,14 @@ const Header = ({ onSelectAll }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isFilterOpen]);
 
+    const handleTrashOrDelete = React.useCallback(() => {
+        if (activeView === 'trash') {
+            setIsConfirmDeleteOpen(true);
+        } else {
+            dispatch(bulkTrashOnServer(selectedNoteIds));
+        }
+    }, [activeView, dispatch, selectedNoteIds]);
+
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Delete' && selectedNoteIds.length > 0) {
@@ -74,7 +82,7 @@ const Header = ({ onSelectAll }) => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedNoteIds, activeView, dispatch]);
+    }, [selectedNoteIds, handleTrashOrDelete]);
 
     const handleSortSelect = (value) => {
         dispatch(setSortBy(value));
@@ -97,13 +105,7 @@ const Header = ({ onSelectAll }) => {
         }
     };
 
-    const handleTrashOrDelete = () => {
-        if (activeView === 'trash') {
-            setIsConfirmDeleteOpen(true);
-        } else {
-            dispatch(bulkTrashOnServer(selectedNoteIds));
-        }
-    };
+
 
     const confirmPermanentDelete = () => {
         selectedNoteIds.forEach(id => {

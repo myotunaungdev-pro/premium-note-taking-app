@@ -39,8 +39,14 @@ const Sidebar = () => {
         { id: 'trash', icon: 'bi-trash3', label: t('Trash'), count: trashedCount },
     ];
 
-    // When click menu item run function
     const handleNavItemClick = (id) => {
+        if (id === 'settings') {
+            navigate('/system-settings');
+            if (isMobile) {
+                dispatch(setSidebarCollapsed(true));
+            }
+            return;
+        }
         if (id === 'help') {
             navigate('/help');
             if (isMobile) {
@@ -134,6 +140,19 @@ const Sidebar = () => {
                     
                     <div style={{ marginTop: 'auto' }}>
                         <ul className="nav-list">
+                            <li>
+                                <button
+                                    className={`nav-item ${activeView === 'settings' ? 'active' : ''}`}
+                                    onClick={() => handleNavItemClick('settings')}
+                                >
+                                    <i className="bi bi-gear"></i>
+                                    {!sidebarCollapsed && (
+                                        <span className={`nav-label ${sidebarCollapsed ? 'hidden' : 'visible'}`}>
+                                            {t('Settings')}
+                                        </span>
+                                    )}
+                                </button>
+                            </li>
                             <li>
                                 <button
                                     className={`nav-item ${activeView === 'help' ? 'active' : ''}`}

@@ -5,8 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { logout, updateUserProfile } from '../../App/store/authSlice';
-import { setShortcutModalOpen } from '../../App/store/notesSlice';
-import LanguageSwitcher from '../common/LanguageSwitcher';
 import Lightbox from '../common/Lightbox';
 import './Settings.css';
 
@@ -15,11 +13,6 @@ const Settings = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
-
-    const [isDarkMode, setIsDarkMode] = React.useState(() => {
-        const savedTheme = localStorage.getItem('theme');
-        return savedTheme ? savedTheme === 'dark' : true;
-    });
 
     const [isEditMode, setIsEditMode] = React.useState(false);
     const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
@@ -32,11 +25,6 @@ const Settings = () => {
         email: user?.email || '',
         birthdate: user?.birthdate ? new Date(user.birthdate).toISOString().split('T')[0] : ''
     });
-
-    React.useEffect(() => {
-        document.body.classList.toggle('light-theme', !isDarkMode);
-        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    }, [isDarkMode]);
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -126,7 +114,7 @@ const Settings = () => {
                     <i className="bi bi-arrow-left"></i>
                     <span>{t('Back to Notes')}</span>
                 </button>
-                <h1 className="page-title">{t('Settings')}</h1>
+                <h1 className="page-title">{t('Account Profile')}</h1>
             </div>
 
             <div className="settings-content">
@@ -199,43 +187,6 @@ const Settings = () => {
                                 </div>
                             </form>
                         )}
-                    </div>
-                </section>
-
-                {/* Preferences */}
-                <section className="settings-section preferences-section">
-                    <h2 className="section-title">{t('Preferences')}</h2>
-                    <div className="settings-card">
-                        <div className="preference-item">
-                            <div className="preference-info">
-                                <i className="bi bi-palette"></i>
-                                <span>{t('Theme')} ({isDarkMode ? t('Dark Mode') : t('Light Mode')})</span>
-                            </div>
-                            <div 
-                                className={`toggle-switch ${isDarkMode ? 'active' : ''}`}
-                                onClick={() => setIsDarkMode(!isDarkMode)}
-                            >
-                                <div className="toggle-knob"></div>
-                            </div>
-                        </div>
-                        <div className="preference-divider"></div>
-                        <div className="preference-item">
-                            <div className="preference-info">
-                                <i className="bi bi-keyboard"></i>
-                                <span>{t('Keyboard Shortcuts')}</span>
-                            </div>
-                            <button className="btn-upgrade" onClick={() => dispatch(setShortcutModalOpen(true))} style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'inherit' }}>
-                                {t('View Cheat Sheet')}
-                            </button>
-                        </div>
-                        <div className="preference-divider"></div>
-                        <div className="preference-item">
-                            <div className="preference-info">
-                                <i className="bi bi-translate"></i>
-                                <span>{t('Language')}</span>
-                            </div>
-                            <LanguageSwitcher />
-                        </div>
                     </div>
                 </section>
 

@@ -11,7 +11,7 @@ const HelpGuide = () => {
     const tabs = [
         { id: 'getting_started', label: t('Getting Started'), icon: 'bi-rocket' },
         { id: 'pro_features', label: t('Pro Features'), icon: 'bi-star' },
-        { id: 'shortcuts', label: t('Keyboard Shortcuts'), icon: 'bi-keyboard' },
+        { id: 'shortcuts', label: t('Essential Shortcuts'), icon: 'bi-keyboard' },
         { id: 'settings_language', label: t('Settings & Language'), icon: 'bi-gear' }
     ];
 
@@ -62,8 +62,12 @@ const HelpGuide = () => {
                     )}
                     {activeTab === 'shortcuts' && (
                         <div className="help-section fade-in">
-                            <h3><i className="bi bi-keyboard text-success"></i> {t('Keyboard Shortcuts')}</h3>
-                            <p className="help-text">{t('Power up your productivity with keyboard shortcuts. You can open the quick Cheat Sheet from anywhere by pressing:')}</p>
+                            <h3><i className="bi bi-keyboard text-success"></i> {t('Essential Shortcuts')}</h3>
+                            <p className="help-text">
+                                {t('Master your workflow with these essential commands. To see the ')} 
+                                <strong>{t('complete list')}</strong> 
+                                {t(' of all available shortcuts at any time, open the full Cheat Sheet by pressing:')}
+                            </p>
                             <div className="shortcut-highlight">
                                 <kbd>?</kbd> {t('or')} <kbd>Ctrl</kbd> + <kbd>/</kbd>
                             </div>
