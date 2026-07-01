@@ -840,7 +840,7 @@ const NoteReadView = ({ note, onClose }) => {
 };
 
 const NoteEditModal = () => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const dispatch = useDispatch();
     const { editingNote } = useSelector((state) => state.notes);
 
@@ -924,7 +924,7 @@ const NoteEditModal = () => {
         'font',
         'header',
         'bold', 'italic', 'underline',
-        'list', 'bullet',
+        'list',
         'link', 'image'
     ];
 
@@ -1100,6 +1100,22 @@ const NoteEditModal = () => {
         };
     }, []);
 
+    // Inject Cancel button into Quill Tooltip
+    useEffect(() => {
+        if (!quillWrapperRef.current) return;
+        const tooltip = quillWrapperRef.current.querySelector('.ql-tooltip');
+        if (tooltip && !tooltip.querySelector('.ql-cancel-btn')) {
+            const cancelBtn = document.createElement('a');
+            cancelBtn.className = 'ql-cancel-btn';
+            cancelBtn.style.cursor = 'pointer';
+            cancelBtn.onclick = (e) => {
+                e.preventDefault();
+                tooltip.classList.add('ql-hidden');
+            };
+            tooltip.appendChild(cancelBtn);
+        }
+    }, []);
+
     const handleClose = () => {
         dispatch(setModalOpen(false));
         dispatch(setEditingNote(null));
@@ -1249,7 +1265,8 @@ const NoteEditModal = () => {
                             '--quill-action-text': `"${t('link.edit', 'Edit')}"`,
                             '--quill-remove-text': `"${t('link.remove', 'Remove')}"`,
                             '--quill-enter-text': `"${t('link.enterLink', 'Enter link:')}"`,
-                            '--quill-save-text': `"${t('link.save', 'Save')}"`
+                            '--quill-save-text': `"${t('link.save', 'Save')}"`,
+                            '--quill-cancel-text': `"${t('link.cancel', 'Cancel')}"`
                         }}
                     >
                         <label className="form-label">{t("notes.modal.contentLabel")}</label>
@@ -1261,6 +1278,7 @@ const NoteEditModal = () => {
                             modules={quillModules}
                             formats={quillFormats}
                             placeholder={t("notes.modal.contentPlaceholder")}
+                            bounds=".quill-group"
                         />
                     </div>
 

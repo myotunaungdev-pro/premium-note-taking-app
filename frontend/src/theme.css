@@ -179,4 +179,9 @@ body.light-theme {
     color: #ffffff !important;
 }
 
-
+/* Hide global tooltips on touch devices and small screens */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+    .custom-react-tooltip {
+        display: none !important;
+    }
+}

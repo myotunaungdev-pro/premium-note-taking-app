@@ -1,0 +1,17 @@
+Refactor NoteModal layout and UI/UX improvements
+
+### ✨ New Features & Enhancements
+* **Quill Link Tooltip Cancel Action:** Added a fully functioning 'Cancel' button to the Quill link tooltip for better user control. Injected safely via a React `useEffect` without mutating Quill's core event flow.
+* **Localization Support for Cancel Action:** Added multi-language translation keys for the new Cancel button across English (`en.json`), Thai (`th.json`), and Burmese (`my.json`), injecting the text seamlessly via CSS variables.
+
+### 🐛 Bug Fixes
+* **'Bullet' Format Console Error:** Removed the invalid `bullet` string from the `quillFormats` array in `NoteModal.js` to fix the Quill unregistered format console warning.
+* **ESLint `i18n` Warning:** Cleaned up the unused `i18n` import from the `useTranslation()` hook in `NoteModal.js`.
+* **Tooltip Z-Index Scrolling Overlap:** Fixed a major visual bug where the Quill editor tooltip would float *over* the Note Title and Modal Header when scrolling. Solved by assigning proper `z-index` and `position: relative` values to the `.ql-toolbar`, `.ql-container`, and `.modal-header`.
+* **Quill Tooltip Clipping:** Added `bounds=".quill-group"` to the `<ReactQuill>` component to ensure the floating tooltip is constrained properly and doesn't get cut off or jump around unpredictably near the edges of the modal body.
+
+### 🎨 UI/UX Improvements
+* **Advanced Desktop Tooltip Flex Layout:** Completely revamped the base Quill tooltip CSS using an advanced Flexbox ordering strategy. Long URLs now properly truncate, and action buttons ('Edit', 'Remove', 'Cancel') are cleanly grouped and right-aligned on a new forced row, resulting in a highly professional and balanced layout.
+* **Responsive Mobile Tooltip Polish:** Adjusted the mobile media query (`max-width: 600px`) to strip out the right-aligned margins, letting all action buttons perfectly center themselves without wrapping awkwardly. Reduced the column gap to ensure all three buttons fit cleanly side-by-side on narrow screens.
+* **Settings 'Back' Button Optimization:** Shortened the overly long 'Back to Notes' button to simply 'Back' (and updated its Thai/Burmese translations) to resolve layout constraint issues on small mobile devices while retaining the back arrow icon.
+* **Touch Device Hover Tooltips:** Added a media query inside `theme.css` (`@media (max-width: 768px), (hover: none) and (pointer: coarse)`) to disable standard hover tooltips on touch devices, preventing annoying persistent tooltip popups after a user taps the screen.

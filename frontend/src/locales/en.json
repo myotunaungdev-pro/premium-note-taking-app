@@ -4,7 +4,8 @@
     "edit": "Edit",
     "remove": "Remove",
     "enterLink": "Enter link:",
-    "save": "Save"
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "misc": {
     "123456": "123456",
@@ -391,7 +392,7 @@
       "theme": "Theme",
       "language": "Language"
     },
-    "back": "Back to Notes",
+    "back": "Back",
     "theme": {
       "dark": "Dark Mode",
       "light": "Light Mode"
