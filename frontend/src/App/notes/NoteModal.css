@@ -275,6 +275,42 @@
     display: none !important;
 }
 
+/* React Quill Tooltip (Link Input) Overrides */
+.ql-snow .ql-tooltip::before { content: var(--quill-visit-text) !important; }
+.ql-snow .ql-tooltip a.ql-action::after { content: var(--quill-action-text) !important; }
+.ql-snow .ql-tooltip a.ql-remove::before { content: var(--quill-remove-text) !important; }
+.ql-snow .ql-tooltip[data-mode="link"]::before { content: var(--quill-enter-text) !important; }
+.ql-snow .ql-tooltip[data-mode="link"] a.ql-action::after { content: var(--quill-save-text) !important; }
+
+.ql-snow .ql-tooltip {
+    background: rgba(17, 24, 39, 0.98) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    border-radius: 8px !important;
+    color: #e2e8f0 !important;
+    z-index: 1050 !important;
+    white-space: nowrap;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+.ql-snow .ql-tooltip input[type=text] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+    border-radius: 4px !important;
+    padding: 4px 8px !important;
+}
+.ql-snow .ql-tooltip input[type=text]:focus {
+    border-color: #00d4aa !important;
+    outline: none !important;
+}
+.ql-snow .ql-tooltip a.ql-action::after {
+    color: #00d4aa !important;
+}
+.ql-snow .ql-tooltip a.ql-remove::before {
+    color: #ef4444 !important;
+}
+
 /* Editor Image Constraints */
 .ql-editor img {
     max-width: 100%;
@@ -1575,4 +1611,49 @@ h1.reader-page-title {
         flex: 0 1 220px;
         max-width: 220px;
     }
+}
+
+/* Custom Link Modal Styles */
+.link-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.link-modal {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(17, 24, 39, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 100px rgba(0, 212, 170, 0.1);
+    animation: slideUp 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.link-modal h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.link-modal h3 i {
+    color: #00d4aa;
 }

@@ -31,7 +31,7 @@ export const bulkArchiveOnServer = createAsyncThunk(
     async (ids, { rejectWithValue }) => {
         try {
             await axiosInstance.patch(`/notes/bulk-archive`, { ids });
-            return ids;
+            return { ids, timestamp: new Date().toISOString() };
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
         }
@@ -44,7 +44,7 @@ export const bulkTrashOnServer = createAsyncThunk(
     async (ids, { rejectWithValue }) => {
         try {
             await axiosInstance.patch(`/notes/bulk-trash`, { ids });
-            return ids;
+            return { ids, timestamp: new Date().toISOString() };
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
         }
@@ -57,7 +57,7 @@ export const bulkRestoreOnServer = createAsyncThunk(
     async (ids, { rejectWithValue }) => {
         try {
             await axiosInstance.patch(`/notes/bulk-restore`, { ids });
-            return ids;
+            return { ids, timestamp: new Date().toISOString() };
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
         }

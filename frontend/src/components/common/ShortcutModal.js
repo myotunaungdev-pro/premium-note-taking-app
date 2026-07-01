@@ -41,10 +41,15 @@ const ShortcutModal = () => {
         <div className="shortcut-modal-overlay" onClick={closeShortcutModal}>
             <div className="shortcut-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="shortcut-modal-header">
-                    <h2>
-                        <i className="bi bi-keyboard"></i>
-                        {t("common.keyboardShortcuts")}
-                    </h2>
+                    <div>
+                        <h2>
+                            <i className="bi bi-keyboard"></i>
+                            {t("common.keyboardShortcuts")}
+                        </h2>
+                        <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: '0.5rem 0 0 0', fontWeight: 'normal', maxWidth: '90%', lineHeight: '1.4' }}>
+                            {t("shortcuts.mobileNote")}
+                        </p>
+                    </div>
                     <button className="btn-close-shortcut" onClick={closeShortcutModal} data-tooltip-id="global-tooltip" data-tooltip-content={t("common.closeEsc")}>
                         <i className="bi bi-x-lg"></i>
                     </button>

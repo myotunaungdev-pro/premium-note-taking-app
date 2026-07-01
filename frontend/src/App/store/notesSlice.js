@@ -88,25 +88,25 @@ const notesSlice = createSlice({
             })
             // Bulk Archive
             .addCase(bulkArchiveOnServer.fulfilled, (state, action) => {
-                const ids = action.payload;
+                const { ids, timestamp } = action.payload;
                 state.notes = state.notes.map((n) =>
-                    ids.includes(n._id) ? { ...n, isArchived: true, isDeleted: false } : n
+                    ids.includes(n._id) ? { ...n, isArchived: true, isDeleted: false, updatedAt: timestamp } : n
                 );
                 state.selectedNoteIds = [];
             })
             // Bulk Trash
             .addCase(bulkTrashOnServer.fulfilled, (state, action) => {
-                const ids = action.payload;
+                const { ids, timestamp } = action.payload;
                 state.notes = state.notes.map((n) =>
-                    ids.includes(n._id) ? { ...n, isDeleted: true, isArchived: false } : n
+                    ids.includes(n._id) ? { ...n, isDeleted: true, isArchived: false, updatedAt: timestamp } : n
                 );
                 state.selectedNoteIds = [];
             })
             // Bulk Restore
             .addCase(bulkRestoreOnServer.fulfilled, (state, action) => {
-                const ids = action.payload;
+                const { ids, timestamp } = action.payload;
                 state.notes = state.notes.map((n) =>
-                    ids.includes(n._id) ? { ...n, isArchived: false, isDeleted: false } : n
+                    ids.includes(n._id) ? { ...n, isArchived: false, isDeleted: false, updatedAt: timestamp } : n
                 );
                 state.selectedNoteIds = [];
             });

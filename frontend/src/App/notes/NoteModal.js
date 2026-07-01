@@ -840,7 +840,7 @@ const NoteReadView = ({ note, onClose }) => {
 };
 
 const NoteEditModal = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const dispatch = useDispatch();
     const { editingNote } = useSelector((state) => state.notes);
 
@@ -868,12 +868,31 @@ const NoteEditModal = () => {
     const [showImageMenu, setShowImageMenu] = useState(false);
     const [showWebcamModal, setShowWebcamModal] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    // Custom Link Modal State
+    const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+    const [linkDisplayText, setLinkDisplayText] = useState('');
+    const [linkUrl, setLinkUrl] = useState('');
+    const [savedSelectionRange, setSavedSelectionRange] = useState(null);
+    const openLinkModalRef = useRef(null);
     
     // Image Delete Overlay State
     const [hoveredImgNode, setHoveredImgNode] = useState(null);
     const [overlayPos, setOverlayPos] = useState({ top: 0, left: 0, width: 0, height: 0 });
     const overlayRef = useRef(null);
     
+    // Wire the ref to the logic that triggers the custom modal
+    openLinkModalRef.current = (quill) => {
+        const range = quill.getSelection(true);
+        setSavedSelectionRange(range);
+        let text = '';
+        if (range && range.length > 0) {
+            text = quill.getText(range.index, range.length);
+        }
+        setLinkDisplayText(text);
+        setLinkUrl('');
+        setIsLinkModalOpen(true);
+    };
+
     // Use a ref to ensure the memoized Quill config always has access to the latest state setter
     const setShowImageMenuRef = useRef(setShowImageMenu);
     setShowImageMenuRef.current = setShowImageMenu;
@@ -889,12 +908,25 @@ const NoteEditModal = () => {
                 ['clean']
             ],
             handlers: {
+                link: function(value) {
+                    if (openLinkModalRef.current) {
+                        openLinkModalRef.current(this.quill);
+                    }
+                },
                 image: () => {
                     setShowImageMenuRef.current(true);
                 }
             }
         }
     }), []);
+
+    const quillFormats = [
+        'font',
+        'header',
+        'bold', 'italic', 'underline',
+        'list', 'bullet',
+        'link', 'image'
+    ];
 
     const insertBase64ToEditor = (base64) => {
         if (quillRef.current) {
@@ -1109,8 +1141,44 @@ const NoteEditModal = () => {
         handleClose();
     };
 
+    const handleLinkSave = (e) => {
+        e.preventDefault();
+        if (!quillRef.current || !savedSelectionRange) return;
+        
+        const quill = quillRef.current.getEditor();
+        const { index, length } = savedSelectionRange;
+        
+        const textToInsert = linkDisplayText.trim() || linkUrl.trim();
+        const urlToInsert = linkUrl.trim();
+        
+        if (urlToInsert) {
+            if (length > 0) {
+                quill.deleteText(index, length);
+            }
+            if (textToInsert) {
+                quill.insertText(index, textToInsert, 'link', urlToInsert);
+                quill.setSelection(index + textToInsert.length);
+            }
+        }
+        
+        setIsLinkModalOpen(false);
+        setLinkDisplayText('');
+        setLinkUrl('');
+        setSavedSelectionRange(null);
+    };
+
+    const isValidUrl = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(linkUrl.trim());
+    const isLinkSaveDisabled = !linkDisplayText.trim() || !isValidUrl;
+    
+    const handleLinkKeyDown = (e) => {
+        if (e.key === 'Enter' && !isLinkSaveDisabled) {
+            handleLinkSave(e);
+        }
+    };
+
     return (
         <div className="modal-overlay" onClick={handleClose}>
+            {isLinkModalOpen && <style>{`.ql-tooltip { display: none !important; }`}</style>}
             <form className="note-modal" onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title">
@@ -1176,6 +1244,13 @@ const NoteEditModal = () => {
                         onCompositionEnd={() => setIsComposing(false)}
                         onClick={handleEditorInteract}
                         onMouseOver={handleEditorInteract}
+                        style={{
+                            '--quill-visit-text': `"${t('link.visitUrl', 'Visit URL:')}"`,
+                            '--quill-action-text': `"${t('link.edit', 'Edit')}"`,
+                            '--quill-remove-text': `"${t('link.remove', 'Remove')}"`,
+                            '--quill-enter-text': `"${t('link.enterLink', 'Enter link:')}"`,
+                            '--quill-save-text': `"${t('link.save', 'Save')}"`
+                        }}
                     >
                         <label className="form-label">{t("notes.modal.contentLabel")}</label>
                         <ReactQuill 
@@ -1184,6 +1259,7 @@ const NoteEditModal = () => {
                             value={content} 
                             onChange={setContent} 
                             modules={quillModules}
+                            formats={quillFormats}
                             placeholder={t("notes.modal.contentPlaceholder")}
                         />
                     </div>
@@ -1231,6 +1307,49 @@ const NoteEditModal = () => {
                 onDesktopCameraSelect={handleDesktopCameraSelect} 
                 isUploading={isUploading}
             />
+
+            {isLinkModalOpen && (
+                <div className="link-modal-overlay" onClick={() => setIsLinkModalOpen(false)}>
+                    <div className="link-modal" onClick={(e) => e.stopPropagation()}>
+                        <h3><i className="bi bi-link-45deg"></i> {t("notes.modal.linkModal.title")}</h3>
+                        <div className="form-group">
+                            <label className="form-label">{t("notes.modal.linkModal.textToDisplay")}</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={linkDisplayText}
+                                onChange={(e) => setLinkDisplayText(e.target.value)}
+                                onKeyDown={handleLinkKeyDown}
+                                placeholder={t("notes.modal.linkModal.textToDisplay")}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">{t("notes.modal.linkModal.linkUrl")}</label>
+                            <input
+                                type="url"
+                                className="form-input"
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                                onKeyDown={handleLinkKeyDown}
+                                placeholder="https://example.com"
+                                autoFocus
+                            />
+                        </div>
+                        <div className="modal-footer" style={{ marginTop: '20px', padding: 0, borderTop: 'none' }}>
+                            <button type="button" className="btn-cancel" onClick={() => setIsLinkModalOpen(false)}>{t("common.cancel")}</button>
+                            <button 
+                                type="button" 
+                                className="btn-save" 
+                                onClick={handleLinkSave}
+                                disabled={isLinkSaveDisabled}
+                                style={{ opacity: isLinkSaveDisabled ? 0.5 : 1, cursor: isLinkSaveDisabled ? 'not-allowed' : 'pointer' }}
+                            >
+                                {t("notes.modal.linkModal.saveLink")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             
             {showWebcamModal && (
                 <WebcamCaptureModal 

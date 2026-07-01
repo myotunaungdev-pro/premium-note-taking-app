@@ -1,4 +1,11 @@
 {
+  "link": {
+    "visitUrl": "Visit URL:",
+    "edit": "Edit",
+    "remove": "Remove",
+    "enterLink": "Enter link:",
+    "save": "Save"
+  },
   "misc": {
     "123456": "123456",
     "Pro_Plan": "Pro Plan",
@@ -145,9 +152,15 @@
       "readOnly": "Read-Only",
       "closeView": "Close View",
       "editNote": "Edit Note",
-      "createNewNote": "Create New Note"
+      "createNewNote": "Create New Note",
+      "linkModal": {
+        "title": "Insert Link",
+        "textToDisplay": "Text to display",
+        "linkUrl": "Link URL",
+        "saveLink": "Save Link"
+      }
     },
-    "toggleSidebarCtrl": "Toggle Sidebar (Ctrl + \\\\)",
+    "toggleSidebarCtrl": "Toggle Sidebar (Ctrl + \\)",
     "selectAllVisibleCtrl": "Select All Visible (Ctrl + A)",
     "latest": "latest",
     "aZ": "a-z",
@@ -436,5 +449,8 @@
     "switchBetweenOurPrem": "Switch between our premium dark mode and light mode directly from the header.",
     "comingSoonTitle": "Coming Soon",
     "comingSoonDesc": "Pro features are currently under development. We are working hard to bring you advanced capabilities and premium tools in future updates. Stay tuned!"
+  },
+  "shortcuts": {
+    "mobileNote": "Note: These shortcuts are designed for physical keyboards. Mobile users do not need to worry about them."
   }
 }

@@ -79,7 +79,7 @@ export const bulkArchiveNotes = async (req, res) => {
         
         await Note.updateMany(
             { _id: { $in: ids }, userId: req.user.id }, 
-            { $set: { isArchived: true, isDeleted: false } }
+            { $set: { isArchived: true, isDeleted: false, updatedAt: new Date() } }
         );
         
         res.status(200).json({ message: "Successfully archived selected notes" });
@@ -95,7 +95,7 @@ export const bulkTrashNotes = async (req, res) => {
         
         await Note.updateMany(
             { _id: { $in: ids }, userId: req.user.id }, 
-            { $set: { isDeleted: true, isArchived: false } }
+            { $set: { isDeleted: true, isArchived: false, updatedAt: new Date() } }
         );
         
         res.status(200).json({ message: "Successfully trashed selected notes" });
@@ -111,7 +111,7 @@ export const bulkRestoreNotes = async (req, res) => {
         
         await Note.updateMany(
             { _id: { $in: ids }, userId: req.user.id }, 
-            { $set: { isArchived: false, isDeleted: false } }
+            { $set: { isArchived: false, isDeleted: false, updatedAt: new Date() } }
         );
         
         res.status(200).json({ message: "Successfully restored selected notes" });

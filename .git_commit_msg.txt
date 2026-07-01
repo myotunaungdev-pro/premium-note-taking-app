@@ -1,0 +1,16 @@
+feat: custom link modal, i18n support, and bulk action timestamps
+
+✨ New Features
+* Custom Link Modal Implementation: Fully replaced the jarring native browser window.prompt() for rich-text links with a bespoke, fully integrated React Custom Link Modal.
+* Bulk Operations Timestamp Sync: Rewrote the backend handlers (notesController.js) and frontend Redux logic (notesThunks.js, notesSlice.js) for bulk Archiving, Trashing, and Restoring. Bulk actions now instantly return and seamlessly sync updated timestamps to the frontend state without requiring a page refresh.
+
+🐛 Bug Fixes
+* Quill Tooltip Positioning & Layout: Fixed an annoying visual bug where Quill's native link-editing tooltip (.ql-tooltip) would misalign and clip off the left edge of the modal. It is now forcefully centered relative to the editor via CSS overrides.
+* Quill Tooltip Localization Architecture: Reverted buggy JavaScript DOM mutation hacks (useEffect logic) attempting to override Quill's hardcoded tooltip. Replaced them with an airtight, native CSS Variables architecture (--quill-visit-text, etc.) passed directly from the React wrapper. The layout strictly preserves Quill's original UI (including button text colors and spacing) while perfectly supporting dynamic translations.
+* Compilation Errors Resolved: Safely removed a ghost function reference (handleDrawSelect) that had accidentally been injected into the image upload handler, restoring a clean compile state (no-undef error fixed).
+
+🎨 UI/UX Improvements
+* Strict URL Validation: Bolstered the Custom Link Modal with rigorous Regex validation. The modal completely rejects malformed inputs and visually disables the "Save Link" button (lowered opacity, blocked cursor) until the user provides a valid web format.
+* Streamlined Keyboard Accessibility: Added an onKeyDown listener to the new Custom Link Modal. Power users can now instantly trigger the "Save Link" sequence by hitting the Enter key after filling out the URL, bypassing the mouse entirely.
+* Full i18n Localization Support: Every single label in the new Custom Modal ("Insert Link", "Text to display", "Link URL", "Cancel", "Save Link") and Quill's native tooltips ("Visit URL", "Edit", "Remove", "Enter link") is fully wrapped in t() hooks and tied to comprehensive translation maps in en.json, my.json, and th.json.
+* Keyboard Shortcut Modal Polish: Cleaned up translation keys and styling for the ShortcutModal to cleanly inform mobile users that keyboard shortcuts are specifically intended for desktop hardware.
