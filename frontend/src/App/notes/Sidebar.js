@@ -34,9 +34,9 @@ const Sidebar = () => {
     const trashedCount = notes.filter((n) => n.isDeleted).length;
 
     const menuItems = [
-        { id: 'all', icon: 'bi-journal-text', label: t('All Notes'), count: allNotesCount },
-        { id: 'archive', icon: 'bi-archive', label: t('Archive'), count: archivedCount },
-        { id: 'trash', icon: 'bi-trash3', label: t('Trash'), count: trashedCount },
+        { id: 'all', icon: 'bi-journal-text', label: t("notes.sidebar.allNotes"), count: allNotesCount },
+        { id: 'archive', icon: 'bi-archive', label: t("notes.sidebar.archive"), count: archivedCount },
+        { id: 'trash', icon: 'bi-trash3', label: t("notes.sidebar.trash"), count: trashedCount },
     ];
 
     const handleNavItemClick = (id) => {
@@ -108,9 +108,9 @@ const Sidebar = () => {
                         <div className="logo-icon">
                             <i className="bi bi-lightning-charge-fill"></i>
                         </div>
-                        {!sidebarCollapsed && <span className="logo-text">{t('My Notes')}</span>}
+                        {!sidebarCollapsed && <span className="logo-text">{t("notes.header.myNotes")}</span>}
                     </div>
-                    <button className="toggle-btn" onClick={() => dispatch(toggleSidebar())} data-tooltip-id="global-tooltip" data-tooltip-content={t('Toggle Sidebar (Ctrl + \\)')}>
+                    <button className="toggle-btn" onClick={() => dispatch(toggleSidebar())} data-tooltip-id="global-tooltip" data-tooltip-content={t("notes.toggleSidebarCtrl")}>
                         <i className={`bi ${sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'}`}></i>
                     </button>
                 </div>
@@ -148,7 +148,7 @@ const Sidebar = () => {
                                     <i className="bi bi-gear"></i>
                                     {!sidebarCollapsed && (
                                         <span className={`nav-label ${sidebarCollapsed ? 'hidden' : 'visible'}`}>
-                                            {t('Settings')}
+                                            {t("settings.title")}
                                         </span>
                                     )}
                                 </button>
@@ -161,7 +161,7 @@ const Sidebar = () => {
                                     <i className="bi bi-question-circle"></i>
                                     {!sidebarCollapsed && (
                                         <span className={`nav-label ${sidebarCollapsed ? 'hidden' : 'visible'}`}>
-                                            {t('Help & Guide')}
+                                            {t("notes.helpGuide")}
                                         </span>
                                     )}
                                 </button>
@@ -191,7 +191,7 @@ const Sidebar = () => {
                         {!sidebarCollapsed && (
                             <div className="user-info">
                                 <span className="user-name">{user?.name || 'User'}</span>
-                                <span className="user-plan">{t('Free Plan')}</span>
+                                <span className="user-plan">{t("settings.plan.free")}</span>
                             </div>
                         )}
                     </div>

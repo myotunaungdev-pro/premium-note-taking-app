@@ -147,7 +147,7 @@ const NoteCard = ({ note, onDeleteRequest, onSelectToggle }) => {
                         onClick={handleToggleDone}
                     >
                         <i className={`bi ${note.isDone ? 'bi-check-circle-fill' : 'bi-circle'}`}></i>
-                        <span>{note.isDone ? t('Done') : t('Pending')}</span>
+                        <span>{note.isDone ? t("notes.card.done") : t("notes.card.pending")}</span>
                     </button>
                 </div>
 

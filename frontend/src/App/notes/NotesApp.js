@@ -85,21 +85,21 @@ const NotesApp = () => {
         if (searchQuery) {
             return {
                 icon: 'bi-search',
-                title: t('No results found'),
-                text: t('Try adjusting your search terms'),
+                title: t("notes.noResultsFound"),
+                text: t("notes.tryAdjustingYourSear"),
             };
         }
 
         switch (activeView) {
             case 'archive':
-                return { icon: 'bi-archive', title: t('Archive is empty'), text: t('Archived notes will appear here') };
+                return { icon: 'bi-archive', title: t("notes.archiveIsEmpty"), text: t("notes.archivedNotesWillApp") };
             case 'trash':
-                return { icon: 'bi-trash3', title: t('Trash is empty'), text: t('Deleted notes will appear here') };
+                return { icon: 'bi-trash3', title: t("notes.trashIsEmpty"), text: t("notes.deletedNotesWillAppe") };
             default:
                 return {
                     icon: 'bi-journal-plus',
-                    title: t('No notes yet'),
-                    text: t('Create your first note to get started'),
+                    title: t("notes.noNotesYet"),
+                    text: t("notes.createYourFirstNoteT"),
                 };
         }
     };
@@ -339,7 +339,7 @@ const NotesApp = () => {
                                 dispatch(clearSelection());
                             }}
                         >
-                            {t('All')}
+                            {t("notes.all")}
                         </button>
                         {tagOptions.map((tag) => {
                             const isActive = safeCategoryFilter.includes(tag.label);
@@ -355,7 +355,7 @@ const NotesApp = () => {
                                         dispatch(clearSelection());
                                     }}
                                 >
-                                    {t(tag.label)}
+                                    {t(`tags.${tag.label.toLowerCase()}`)}
                                     {isActive && <i className="bi bi-x chip-close-icon"></i>}
                                 </button>
                             );
@@ -405,14 +405,14 @@ const NotesApp = () => {
                         <div className="logout-modal-icon">
                             <i className="bi bi-exclamation-triangle"></i>
                         </div>
-                        <h3>{t("Permanently Delete Note")}</h3>
-                        <p>{t("Are you sure you want to permanently delete this note? This action cannot be undone.")}</p>
+                        <h3>{t("notes.header.deleteConfirmTitleSingle")}</h3>
+                        <p>{t("notes.header.deleteConfirmDescSingle")}</p>
                         <div className="logout-modal-actions">
                             <button className="btn-modal-cancel" onClick={() => setNoteToDelete(null)}>
-                                {t("Cancel")}
+                                {t("common.cancel")}
                             </button>
-                            <button className="btn-modal-confirm" onClick={confirmPermanentDelete} data-tooltip-id="global-tooltip" data-tooltip-content={t('Confirm (Enter)')}>
-                                {t("Delete")}
+                            <button className="btn-modal-confirm" onClick={confirmPermanentDelete} data-tooltip-id="global-tooltip" data-tooltip-content={t("common.confirmEnter")}>
+                                {t("common.delete")}
                             </button>
                         </div>
                     </div>

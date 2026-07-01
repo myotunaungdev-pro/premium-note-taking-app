@@ -43,9 +43,9 @@ const ShortcutModal = () => {
                 <div className="shortcut-modal-header">
                     <h2>
                         <i className="bi bi-keyboard"></i>
-                        {t('Keyboard Shortcuts')}
+                        {t("common.keyboardShortcuts")}
                     </h2>
-                    <button className="btn-close-shortcut" onClick={closeShortcutModal} data-tooltip-id="global-tooltip" data-tooltip-content={t('Close (Esc)')}>
+                    <button className="btn-close-shortcut" onClick={closeShortcutModal} data-tooltip-id="global-tooltip" data-tooltip-content={t("common.closeEsc")}>
                         <i className="bi bi-x-lg"></i>
                     </button>
                 </div>
@@ -53,28 +53,28 @@ const ShortcutModal = () => {
                 <div className="shortcut-modal-body">
                     
                     <div className="shortcut-category">
-                        <h3>{t('General')}</h3>
+                        <h3>{t("common.general")}</h3>
                         <div className="shortcut-list">
                             <div className="shortcut-item">
-                                <span className="shortcut-desc">{t('Toggle Keyboard Shortcuts')}</span>
+                                <span className="shortcut-desc">{t("common.toggleKeyboardShortc")}</span>
                                 <div className="shortcut-keys">
-                                    <kbd>?</kbd> {t('or')} <kbd>Ctrl</kbd> + <kbd>/</kbd>
+                                    <kbd>?</kbd> {t("common.or")} <kbd>Ctrl</kbd> + <kbd>/</kbd>
                                 </div>
                             </div>
                             <div className="shortcut-item">
-                                <span className="shortcut-desc">{t('Toggle Sidebar')}</span>
+                                <span className="shortcut-desc">{t("common.toggleSidebar")}</span>
                                 <div className="shortcut-keys">
                                     <kbd>Ctrl</kbd> + <kbd>\</kbd>
                                 </div>
                             </div>
                             <div className="shortcut-item">
-                                <span className="shortcut-desc">{t('Close Modals / Clear Focus')}</span>
+                                <span className="shortcut-desc">{t("common.closeModalsClearFocu")}</span>
                                 <div className="shortcut-keys">
                                     <kbd>Esc</kbd>
                                 </div>
                             </div>
                             <div className="shortcut-item">
-                                <span className="shortcut-desc">{t('Confirm Delete or Logout')}</span>
+                                <span className="shortcut-desc">{t("common.confirmDeleteOrLogou")}</span>
                                 <div className="shortcut-keys">
                                     <kbd>Enter</kbd>
                                 </div>
@@ -83,22 +83,22 @@ const ShortcutModal = () => {
                     </div>
 
                     <div className="shortcut-category">
-                        <h3>{t('Note Actions')}</h3>
+                        <h3>{t("common.noteActions")}</h3>
                         <div className="shortcut-list">
                             <div className="shortcut-item">
-                                <span className="shortcut-desc">{t('New Note')}</span>
+                                <span className="shortcut-desc">{t("notes.sidebar.newNote")}</span>
                                 <div className="shortcut-keys">
                                     <kbd>Ctrl</kbd> + <kbd>N</kbd>
                                 </div>
                             </div>
                             <div className="shortcut-item">
-                                <span className="shortcut-desc">{t('Save Note')}</span>
+                                <span className="shortcut-desc">{t("common.saveNote")}</span>
                                 <div className="shortcut-keys">
                                     <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
                                 </div>
                             </div>
                             <div className="shortcut-item">
-                                <span className="shortcut-desc">{t('Open Selected Note')}</span>
+                                <span className="shortcut-desc">{t("common.openSelectedNote")}</span>
                                 <div className="shortcut-keys">
                                     <kbd>Enter</kbd>
                                 </div>
@@ -107,16 +107,16 @@ const ShortcutModal = () => {
                     </div>
 
                     <div className="shortcut-category">
-                        <h3>{t('Selection')}</h3>
+                        <h3>{t("common.selection")}</h3>
                         <div className="shortcut-list">
                             <div className="shortcut-item">
-                                <span className="shortcut-desc">{t('Multi-select (Range)')}</span>
+                                <span className="shortcut-desc">{t("common.multiSelectRange")}</span>
                                 <div className="shortcut-keys">
                                     <kbd>Shift</kbd> + <kbd>Click</kbd>
                                 </div>
                             </div>
                             <div className="shortcut-item">
-                                <span className="shortcut-desc">{t('Select All Visible')}</span>
+                                <span className="shortcut-desc">{t("common.selectAllVisible")}</span>
                                 <div className="shortcut-keys">
                                     <kbd>Ctrl</kbd> + <kbd>A</kbd>
                                 </div>

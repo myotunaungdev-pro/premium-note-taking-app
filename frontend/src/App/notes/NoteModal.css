@@ -275,6 +275,48 @@
     display: none !important;
 }
 
+/* Editor Image Constraints */
+.ql-editor img {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ql-editor img:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Image Delete Button */
+.image-delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.image-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.9);
+    color: #ffffff;
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
 /* --- Custom Title Font Dropdown --- */
 .title-font-dropdown-toggle {
     display: flex;

@@ -14,7 +14,9 @@ const root = ReactDom.createRoot(document.getElementById("root"));
 root.render(
     <React.StrictMode>
         <Provider store={store}>
-            <App />
+            <React.Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#00d4aa', fontSize: '1.2rem' }}>Loading workspace...</div>}>
+                <App />
+            </React.Suspense>
         </Provider>
     </React.StrictMode>
 );

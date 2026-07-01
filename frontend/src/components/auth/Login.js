@@ -42,7 +42,7 @@ const Login = () => {
 
         try {
             await dispatch(loginUser(formData)).unwrap();
-            toast.success(t("Login successful!"));
+            toast.success(t("auth.login.success"));
             navigate('/notes');
         } catch (error) {
             toast.error(t(error || "Login failed"));
@@ -62,37 +62,37 @@ const Login = () => {
             <main className="auth-main">
                 <div className="auth-card">
                     <Link to="/" className="back-link">
-                        <i className="bi bi-arrow-left"></i> {t("Back to Home")}
+                        <i className="bi bi-arrow-left"></i> {t("common.backToHome")}
                     </Link>
-                    <h2 className="auth-title">{t("Login")}</h2>
-                    <p className="auth-subtitle">{t("Welcome back to your premium workspace.")}</p>
+                    <h2 className="auth-title">{t("auth.login.title")}</h2>
+                    <p className="auth-subtitle">{t("auth.login.subtitle")}</p>
 
                     <form onSubmit={handleSubmit} className="auth-form" noValidate>
                         <div className="form-group">
-                            <label htmlFor="email">{t("Email")}</label>
+                            <label htmlFor="email">{t("auth.common.email")}</label>
                             <div className="input-wrapper">
                                 <i className="bi bi-envelope input-icon-left"></i>
                                 <input
                                     type="email"
                                     id="email"
                                     name="email"
-                                    placeholder={t("Enter your email")}
+                                    placeholder={t("auth.common.emailPlaceholder")}
                                     value={formData.email}
                                     onChange={handleChange}
                                 />
                             </div>
-                            {formErrors.email === 'empty' && <div className="validation-error">{t("Please enter your email.")}</div>}
+                            {formErrors.email === 'empty' && <div className="validation-error">{t("auth.common.emailRequired")}</div>}
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="password">{t("Password")}</label>
+                            <label htmlFor="password">{t("auth.common.password")}</label>
                             <div className="input-wrapper">
                                 <i className="bi bi-lock input-icon-left"></i>
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     id="password"
                                     name="password"
-                                    placeholder={t("Enter your password")}
+                                    placeholder={t("auth.common.passwordPlaceholder")}
                                     value={formData.password}
                                     onChange={handleChange}
                                 />
@@ -104,22 +104,22 @@ const Login = () => {
                                     <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                                 </button>
                             </div>
-                            {formErrors.password === 'empty' && <div className="validation-error">{t("Please enter your password.")}</div>}
+                            {formErrors.password === 'empty' && <div className="validation-error">{t("auth.common.passwordRequired")}</div>}
                         </div>
 
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', marginTop: '-10px' }}>
                             <Link to="/forgot-password" style={{ color: '#00d4aa', fontSize: '13px', textDecoration: 'none' }}>
-                                {t("Forgot Password?")}
+                                {t("auth.login.forgotPassword")}
                             </Link>
                         </div>
 
                         <button type="submit" className="btn-auth-submit" disabled={isLoading}>
-                            {isLoading ? t("Logging in...") : t("Log In")}
+                            {isLoading ? t("auth.login.loading") : t("auth.login.submit")}
                         </button>
                     </form>
 
                     <p className="auth-redirect">
-                        {t("Don't have an account?")} <Link to="/signup">{t("Sign up here")}</Link>
+                        {t("auth.login.noAccount")} <Link to="/signup">{t("auth.login.signUpLink")}</Link>
                     </p>
                 </div>
             </main>

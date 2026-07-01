@@ -55,7 +55,7 @@ const LandingPage = () => {
                     <button className="btn-theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
                         <i className={`bi ${isLightMode ? 'bi-moon-stars' : 'bi-sun'}`}></i>
                     </button>
-                    <Link to="/login" className="btn-login">{t("Log In")}</Link>
+                    <Link to="/login" className="btn-login">{t("auth.login.submit")}</Link>
                 </div>
             </nav>
 
@@ -63,12 +63,12 @@ const LandingPage = () => {
                 {/* Hero Section */}
                 <section className="hero-section">
                     <div className="hero-content">
-                        <h1 className="hero-title">{t("Capture Your Best Ideas")}</h1>
+                        <h1 className="hero-title">{t("landing.hero.title")}</h1>
                         <p className="hero-subtitle">
-                            {t("A premium, fully localized note-taking experience designed for productivity. Seamlessly organize your thoughts with multi-language support and a gorgeous dark theme.")}
+                            {t("landing.aPremiumFullyLocaliz")}
                         </p>
                         <Link to="/login" className="btn-get-started">
-                            {t("Get Started")}
+                            {t("landing.hero.cta")}
                             <i className="bi bi-arrow-right-short"></i>
                         </Link>
                     </div>
@@ -78,10 +78,10 @@ const LandingPage = () => {
                 <section className="features-section">
                     <div className="zigzag-row reveal fade-up">
                         <div className="zigzag-text">
-                            <span className="zigzag-label">{t("Secure Cloud Sync")}</span>
-                            <h2 className="zigzag-title">{t("Your notes, everywhere you go")}</h2>
+                            <span className="zigzag-label">{t("landing.secureCloudSync")}</span>
+                            <h2 className="zigzag-title">{t("landing.yourNotesEverywhereY")}</h2>
                             <p className="zigzag-desc">
-                                {t("Never lose an idea again. PremiumNotes instantly syncs across all your devices with military-grade encryption to keep your personal data completely private and secure.")}
+                                {t("landing.neverLoseAnIdeaAgain")}
                             </p>
                         </div>
                         <div className="zigzag-image reveal slide-right">
@@ -93,10 +93,10 @@ const LandingPage = () => {
 
                     <div className="zigzag-row reverse reveal fade-up">
                         <div className="zigzag-text">
-                            <span className="zigzag-label">{t("Rich Text Editing")}</span>
-                            <h2 className="zigzag-title">{t("Format exactly how you think")}</h2>
+                            <span className="zigzag-label">{t("landing.richTextEditing")}</span>
+                            <h2 className="zigzag-title">{t("landing.formatExactlyHowYouT")}</h2>
                             <p className="zigzag-desc">
-                                {t("Use our premium Quill editor to add beautiful formatting, lists, code blocks, and dynamic styling. Everything feels native and incredibly responsive.")}
+                                {t("landing.useOurPremiumQuillEd")}
                             </p>
                         </div>
                         <div className="zigzag-image reveal slide-left">
@@ -109,66 +109,66 @@ const LandingPage = () => {
 
                 {/* How It Works Section */}
                 <section className="how-it-works">
-                    <h2 className="section-title reveal fade-up">{t("How It Works")}</h2>
+                    <h2 className="section-title reveal fade-up">{t("landing.howItWorks")}</h2>
                     <div className="steps-grid">
                         <div className="step-card reveal fade-up" style={{ transitionDelay: '0.1s' }}>
                             <div className="step-number">1</div>
-                            <h3 className="step-title">{t("Sign Up")}</h3>
-                            <p className="step-desc">{t("Create your free Premium Workspace in less than a minute. No credit card required.")}</p>
+                            <h3 className="step-title">{t("auth.signup.title")}</h3>
+                            <p className="step-desc">{t("landing.createYourFreePremiu")}</p>
                         </div>
                         <div className="step-card reveal fade-up" style={{ transitionDelay: '0.2s' }}>
                             <div className="step-number">2</div>
-                            <h3 className="step-title">{t("Capture Ideas")}</h3>
-                            <p className="step-desc">{t("Start typing your thoughts instantly into our gorgeous glassmorphic editor.")}</p>
+                            <h3 className="step-title">{t("landing.captureIdeas")}</h3>
+                            <p className="step-desc">{t("landing.startTypingYourThoug")}</p>
                         </div>
                         <div className="step-card reveal fade-up" style={{ transitionDelay: '0.3s' }}>
                             <div className="step-number">3</div>
-                            <h3 className="step-title">{t("Access Anywhere")}</h3>
-                            <p className="step-desc">{t("Pick up exactly where you left off on your phone, tablet, or desktop browser.")}</p>
+                            <h3 className="step-title">{t("landing.accessAnywhere")}</h3>
+                            <p className="step-desc">{t("landing.pickUpExactlyWhereYo")}</p>
                         </div>
                     </div>
                 </section>
 
                 {/* Testimonials Section */}
                 <section className="testimonials-section">
-                    <h2 className="section-title reveal fade-up">{t("Loved by creators worldwide")}</h2>
+                    <h2 className="section-title reveal fade-up">{t("landing.lovedByCreatorsWorld")}</h2>
                     <div className="testimonials-grid">
                         <div className="testimonial-card reveal fade-up" style={{ transitionDelay: '0.1s' }}>
                             <i className="bi bi-quote testimonial-quote"></i>
                             <p className="testimonial-text">
-                                "{t("PremiumNotes changed how I organize my thoughts completely. The multi-language support is unmatched for my international team.")}"
+                                "{t("landing.premiumNotesChangedH")}"
                             </p>
                             <div className="testimonial-author">
                                 <div className="testimonial-avatar">A</div>
                                 <div className="author-info">
-                                    <h4>{t("Alice Chen")}</h4>
-                                    <p>{t("Product Designer")}</p>
+                                    <h4>{t("landing.aliceChen")}</h4>
+                                    <p>{t("landing.productDesigner")}</p>
                                 </div>
                             </div>
                         </div>
                         <div className="testimonial-card reveal fade-up" style={{ transitionDelay: '0.2s' }}>
                             <i className="bi bi-quote testimonial-quote"></i>
                             <p className="testimonial-text">
-                                "{t("The dark mode aesthetic combined with the buttery smooth React UI makes writing a joy instead of a chore.")}"
+                                "{t("landing.theDarkModeAesthetic")}"
                             </p>
                             <div className="testimonial-author">
                                 <div className="testimonial-avatar">M</div>
                                 <div className="author-info">
-                                    <h4>{t("Mark Sterling")}</h4>
-                                    <p>{t("Software Engineer")}</p>
+                                    <h4>{t("landing.markSterling")}</h4>
+                                    <p>{t("landing.softwareEngineer")}</p>
                                 </div>
                             </div>
                         </div>
                         <div className="testimonial-card reveal fade-up" style={{ transitionDelay: '0.3s' }}>
                             <i className="bi bi-quote testimonial-quote"></i>
                             <p className="testimonial-text">
-                                "{t("I love how fast the search works. I can find any note from 2 years ago instantly. Highly recommend upgrading to Pro.")}"
+                                "{t("landing.iLoveHowFastTheSearc")}"
                             </p>
                             <div className="testimonial-author">
                                 <div className="testimonial-avatar">S</div>
                                 <div className="author-info">
-                                    <h4>{t("Sarah Jenkins")}</h4>
-                                    <p>{t("Content Strategist")}</p>
+                                    <h4>{t("landing.sarahJenkins")}</h4>
+                                    <p>{t("landing.contentStrategist")}</p>
                                 </div>
                             </div>
                         </div>
@@ -178,10 +178,10 @@ const LandingPage = () => {
                 {/* Final CTA Section */}
                 <section className="final-cta-section reveal fade-up">
                     <div className="final-cta-container">
-                        <h2 className="final-cta-title">{t("Start Your Free Premium Workspace Today")}</h2>
-                        <p className="final-cta-subtitle">{t("Join thousands of professionals capturing their best ideas securely in the cloud.")}</p>
+                        <h2 className="final-cta-title">{t("landing.startYourFreePremium")}</h2>
+                        <p className="final-cta-subtitle">{t("landing.joinThousandsOfProfe")}</p>
                         <Link to="/signup" className="btn-get-started">
-                            {t("Sign Up Now")}
+                            {t("landing.signUpNow")}
                             <i className="bi bi-arrow-right-short"></i>
                         </Link>
                     </div>
@@ -197,7 +197,7 @@ const LandingPage = () => {
                             <span>PremiumNotes</span>
                         </div>
                         <p className="footer-desc">
-                            {t("A premium, fully localized note-taking experience designed for productivity.")}
+                            {t("landing.hero.subtitle1")}
                         </p>
                         <div className="social-links">
                             <a href="#twitter"><i className="bi bi-twitter-x"></i></a>
@@ -207,49 +207,49 @@ const LandingPage = () => {
                     </div>
                     
                     <div className="footer-col">
-                        <h4>{t("Product")}</h4>
+                        <h4>{t("landing.product")}</h4>
                         <ul>
-                            <li><a href="#features">{t("Features")}</a></li>
-                            <li><a href="#pricing">{t("Pricing")}</a></li>
-                            <li><a href="#integrations">{t("Integrations")}</a></li>
-                            <li><a href="#changelog">{t("Changelog")}</a></li>
+                            <li><a href="#features">{t("landing.footerFeaturesLink")}</a></li>
+                            <li><a href="#pricing">{t("landing.pricing")}</a></li>
+                            <li><a href="#integrations">{t("landing.integrations")}</a></li>
+                            <li><a href="#changelog">{t("landing.changelog")}</a></li>
                         </ul>
                     </div>
 
                     <div className="footer-col">
-                        <h4>{t("Resources")}</h4>
+                        <h4>{t("landing.resources")}</h4>
                         <ul>
-                            <li><a href="#help">{t("Help Center")}</a></li>
-                            <li><a href="#guides">{t("Guides")}</a></li>
-                            <li><a href="#api">{t("API Docs")}</a></li>
-                            <li><a href="#community">{t("Community")}</a></li>
+                            <li><a href="#help">{t("landing.helpCenter")}</a></li>
+                            <li><a href="#guides">{t("landing.guides")}</a></li>
+                            <li><a href="#api">{t("landing.aPIDocs")}</a></li>
+                            <li><a href="#community">{t("landing.community")}</a></li>
                         </ul>
                     </div>
 
                     <div className="footer-col">
-                        <h4>{t("Company")}</h4>
+                        <h4>{t("landing.company")}</h4>
                         <ul>
-                            <li><a href="#about">{t("About Us")}</a></li>
-                            <li><a href="#careers">{t("Careers")}</a></li>
-                            <li><a href="#blog">{t("Blog")}</a></li>
-                            <li><a href="#contact">{t("Contact")}</a></li>
+                            <li><a href="#about">{t("landing.aboutUs")}</a></li>
+                            <li><a href="#careers">{t("landing.careers")}</a></li>
+                            <li><a href="#blog">{t("landing.blog")}</a></li>
+                            <li><a href="#contact">{t("landing.contact")}</a></li>
                         </ul>
                     </div>
 
                     <div className="footer-col">
-                        <h4>{t("Legal")}</h4>
+                        <h4>{t("landing.legal")}</h4>
                         <ul>
-                            <li><a href="#privacy">{t("Privacy Policy")}</a></li>
-                            <li><a href="#terms">{t("Terms of Service")}</a></li>
-                            <li><a href="#cookies">{t("Cookie Policy")}</a></li>
+                            <li><a href="#privacy">{t("landing.privacyPolicy")}</a></li>
+                            <li><a href="#terms">{t("landing.termsOfService")}</a></li>
+                            <li><a href="#cookies">{t("landing.cookiePolicy")}</a></li>
                         </ul>
                     </div>
                 </div>
                 
                 <div className="footer-bottom">
-                    <p>&copy; {new Date().getFullYear()} PremiumNotes. {t("All rights reserved.")}</p>
+                    <p>&copy; {new Date().getFullYear()} PremiumNotes. {t("landing.footer.rights")}</p>
                     <div className="footer-locale">
-                        {t("Built with precision.")}
+                        {t("landing.builtWithPrecision")}
                     </div>
                 </div>
             </footer>

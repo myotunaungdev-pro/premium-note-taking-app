@@ -11,14 +11,25 @@ const resources = {
   th: { translation: thTranslation }
 };
 
+const getSavedLanguage = () => {
+    try {
+        return localStorage.getItem('appLanguage') || 'en';
+    } catch (e) {
+        return 'en';
+    }
+};
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: localStorage.getItem('appLanguage') || "en", 
+    lng: getSavedLanguage(), 
     fallbackLng: "en",
     interpolation: {
       escapeValue: false
+    },
+    react: {
+      useSuspense: false
     }
   });
 

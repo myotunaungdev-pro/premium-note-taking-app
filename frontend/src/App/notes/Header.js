@@ -97,11 +97,11 @@ const Header = ({ onSelectAll }) => {
     const getViewTitle = () => {
         switch (activeView) {
             case 'archive':
-                return t('Archived');
+                return t("notes.header.archived");
             case 'trash':
-                return t('Trash');
+                return t("notes.sidebar.trash");
             default:
-                return t('All Notes');
+                return t("notes.sidebar.allNotes");
         }
     };
 
@@ -126,7 +126,7 @@ const Header = ({ onSelectAll }) => {
                     <button className="clear-selection-btn" onClick={() => dispatch(clearSelection())}>
                         <i className="bi bi-x-lg"></i>
                     </button>
-                    <span className="selection-count">{selectedNoteIds.length} {t('selected')}</span>
+                    <span className="selection-count">{selectedNoteIds.length} {t("notes.header.selected")}</span>
                 </div>
 
                 <div className="header-right selection-actions">
@@ -166,14 +166,14 @@ const Header = ({ onSelectAll }) => {
                             <div className="logout-modal-icon">
                                 <i className="bi bi-exclamation-triangle"></i>
                             </div>
-                            <h3>{selectedNoteIds.length === 1 ? t("Permanently Delete Note") : t("Permanently Delete Notes")}</h3>
-                            <p>{selectedNoteIds.length === 1 ? t("Are you sure you want to permanently delete this note? This action cannot be undone.") : t("Are you sure you want to permanently delete these notes? This action cannot be undone.")}</p>
+                            <h3>{selectedNoteIds.length === 1 ? t("notes.header.deleteConfirmTitleSingle") : t("notes.header.deleteConfirmTitleMulti")}</h3>
+                            <p>{selectedNoteIds.length === 1 ? t("notes.header.deleteConfirmDescSingle") : t("notes.header.deleteConfirmDescMulti")}</p>
                             <div className="logout-modal-actions">
                                 <button className="btn-modal-cancel" onClick={() => setIsConfirmDeleteOpen(false)}>
-                                    {t("Cancel")}
+                                    {t("common.cancel")}
                                 </button>
-                                <button className="btn-modal-confirm" onClick={confirmPermanentDelete} data-tooltip-id="global-tooltip" data-tooltip-content={t('Confirm (Enter)')}>
-                                    {t("Delete")}
+                                <button className="btn-modal-confirm" onClick={confirmPermanentDelete} data-tooltip-id="global-tooltip" data-tooltip-content={t("common.confirmEnter")}>
+                                    {t("common.delete")}
                                 </button>
                             </div>
                         </div>
@@ -190,7 +190,7 @@ const Header = ({ onSelectAll }) => {
             onKeyDown={(e) => e.stopPropagation()}
         >
             <div className="header-left">
-                <button className="mobile-menu-btn" onClick={() => dispatch(toggleSidebar())} data-tooltip-id="global-tooltip" data-tooltip-content={t('Toggle Sidebar (Ctrl + \\)')}>
+                <button className="mobile-menu-btn" onClick={() => dispatch(toggleSidebar())} data-tooltip-id="global-tooltip" data-tooltip-content={t("notes.toggleSidebarCtrl")}>
                     <i className="bi bi-list"></i>
                 </button>
 
@@ -204,7 +204,7 @@ const Header = ({ onSelectAll }) => {
                         id="global-search-input"
                         type="text"
                         className="search-input"
-                        placeholder={t("Search notes...")}
+                        placeholder={t("notes.sidebar.searchPlaceholder")}
                         value={searchQuery}
                         onChange={(e) => dispatch(setSearchQuery(e.target.value))}
                     />
@@ -221,7 +221,7 @@ const Header = ({ onSelectAll }) => {
                     className="select-all-btn" 
                     onClick={onSelectAll}
                     data-tooltip-id="global-tooltip"
-                    data-tooltip-content={t("Select All Visible (Ctrl + A)")}
+                    data-tooltip-content={t("notes.selectAllVisibleCtrl")}
                 >
                     <i className="bi bi-check2-all"></i>
                 </button>
@@ -237,10 +237,10 @@ const Header = ({ onSelectAll }) => {
                     >
                         <i className="bi bi-funnel"></i>
                         <span>
-                            {sortBy === 'latest' && t('Latest')}
-                            {sortBy === 'a-z' && t('A-Z')}
-                            {sortBy === 'done' && t('Done')}
-                            {sortBy === 'not-done' && t('Not Done')}
+                            {sortBy === 'latest' && t("notes.sidebar.sortLatest")}
+                            {sortBy === 'a-z' && t("notes.sidebar.sortAZ")}
+                            {sortBy === 'done' && t("notes.card.done")}
+                            {sortBy === 'not-done' && t("notes.card.notDone")}
                         </span>
                     </button>
                     <ul className={`dropdown-menu dropdown-menu-dark ${isFilterOpen ? 'show' : ''}`}>
@@ -248,18 +248,18 @@ const Header = ({ onSelectAll }) => {
                             <button
                                 type="button"
                                 className={`dropdown-item ${sortBy === 'latest' ? 'active' : ''}`}
-                                onClick={() => handleSortSelect('latest')}
+                                onClick={() => handleSortSelect("notes.latest")}
                             >
-                                <i className="bi bi-clock"></i> {t('Latest First')}
+                                <i className="bi bi-clock"></i> {t("notes.sidebar.sortLatestFirst")}
                             </button>
                         </li>
                         <li>
                             <button
                                 type="button"
                                 className={`dropdown-item ${sortBy === 'a-z' ? 'active' : ''}`}
-                                onClick={() => handleSortSelect('a-z')}
+                                onClick={() => handleSortSelect("notes.aZ")}
                             >
-                                <i className="bi bi-sort-alpha-down"></i> {t('A-Z')}
+                                <i className="bi bi-sort-alpha-down"></i> {t("notes.sidebar.sortAZ")}
                             </button>
                         </li>
                         <li>
@@ -269,27 +269,27 @@ const Header = ({ onSelectAll }) => {
                             <button
                                 type="button"
                                 className={`dropdown-item ${sortBy === 'done' ? 'active' : ''}`}
-                                onClick={() => handleSortSelect('done')}
+                                onClick={() => handleSortSelect("notes.done")}
                             >
-                                <i className="bi bi-check-circle"></i> {t('Done')}
+                                <i className="bi bi-check-circle"></i> {t("notes.card.done")}
                             </button>
                         </li>
                         <li>
                             <button
                                 type="button"
                                 className={`dropdown-item ${sortBy === 'not-done' ? 'active' : ''}`}
-                                onClick={() => handleSortSelect('not-done')}
+                                onClick={() => handleSortSelect("notes.notDone")}
                             >
-                                <i className="bi bi-circle"></i> {t('Not Done')}
+                                <i className="bi bi-circle"></i> {t("notes.card.notDone")}
                             </button>
                         </li>
                     </ul>
                 </div>
 
                 {activeView === 'all' && (
-                    <button className="new-note-btn" onClick={handleNewNote} data-tooltip-id="global-tooltip" data-tooltip-content={t('New Note (Ctrl + N)')}>
+                    <button className="new-note-btn" onClick={handleNewNote} data-tooltip-id="global-tooltip" data-tooltip-content={t("notes.newNoteCtrlN")}>
                         <i className="bi bi-plus-lg"></i>
-                        <span>{t('New Note')}</span>
+                        <span>{t("notes.sidebar.newNote")}</span>
                     </button>
                 )}
             </div>

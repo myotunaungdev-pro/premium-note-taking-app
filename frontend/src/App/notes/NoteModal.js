@@ -20,13 +20,13 @@ import "yet-another-react-lightbox/styles.css";
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
-import { Pencil, PenTool, Highlighter, Eraser, Undo2, Trash2 } from 'lucide-react';
+import { Pencil, PenTool, Highlighter, Eraser, Undo2, Trash2, X } from 'lucide-react';
 
 async function getCroppedImg(image, crop) {
-  const canvas = document.createElement('canvas')
+  const canvas = document.createElement("canvas")
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext("2d")
 
   if (!ctx) {
     return null
@@ -64,7 +64,7 @@ const compressImage = async (file) => {
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => {
-            const canvas = document.createElement('canvas');
+            const canvas = document.createElement("canvas");
             const MAX_WIDTH = 1920;
             let width = img.width;
             let height = img.height;
@@ -76,7 +76,7 @@ const compressImage = async (file) => {
 
             canvas.width = width;
             canvas.height = height;
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
 
             canvas.toBlob((blob) => {
@@ -149,12 +149,12 @@ const ImageCropModal = ({ imageSrc, onClose, onUpdateImage }) => {
                 <div className="crop-action-bar">
                     <div className="modal-action-buttons">
                         <button className="custom-btn primary-btn" onClick={() => handleSave('replace')} disabled={savingAction !== null}>
-                            {savingAction === 'replace' ? t('Uploading...') : t('Replace Original')}
+                            {savingAction === 'replace' ? t('common.uploading') : t("notes.replaceOriginal")}
                         </button>
                         <button className="custom-btn secondary-btn" onClick={() => handleSave('copy')} disabled={savingAction !== null}>
-                            {savingAction === 'copy' ? t('Uploading...') : t('Save as Copy')}
+                            {savingAction === 'copy' ? t('common.uploading') : t("notes.saveAsCopy")}
                         </button>
-                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={savingAction !== null}>{t('Cancel')}</button>
+                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={savingAction !== null}>{t("common.cancel")}</button>
                     </div>
                 </div>
             </div>
@@ -187,10 +187,10 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
             const naturalWidth = originalImg.naturalWidth;
             const naturalHeight = originalImg.naturalHeight;
             
-            const canvas = document.createElement('canvas');
+            const canvas = document.createElement("canvas");
             canvas.width = naturalWidth;
             canvas.height = naturalHeight;
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext("2d");
             
             ctx.drawImage(originalImg, 0, 0, naturalWidth, naturalHeight);
             
@@ -232,12 +232,10 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
     const hexToRgba = (hex, alpha) => {
         let cleanHex = hex.replace('#', '');
         if (cleanHex.length === 3) {
-            cleanHex = cleanHex.split('').map(char => char + char).join('');
+            cleanHex = cleanHex.split("").map(char => char + char).join('');
         }
-        const r = parseInt(cleanHex.slice(0, 2), 16) || 0;
-        const g = parseInt(cleanHex.slice(2, 4), 16) || 0;
-        const b = parseInt(cleanHex.slice(4, 6), 16) || 0;
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        const alphaHex = Math.round(alpha * 255).toString(16).padStart(2, '0');
+        return `#${cleanHex}${alphaHex}`;
     };
 
     useEffect(() => {
@@ -425,12 +423,12 @@ const DoodleModal = ({ imageSrc, onClose, onUpdateImage }) => {
                     </div>
                     <div className="modal-action-buttons">
                         <button className="custom-btn primary-btn" onClick={() => handleSave('replace')} disabled={savingAction !== null}>
-                            {savingAction === 'replace' ? t('Uploading...') : t('Replace Original')}
+                            {savingAction === 'replace' ? t('common.uploading') : t("notes.replaceOriginal")}
                         </button>
                         <button className="custom-btn secondary-btn" onClick={() => handleSave('copy')} disabled={savingAction !== null}>
-                            {savingAction === 'copy' ? t('Uploading...') : t('Save as Copy')}
+                            {savingAction === 'copy' ? t('common.uploading') : t("notes.saveAsCopy")}
                         </button>
-                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={savingAction !== null}>{t('Cancel')}</button>
+                        <button className="custom-btn cancel-btn" onClick={onClose} disabled={savingAction !== null}>{t("common.cancel")}</button>
                     </div>
                 </div>
             </div>
@@ -453,7 +451,7 @@ const WebcamCaptureModal = ({ onClose, onCapture }) => {
                 }
             } catch (err) {
                 console.error("Failed to access webcam:", err);
-                alert("Could not access camera. Please check permissions.");
+                alert("notes.couldNotAccessCamera");
             }
         };
         startCamera();
@@ -468,10 +466,10 @@ const WebcamCaptureModal = ({ onClose, onCapture }) => {
     const handleCapture = () => {
         if (!videoRef.current) return;
         const video = videoRef.current;
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         canvas.width = video.videoWidth || 640;
         canvas.height = video.videoHeight || 480;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/jpeg');
         onCapture(dataUrl);
@@ -482,7 +480,7 @@ const WebcamCaptureModal = ({ onClose, onCapture }) => {
         <div className="image-menu-overlay" onClick={(e) => { e.stopPropagation(); onClose(); }}>
             <div className="image-menu-sheet" style={{ maxWidth: '640px', maxHeight: '90dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
                 <div className="image-menu-header" style={{ flexShrink: 0 }}>
-                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#ffffff' }}>{t('Webcam Capture')}</h3>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#ffffff' }}>{t("notes.webcamCapture")}</h3>
                     <button type="button" className="image-menu-close" onClick={(e) => { e.stopPropagation(); onClose(); }}>
                         <i className="bi bi-x-lg"></i>
                     </button>
@@ -491,8 +489,8 @@ const WebcamCaptureModal = ({ onClose, onCapture }) => {
                     <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'contain' }}></video>
                 </div>
                 <div style={{ display: 'flex', gap: '12px', width: '100%', justifyContent: 'center', flexShrink: 0, paddingBottom: '16px' }}>
-                    <button className="custom-btn cancel-btn" onClick={onClose}>{t('Cancel')}</button>
-                    <button className="custom-btn primary-btn" onClick={handleCapture}>{t('Capture')}</button>
+                    <button className="custom-btn cancel-btn" onClick={onClose}>{t("common.cancel")}</button>
+                    <button className="custom-btn primary-btn" onClick={handleCapture}>{t("notes.capture")}</button>
                 </div>
             </div>
         </div>,
@@ -525,10 +523,10 @@ const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDe
             <div className="image-menu-sheet" onClick={e => { if(isUploading) return; e.stopPropagation(); }}>
                 <div className="image-menu-header">
                     <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#ffffff' }}>
-                        {isUploading ? t('Uploading to Cloud...') : t('Add Image')}
+                        {isUploading ? t("notes.uploadingToCloud") : t("notes.addImage")}
                     </h3>
                     {!isUploading && (
-                        <button type="button" className="image-menu-close" onClick={(e) => { e.stopPropagation(); onClose(); }} data-tooltip-id="global-tooltip" data-tooltip-content={t('Close (Esc)')}>
+                        <button type="button" className="image-menu-close" onClick={(e) => { e.stopPropagation(); onClose(); }} data-tooltip-id="global-tooltip" data-tooltip-content={t("notes.closeEsc")}>
                             <i className="bi bi-x-lg"></i>
                         </button>
                     )}
@@ -544,21 +542,21 @@ const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDe
                             animation: 'spin 1s linear infinite' 
                         }}></div>
                         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-                        <span style={{ color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>{t('Uploading to Cloud...')}</span>
+                        <span style={{ color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>{t("notes.uploadingToCloud")}</span>
                     </div>
                 ) : (
                     <div className="image-menu-options">
                         <button className="image-menu-option" onClick={handleTakePhoto}>
                             <i className="bi bi-camera"></i>
-                            <span>{t('Take Photo')}</span>
+                            <span>{t("notes.takePhoto")}</span>
                         </button>
                         <button className="image-menu-option" onClick={() => galleryRef.current.click()}>
                             <i className="bi bi-image"></i>
-                            <span>{t('Select Photo')}</span>
+                            <span>{t("notes.selectPhoto")}</span>
                         </button>
-                        <button className="image-menu-option" onClick={() => alert("Recognize Text OCR logic coming soon!")}>
+                        <button className="image-menu-option" onClick={() => alert("notes.recognizeTextOCRLogi")}>
                             <i className="bi bi-fonts"></i>
-                            <span>{t('Recognize Text')}</span>
+                            <span>{t("notes.recognizeText")}</span>
                         </button>
                     </div>
                 )}
@@ -571,7 +569,7 @@ const ImageInputMenu = ({ isOpen, onClose, onGallerySelect, onCameraSelect, onDe
     );
 };
 
-const Font = Quill.import('formats/font');
+const Font = Quill.import("formats/font");
 Font.whitelist = ['', 'lora', 'padauk', 'dancing-script', 'playfair-display'];
 
 // Phase 1.5 Strict Normalization: Quill's default ClassAttributor splits class names 
@@ -584,7 +582,7 @@ if (Font.constructor && Font.constructor.keys) {
             if (name.startsWith('ql-font-')) {
                 return 'ql-font';
             }
-            return name.split('-').slice(0, -1).join('-');
+            return name.split("-").slice(0, -1).join('-');
         }).filter(name => name !== '');
     };
 }
@@ -645,7 +643,7 @@ const NoteReadView = ({ note, onClose }) => {
             const response = await fetch(src);
             const blob = await response.blob();
             // Extract filename or use default
-            let filename = src.split('/').pop() || 'image';
+            let filename = src.split("/").pop() || 'image';
             if (!filename.includes('.')) filename += '.jpg';
 
             try {
@@ -666,7 +664,7 @@ const NoteReadView = ({ note, onClose }) => {
 
                 // Fallback for Safari, Firefox, and Mobile browsers
                 const blobUrl = URL.createObjectURL(blob);
-                const link = document.createElement('a');
+                const link = document.createElement("notes.a");
                 link.href = blobUrl;
                 link.download = filename;
                 document.body.appendChild(link);
@@ -703,7 +701,7 @@ const NoteReadView = ({ note, onClose }) => {
                 <div className="reader-header">
                     <h2 className="reader-title" id="reader-title">
                         <i className="bi bi-book"></i>
-                        {note.title} <span className="reader-badge">({t('Read-Only')})</span>
+                        {note.title} <span className="reader-badge">({t("notes.modal.readOnly")})</span>
                     </h2>
                     <div className="reader-header-actions">
                         <div className="image-toggle-controls">
@@ -726,7 +724,7 @@ const NoteReadView = ({ note, onClose }) => {
                                 <i className="bi bi-arrows-fullscreen"></i>
                             </button>
                         </div>
-                        <button className="modal-close" onClick={onClose} aria-label={t("Close View")}>
+                        <button className="modal-close" onClick={onClose} aria-label={t("notes.modal.closeView")}>
                             <i className="bi bi-x-lg"></i>
                         </button>
                     </div>
@@ -767,7 +765,7 @@ const NoteReadView = ({ note, onClose }) => {
                                         }}
                                     >
                                         <span className="tag-dot" style={{ backgroundColor: tag.color }}></span>
-                                        {t(tag.label)}
+                                        {t(`tags.${tag.label.toLowerCase()}`)}
                                     </span>
                                 );
                             })}
@@ -775,7 +773,7 @@ const NoteReadView = ({ note, onClose }) => {
                     </div>
                     <button type="button" className="btn-close-view" onClick={onClose}>
                         <i className="bi bi-x-lg"></i>
-                        {t('Close View')}
+                        {t("notes.modal.closeView")}
                     </button>
                 </div>
             </div>
@@ -795,7 +793,7 @@ const NoteReadView = ({ note, onClose }) => {
                         className="yarl__button" 
                         onClick={() => setCropImageSrc(lightboxSlides[lightboxIndex]?.src)} 
                         
-                        aria-label={t("Crop Image")}
+                        aria-label={t("notes.cropImage")}
                     >
                         <svg className="yarl__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                             <path d="M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z" />
@@ -807,7 +805,7 @@ const NoteReadView = ({ note, onClose }) => {
                         className="yarl__button" 
                         onClick={() => setDoodleImageSrc(lightboxSlides[lightboxIndex]?.src)} 
                         
-                        aria-label={t("Draw on Image")}
+                        aria-label={t("notes.drawOnImage")}
                     >
                         <svg className="yarl__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.995.995 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
@@ -819,7 +817,7 @@ const NoteReadView = ({ note, onClose }) => {
                         className="yarl__button" 
                         onClick={handleDownloadImage} 
                         
-                        aria-label={t("Download Image")}
+                        aria-label={t("notes.downloadImage")}
                         style={{ marginRight: 'auto' }}
                     >
                         <svg className="yarl__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -871,6 +869,11 @@ const NoteEditModal = () => {
     const [showWebcamModal, setShowWebcamModal] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     
+    // Image Delete Overlay State
+    const [hoveredImgNode, setHoveredImgNode] = useState(null);
+    const [overlayPos, setOverlayPos] = useState({ top: 0, left: 0, width: 0, height: 0 });
+    const overlayRef = useRef(null);
+    
     // Use a ref to ensure the memoized Quill config always has access to the latest state setter
     const setShowImageMenuRef = useRef(setShowImageMenu);
     setShowImageMenuRef.current = setShowImageMenu;
@@ -919,6 +922,58 @@ const NoteEditModal = () => {
             setIsUploading(false);
         }
     };
+
+    const handleEditorInteract = (e) => {
+        if (e.target.tagName === 'IMG') {
+            const rect = e.target.getBoundingClientRect();
+            
+            const editorNode = quillWrapperRef.current?.querySelector('.ql-editor');
+            if (editorNode) {
+                const editorRect = editorNode.getBoundingClientRect();
+                // Strict Boundary Check: If image top is hidden under toolbar, ignore hover
+                if (rect.top < editorRect.top) {
+                    setHoveredImgNode(null);
+                    return;
+                }
+            }
+            
+            setHoveredImgNode(e.target);
+            setOverlayPos({
+                top: rect.top,
+                left: rect.left,
+                width: rect.width,
+                height: rect.height
+            });
+        } else if (!e.target.closest('.image-delete-overlay') && !e.target.closest('.image-delete-btn')) {
+            setHoveredImgNode(null);
+        }
+    };
+
+    const handleRemoveHoveredImage = (e) => {
+        e.stopPropagation();
+        if (quillRef.current && hoveredImgNode) {
+            const editor = quillRef.current.getEditor();
+            const blot = Quill.find(hoveredImgNode);
+            if (blot) {
+                const index = editor.getIndex(blot);
+                if (index !== null && index !== undefined) {
+                    editor.deleteText(index, 1, 'user');
+                }
+            }
+        }
+        setHoveredImgNode(null);
+    };
+
+    useEffect(() => {
+        const handleScroll = (e) => {
+            // Only clear if the scroll originated from inside the editor or modal
+            if (e.target.closest && (e.target.closest('.ql-editor') || e.target.closest('.modal-body'))) {
+                setHoveredImgNode(null);
+            }
+        };
+        document.addEventListener('scroll', handleScroll, true); // true is CRITICAL for capture phase
+        return () => document.removeEventListener('scroll', handleScroll, true);
+    }, []);
 
     const handleDesktopCameraSelect = () => {
         setShowImageMenu(false);
@@ -978,7 +1033,7 @@ const NoteEditModal = () => {
         } else {
             setTitle('');
             setTitleFontFamily('');
-            setContent('');
+            setContent("");
             setSelectedTag(tagOptions[0]);
         }
     }, [editingNote]);
@@ -1060,9 +1115,9 @@ const NoteEditModal = () => {
                 <div className="modal-header">
                     <h2 className="modal-title">
                         <i className={`bi ${editingNote ? 'bi-pencil-square' : 'bi-plus-circle'}`}></i>
-                        {editingNote ? t('Edit Note') : t('Create New Note')}
+                        {editingNote ? t("notes.modal.editNote") : t("notes.modal.createNewNote")}
                     </h2>
-                    <button type="button" className="modal-close" onClick={handleClose} data-tooltip-id="global-tooltip" data-tooltip-content={t('Close (Esc)')}>
+                    <button type="button" className="modal-close" onClick={handleClose} data-tooltip-id="global-tooltip" data-tooltip-content={t("notes.closeEsc")}>
                         <i className="bi bi-x-lg"></i>
                     </button>
                 </div>
@@ -1070,7 +1125,7 @@ const NoteEditModal = () => {
                 <div className="modal-body">
                     <div className="form-group">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                            <label className="form-label" style={{ marginBottom: 0 }}>{t('Title')}</label>
+                            <label className="form-label" style={{ marginBottom: 0 }}>{t("notes.modal.titleLabel")}</label>
                             <div className="title-font-dropdown-container" ref={fontDropdownRef} style={{ position: 'relative' }}>
                                 <button 
                                     type="button"
@@ -1107,7 +1162,7 @@ const NoteEditModal = () => {
                         <input
                             type="text"
                             className={`form-input ${titleFontFamily ? `ql-font-${titleFontFamily}` : ''}`}
-                            placeholder={t("Enter note title...")}
+                            placeholder={t("notes.modal.titlePlaceholder")}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             autoFocus
@@ -1119,20 +1174,22 @@ const NoteEditModal = () => {
                         className={`form-group quill-group ${isComposing ? 'is-composing' : ''}`}
                         onCompositionStart={() => setIsComposing(true)}
                         onCompositionEnd={() => setIsComposing(false)}
+                        onClick={handleEditorInteract}
+                        onMouseOver={handleEditorInteract}
                     >
-                        <label className="form-label">{t('Content')}</label>
+                        <label className="form-label">{t("notes.modal.contentLabel")}</label>
                         <ReactQuill 
                             ref={quillRef}
                             theme="snow" 
                             value={content} 
                             onChange={setContent} 
                             modules={quillModules}
-                            placeholder={t("Write your note here...")}
+                            placeholder={t("notes.modal.contentPlaceholder")}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label">{t('Tag')}</label>
+                        <label className="form-label">{t("notes.modal.tagLabel")}</label>
                         <div className="tag-selector">
                             {tagOptions.map((tag) => (
                                 <button
@@ -1148,7 +1205,7 @@ const NoteEditModal = () => {
                                     onClick={() => setSelectedTag(tag)}
                                 >
                                     <span className="tag-dot" style={{ backgroundColor: tag.color }}></span>
-                                    {t(tag.label)}
+                                    {t(`tags.${tag.label.toLowerCase()}`)}
                                 </button>
                             ))}
                         </div>
@@ -1157,11 +1214,11 @@ const NoteEditModal = () => {
 
                 <div className="modal-footer">
                     <button type="button" className="btn-cancel" onClick={handleClose}>
-                        {t('Cancel')}
+                        {t("common.cancel")}
                     </button>
-                    <button id="global-save-note-btn" type="submit" className="btn-save" disabled={isButtonDisabled} data-tooltip-id="global-tooltip" data-tooltip-content={t('Save Note (Ctrl + Enter)')}>
+                    <button id="global-save-note-btn" type="submit" className="btn-save" disabled={isButtonDisabled} data-tooltip-id="global-tooltip" data-tooltip-content={t("notes.saveNoteCtrlEnter")}>
                         <i className={`bi ${editingNote ? 'bi-check-lg' : 'bi-plus-lg'}`}></i>
-                        {editingNote ? t('Update Note') : t('Create Note')}
+                        {editingNote ? t("notes.modal.updateNote") : t("notes.modal.createNote")}
                     </button>
                 </div>
             </form>
@@ -1180,6 +1237,33 @@ const NoteEditModal = () => {
                     onClose={() => setShowWebcamModal(false)} 
                     onCapture={handleWebcamCapture} 
                 />
+            )}
+            
+            {hoveredImgNode && createPortal(
+                <div 
+                    ref={overlayRef}
+                    className="image-delete-overlay"
+                    style={{
+                        position: 'fixed',
+                        top: overlayPos.top,
+                        left: overlayPos.left,
+                        width: overlayPos.width,
+                        height: overlayPos.height,
+                        pointerEvents: 'none',
+                        zIndex: 10000,
+                        transition: 'opacity 0.1s ease',
+                    }}
+                >
+                    <button
+                        type="button"
+                        className="image-delete-btn"
+                        onClick={handleRemoveHoveredImage}
+                        title={t("notes.deleteImage")}
+                    >
+                        <X size={16} strokeWidth={2.5} />
+                    </button>
+                </div>,
+                document.body
             )}
         </div>
     );

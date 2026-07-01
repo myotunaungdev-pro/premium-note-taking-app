@@ -30,7 +30,7 @@ const ForgotPassword = () => {
 
         try {
             await dispatch(forgotPassword({ email })).unwrap();
-            toast.success(t("Password reset OTP sent to your email."));
+            toast.success(t("auth.passwordResetOTPSent"));
             setStep(2);
         } catch (error) {
             toast.error(t(error || "Failed to send OTP"));
@@ -62,7 +62,7 @@ const ForgotPassword = () => {
 
         try {
             await dispatch(resetPassword({ email, otp, newPassword })).unwrap();
-            toast.success(t("Password reset successfully! You can now log in."));
+            toast.success(t("auth.passwordResetSuccess"));
             navigate('/login');
         } catch (error) {
             toast.error(t(error || "Failed to reset password"));
@@ -84,21 +84,21 @@ const ForgotPassword = () => {
                     {step === 1 ? (
                         <>
                             <Link to="/" className="back-link">
-                                <i className="bi bi-arrow-left"></i> {t("Back to Home")}
+                                <i className="bi bi-arrow-left"></i> {t("common.backToHome")}
                             </Link>
-                            <h2 className="auth-title">{t("Forgot Password")}</h2>
-                            <p className="auth-subtitle">{t("Enter your email address to receive a secure reset code.")}</p>
+                            <h2 className="auth-title">{t("auth.forgotPassword")}</h2>
+                            <p className="auth-subtitle">{t("auth.enterYourEmailAddres")}</p>
 
                             <form onSubmit={handleRequestOTP} className="auth-form" noValidate>
                                 <div className="form-group">
-                                    <label htmlFor="email">{t("Email")}</label>
+                                    <label htmlFor="email">{t("auth.common.email")}</label>
                                     <div className="input-wrapper">
                                         <i className="bi bi-envelope input-icon-left"></i>
                                         <input
                                             type="email"
                                             id="email"
                                             name="email"
-                                            placeholder={t("Enter your email")}
+                                            placeholder={t("auth.common.emailPlaceholder")}
                                             value={email}
                                             onChange={(e) => {
                                                 setEmail(e.target.value);
@@ -106,33 +106,33 @@ const ForgotPassword = () => {
                                             }}
                                         />
                                     </div>
-                                    {formErrors.email === 'empty' && <div className="validation-error">{t("Please enter your email address.")}</div>}
+                                    {formErrors.email === 'empty' && <div className="validation-error">{t("auth.pleaseEnterYourEmail")}</div>}
                                 </div>
 
                                 <button type="submit" className="btn-auth-submit" disabled={isLoading}>
-                                    {isLoading ? t("Sending...") : t("Send Reset Code")}
+                                    {isLoading ? t("Sending...") : t("auth.sendResetCode")}
                                 </button>
                             </form>
 
                             <p className="auth-redirect">
-                                {t("Remember your password?")} <Link to="/login">{t("Log in here")}</Link>
+                                {t("auth.rememberYourPassword")} <Link to="/login">{t("auth.logInHere")}</Link>
                             </p>
                         </>
                     ) : (
                         <>
-                            <h2 className="auth-title">{t("Reset Password")}</h2>
-                            <p className="auth-subtitle">{t("Enter the 6-digit code sent to ")} <strong>{email}</strong> {t("along with your new password.")}</p>
+                            <h2 className="auth-title">{t("auth.resetPassword")}</h2>
+                            <p className="auth-subtitle">{t("auth.enterThe6DigitCodeSe")} <strong>{email}</strong> {t("auth.alongWithYourNewPass")}</p>
 
                             <form onSubmit={handleResetPassword} className="auth-form" noValidate>
                                 <div className="form-group">
-                                    <label htmlFor="otp">{t("Verification Code")}</label>
+                                    <label htmlFor="otp">{t("auth.verificationCode")}</label>
                                     <div className="input-wrapper">
                                         <i className="bi bi-shield-check input-icon-left"></i>
                                         <input
                                             type="text"
                                             id="otp"
                                             name="otp"
-                                            placeholder={t("123456")}
+                                            placeholder={t("auth.123456")}
                                             maxLength="6"
                                             value={otp}
                                             onChange={(e) => {
@@ -142,19 +142,19 @@ const ForgotPassword = () => {
                                             style={{ letterSpacing: '8px', textAlign: 'center', fontSize: '20px' }}
                                         />
                                     </div>
-                                    {formErrors.otp === 'empty' && <div className="validation-error">{t("Please enter the verification code.")}</div>}
-                                    {formErrors.otp === 'length' && <div className="validation-error">{t("Verification code must be 6 digits.")}</div>}
+                                    {formErrors.otp === 'empty' && <div className="validation-error">{t("auth.pleaseEnterTheVerifi")}</div>}
+                                    {formErrors.otp === 'length' && <div className="validation-error">{t("auth.verificationCodeMust")}</div>}
                                 </div>
 
                                 <div className="form-group">
-                                    <label htmlFor="newPassword">{t("New Password")}</label>
+                                    <label htmlFor="newPassword">{t("auth.newPassword")}</label>
                                     <div className="input-wrapper">
                                         <i className="bi bi-lock input-icon-left"></i>
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             id="newPassword"
                                             name="newPassword"
-                                            placeholder={t("Enter new password")}
+                                            placeholder={t("auth.enterNewPassword")}
                                             value={newPassword}
                                             onChange={(e) => {
                                                 setNewPassword(e.target.value);
@@ -169,16 +169,16 @@ const ForgotPassword = () => {
                                             <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                                         </button>
                                     </div>
-                                    {formErrors.newPassword === 'empty' && <div className="validation-error">{t("Please enter a new password.")}</div>}
+                                    {formErrors.newPassword === 'empty' && <div className="validation-error">{t("auth.pleaseEnterANewPassw")}</div>}
                                 </div>
 
                                 <button type="submit" className="btn-auth-submit" disabled={isLoading}>
-                                    {isLoading ? t("Resetting...") : t("Reset Password")}
+                                    {isLoading ? t("Resetting...") : t("auth.resetPassword")}
                                 </button>
                             </form>
                             
                             <p className="auth-redirect" style={{ marginTop: '20px', cursor: 'pointer' }} onClick={() => setStep(1)}>
-                                {t("Change Email Address")}
+                                {t("auth.changeEmailAddress")}
                             </p>
                         </>
                     )}

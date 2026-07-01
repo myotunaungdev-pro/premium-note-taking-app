@@ -23,7 +23,7 @@ const Settings = () => {
     const [formData, setFormData] = React.useState({
         name: user?.name || '',
         email: user?.email || '',
-        birthdate: user?.birthdate ? new Date(user.birthdate).toISOString().split('T')[0] : ''
+        birthdate: user?.birthdate ? new Date(user.birthdate).toISOString().split("settings.t")[0] : ''
     });
 
     const handleInputChange = (e) => {
@@ -33,13 +33,13 @@ const Settings = () => {
     const isFormChanged = 
         formData.name !== (user?.name || '') ||
         formData.email !== (user?.email || '') ||
-        formData.birthdate !== (user?.birthdate ? new Date(user.birthdate).toISOString().split('T')[0] : '');
+        formData.birthdate !== (user?.birthdate ? new Date(user.birthdate).toISOString().split("settings.t")[0] : '');
 
     const handleSaveProfile = async (e) => {
         e.preventDefault();
         try {
             await dispatch(updateUserProfile(formData)).unwrap();
-            toast.success(t("Profile updated successfully!"));
+            toast.success(t("settings.profile.updateSuccess"));
             setIsEditMode(false);
         } catch (error) {
             toast.error(t(error || "Failed to update profile"));
@@ -50,7 +50,7 @@ const Settings = () => {
         setFormData({
             name: user?.name || '',
             email: user?.email || '',
-            birthdate: user?.birthdate ? new Date(user.birthdate).toISOString().split('T')[0] : ''
+            birthdate: user?.birthdate ? new Date(user.birthdate).toISOString().split("settings.t")[0] : ''
         });
         setIsEditMode(false);
     };
@@ -67,9 +67,9 @@ const Settings = () => {
                 const secure_url = response.data.secure_url;
                 
                 await dispatch(updateUserProfile({ avatarUrl: secure_url })).unwrap();
-                toast.success(t('Profile updated successfully!'));
+                toast.success(t("settings.profile.updateSuccess"));
             } catch (error) {
-                toast.error(t('Failed to upload image'));
+                toast.error(t("settings.profile.uploadError"));
             } finally {
                 if (fileInputRef.current) fileInputRef.current.value = null;
             }
@@ -80,9 +80,9 @@ const Settings = () => {
         setIsAvatarModalOpen(false);
         try {
             await dispatch(updateUserProfile({ avatarUrl: '' })).unwrap();
-            toast.success(t('Profile picture removed!'));
+            toast.success(t("settings.profile.removeSuccess"));
         } catch (error) {
-            toast.error(t('Failed to remove image'));
+            toast.error(t("settings.profile.removeError"));
         }
     };
 
@@ -112,15 +112,15 @@ const Settings = () => {
             <div className="settings-header">
                 <button className="back-btn" onClick={() => navigate('/notes')}>
                     <i className="bi bi-arrow-left"></i>
-                    <span>{t('Back to Notes')}</span>
+                    <span>{t("settings.back")}</span>
                 </button>
-                <h1 className="page-title">{t('Account Profile')}</h1>
+                <h1 className="page-title">{t("settings.accountProfile")}</h1>
             </div>
 
             <div className="settings-content">
                 {/* Account Details */}
                 <section className="settings-section">
-                    <h2 className="section-title">{t('Account Details')}</h2>
+                    <h2 className="section-title">{t("settings.tabs.account")}</h2>
                     <div className="settings-card">
                         <div className="account-card-header">
                             <div 
@@ -138,7 +138,7 @@ const Settings = () => {
                                 <h3>{user?.name || 'User'}</h3>
                                 <p>{user?.email || 'email@example.com'}</p>
                                 <button className="btn-text-edit-avatar" onClick={() => setIsAvatarModalOpen(true)}>
-                                    {t('Change Picture')}
+                                    {t("settings.changePicture")}
                                 </button>
                             </div>
                         </div>
@@ -146,43 +146,43 @@ const Settings = () => {
                         {!isEditMode ? (
                             <div className="profile-readonly">
                                 <div className="profile-data-row">
-                                    <span className="profile-data-label">{t('Full Name')}</span>
+                                    <span className="profile-data-label">{t("auth.signup.fullName")}</span>
                                     <span className="profile-data-value">{user?.name || '—'}</span>
                                 </div>
                                 <div className="profile-data-row">
-                                    <span className="profile-data-label">{t('Email')}</span>
+                                    <span className="profile-data-label">{t("auth.common.email")}</span>
                                     <span className="profile-data-value">{user?.email || '—'}</span>
                                 </div>
                                 <div className="profile-data-row">
-                                    <span className="profile-data-label">{t('Birthdate')}</span>
+                                    <span className="profile-data-label">{t("settings.profile.birthdate")}</span>
                                     <span className="profile-data-value">
                                         {user?.birthdate ? new Date(user.birthdate).toLocaleDateString() : '—'}
                                     </span>
                                 </div>
                                 <button className="btn-edit-profile mt-3" onClick={() => setIsEditMode(true)}>
-                                    <i className="bi bi-pencil"></i> {t('Edit Profile')}
+                                    <i className="bi bi-pencil"></i> {t("settings.profile.edit")}
                                 </button>
                             </div>
                         ) : (
                             <form className="profile-form" onSubmit={handleSaveProfile}>
                                 <div className="form-group">
-                                    <label className="form-label">{t('Full Name')}</label>
+                                    <label className="form-label">{t("auth.signup.fullName")}</label>
                                     <input type="text" name="name" className="form-input" value={formData.name} onChange={handleInputChange} required />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">{t('Email')}</label>
+                                    <label className="form-label">{t("auth.common.email")}</label>
                                     <input type="email" name="email" className="form-input" value={formData.email} onChange={handleInputChange} required />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">{t('Birthdate')}</label>
+                                    <label className="form-label">{t("settings.profile.birthdate")}</label>
                                     <input type="date" name="birthdate" className="form-input" value={formData.birthdate} onChange={handleInputChange} />
                                 </div>
                                 <div className="form-actions mt-3">
                                     <button type="submit" className="btn-save" disabled={!isFormChanged}>
-                                        <i className="bi bi-check2"></i> {t('Save Changes')}
+                                        <i className="bi bi-check2"></i> {t("settings.profile.save")}
                                     </button>
                                     <button type="button" className="btn-cancel" onClick={handleCancelEdit}>
-                                        {t('Cancel')}
+                                        {t("common.cancel")}
                                     </button>
                                 </div>
                             </form>
@@ -192,27 +192,27 @@ const Settings = () => {
 
                 {/* Subscription */}
                 <section className="settings-section">
-                    <h2 className="section-title">{t('Subscription')}</h2>
+                    <h2 className="section-title">{t("settings.profile.subscription")}</h2>
                     <div className="settings-card subscription-card">
                         <div className="subscription-header">
                             <i className="bi bi-star text-muted"></i>
-                            <h3>{t('Current Plan')}</h3>
+                            <h3>{t("settings.plan.current")}</h3>
                         </div>
                         <div className="subscription-body">
-                            <p>{t('Free Plan')}</p>
-                            <button className="btn-upgrade">{t('Upgrade to Pro')}</button>
+                            <p>{t("settings.plan.free")}</p>
+                            <button className="btn-upgrade">{t("settings.plan.upgrade")}</button>
                         </div>
                     </div>
                 </section>
 
                 {/* Danger Zone */}
                 <section className="settings-section danger-zone">
-                    <h2 className="section-title text-danger">{t('Danger Zone')}</h2>
+                    <h2 className="section-title text-danger">{t("settings.profile.dangerZone")}</h2>
                     <div className="settings-card danger-card">
-                        <p>{t('Logout')}</p>
+                        <p>{t("settings.profile.logout")}</p>
                         <button className="btn-logout" onClick={handleLogoutClick}>
                             <i className="bi bi-box-arrow-right"></i>
-                            {t('Logout')}
+                            {t("settings.profile.logout")}
                         </button>
                     </div>
                 </section>
@@ -224,14 +224,14 @@ const Settings = () => {
                         <div className="logout-modal-icon">
                             <i className="bi bi-box-arrow-right"></i>
                         </div>
-                        <h3>{t('Leaving so soon?')}</h3>
-                        <p>{t('We will keep your notes safe and sound until you return. Are you sure you want to sign out?')}</p>
+                        <h3>{t("settings.logout.title")}</h3>
+                        <p>{t("settings.logout.desc")}</p>
                         <div className="logout-modal-actions">
                             <button className="btn-modal-cancel" onClick={() => setIsLogoutModalOpen(false)}>
-                                {t('Cancel')}
+                                {t("common.cancel")}
                             </button>
-                            <button className="btn-modal-confirm" onClick={confirmLogout} data-tooltip-id="global-tooltip" data-tooltip-content={t('Confirm (Enter)')}>
-                                {t('Confirm Logout')}
+                            <button className="btn-modal-confirm" onClick={confirmLogout} data-tooltip-id="global-tooltip" data-tooltip-content={t("common.confirmEnter")}>
+                                {t("settings.logout.confirm")}
                             </button>
                         </div>
                     </div>
@@ -241,7 +241,7 @@ const Settings = () => {
             {isAvatarModalOpen && (
                 <div className="logout-modal-overlay" onClick={() => setIsAvatarModalOpen(false)}>
                     <div className="logout-modal avatar-options-modal" onClick={(e) => e.stopPropagation()}>
-                        <button className="modal-close-icon" onClick={() => setIsAvatarModalOpen(false)} data-tooltip-id="global-tooltip" data-tooltip-content={t('Close (Esc)')}>
+                        <button className="modal-close-icon" onClick={() => setIsAvatarModalOpen(false)} data-tooltip-id="global-tooltip" data-tooltip-content={t("settings.closeEsc")}>
                             <i className="bi bi-x-lg"></i>
                         </button>
 
@@ -253,8 +253,8 @@ const Settings = () => {
                             )}
                         </div>
 
-                        <h3>{t('Profile Picture')}</h3>
-                        <p>{t('A picture helps people recognize you and lets you know when you\'re signed in to your account.')}</p>
+                        <h3>{t("settings.profile.picture")}</h3>
+                        <p>{t("settings.aPictureHelpsPeopleR")}</p>
                         
                         <div className="avatar-modal-options">
                             <button 
@@ -265,16 +265,16 @@ const Settings = () => {
                                 }}
                             >
                                 <i className="bi bi-upload"></i>
-                                {t('Upload from Device')}
+                                {t("settings.profile.upload")}
                             </button>
                             {user?.avatarUrl && (
                                 <button className="btn-avatar-option btn-avatar-remove" onClick={handleRemoveAvatar}>
                                     <i className="bi bi-trash3"></i>
-                                    {t('Remove Picture')}
+                                    {t("settings.profile.removePic")}
                                 </button>
                             )}
                             <button className="btn-avatar-option btn-avatar-cancel" onClick={() => setIsAvatarModalOpen(false)}>
-                                {t('Cancel')}
+                                {t("common.cancel")}
                             </button>
                         </div>
                     </div>
